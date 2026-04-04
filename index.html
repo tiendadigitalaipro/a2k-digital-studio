@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A2K Digital Studio - Soluciones inteligentes para tu negocio. Apps profesionales de punto de venta, inventario y gestión para barberías, salones de uñas, ferreterías, bodegas, farmacias y más.">
+    <meta name="keywords" content="sistema punto de venta, app para barbería, software para salon de uñas, app para ferretería, sistema para bodega, software farmacia, inventario, A2K Digital Studio, sistema POS">
+    <meta name="author" content="A2K Digital Studio">
+    <meta property="og:title" content="A2K Digital Studio - Soluciones Inteligentes para tu Negocio">
+    <meta property="og:description" content="Apps profesionales de gestión empresarial para todo tipo de negocios. Licencias desde $25.">
+    <meta property="og:type" content="website">
+    <title>A2K Digital Studio — Soluciones Inteligentes para tu Negocio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --primary-dark: #5A52D5;
+            --secondary: #00D4AA;
+            --accent: #FF6B6B;
+            --bg-dark: #0A0A1A;
+            --bg-card: #12122A;
+            --bg-card-hover: #1A1A3E;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0C0;
+            --text-muted: #6B6B8D;
+            --border: #2A2A4A;
+            --gradient-1: linear-gradient(135deg, #6C63FF 0%, #00D4AA 100%);
+            --gradient-2: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            --gradient-3: linear-gradient(135deg, #00D4AA 0%, #00B4D8 100%);
+            --gradient-4: linear-gradient(135deg, #6C63FF 0%, #FF6B6B 100%);
+            --shadow-glow: 0 0 40px rgba(108, 99, 255, 0.15);
+            --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 15px 0;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 0;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .nav-logo-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--gradient-1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 16px;
+            color: white;
+        }
+
+        .nav-logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--text-primary); }
+
+        .nav-cta {
+            background: var(--gradient-1);
+            color: white !important;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600 !important;
+            -webkit-text-fill-color: white !important;
+            transition: transform 0.3s, box-shadow 0.3s !important;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('img/hero-banner.png') center/cover no-repeat;
+            opacity: 0.15;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 30% 50%, rgba(108, 99, 255, 0.15) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 50%, rgba(0, 212, 170, 0.1) 0%, transparent 60%);
+        }
+
+        .hero-particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float-particle linear infinite;
+        }
+
+        @keyframes float-particle {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }
+
+        .hero-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(108, 99, 255, 0.15);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 24px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary);
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(32px, 6vw, 72px);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .hero-title-gradient {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(16px, 2.5vw, 22px);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            font-weight: 300;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 36px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 8px 30px rgba(108, 99, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(108, 99, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: rgba(108, 99, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin-top: 60px;
+            animation: fadeInUp 0.8s ease 0.8s both;
+        }
+
+        .stat-item { text-align: center; }
+
+        .stat-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== SECTION COMMON ===== */
+        .section {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .section-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .section-tag::before,
+        .section-tag::after {
+            content: '';
+            width: 30px;
+            height: 2px;
+            background: var(--primary);
+            opacity: 0.5;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(24px, 4vw, 42px);
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 16px;
+        }
+
+        /* ===== APPS GRID ===== */
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 28px;
+        }
+
+        .app-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .app-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .app-card-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 2;
+        }
+
+        .badge-local {
+            background: rgba(0, 212, 170, 0.2);
+            color: var(--secondary);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+        }
+
+        .badge-cloud {
+            background: rgba(108, 99, 255, 0.2);
+            color: var(--primary);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+        }
+
+        .app-card-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .app-card-body {
+            padding: 24px;
+        }
+
+        .app-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 16px;
+        }
+
+        .app-card-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .app-card-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .app-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .app-feature-tag {
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .app-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .app-price {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .app-price-small {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+        }
+
+        .btn-demo {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-demo-local {
+            background: var(--gradient-3);
+            color: #0A0A1A;
+        }
+
+        .btn-demo-cloud {
+            background: var(--gradient-1);
+            color: white;
+        }
+
+        .btn-demo:hover { transform: scale(1.05); }
+
+        /* ===== PRICING ===== */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 28px;
+            text-align: center;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--border);
+            transition: background 0.3s;
+        }
+
+        .pricing-card:hover::before {
+            background: var(--gradient-1);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .pricing-popular {
+            border-color: var(--primary);
+        }
+
+        .pricing-popular::before {
+            background: var(--gradient-1) !important;
+        }
+
+        .pricing-popular-badge {
+            position: absolute;
+            top: 16px;
+            right: -32px;
+            background: var(--gradient-1);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 40px;
+            transform: rotate(45deg);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .pricing-terminals {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .pricing-terminals-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .pricing-amount {
+            margin-bottom: 8px;
+        }
+
+        .pricing-currency {
+            font-size: 18px;
+            vertical-align: super;
+            color: var(--text-secondary);
+        }
+
+        .pricing-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+        }
+
+        .pricing-period {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .pricing-save {
+            display: inline-block;
+            background: rgba(0, 212, 170, 0.15);
+            color: var(--secondary);
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin: 12px 0 24px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 28px;
+        }
+
+        .pricing-features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(42, 42, 74, 0.5);
+        }
+
+        .pricing-features li:last-child { border: none; }
+
+        .pricing-check {
+            color: var(--secondary);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .pricing-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 700;
+            border: 2px solid var(--border);
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+        }
+
+        .pricing-btn:hover {
+            background: var(--gradient-1);
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.3);
+        }
+
+        .pricing-btn-filled {
+            background: var(--gradient-1);
+            border-color: transparent;
+            color: white;
+        }
+
+        /* ===== MODE TOGGLE ===== */
+        .mode-toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 48px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px;
+            position: relative;
+        }
+
+        .mode-btn {
+            padding: 12px 32px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .mode-btn.active {
+            color: white;
+        }
+
+        .mode-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            height: calc(100% - 8px);
+            width: calc(50% - 4px);
+            background: var(--gradient-1);
+            border-radius: 50px;
+            transition: transform 0.3s ease;
+        }
+
+        .mode-slider.cloud {
+            transform: translateX(100%);
+        }
+
+        /* ===== WHY US ===== */
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .why-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .why-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .why-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .why-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .why-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* ===== FAQ ===== */
+        .faq-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .faq-item:hover { border-color: var(--primary); }
+
+        .faq-question {
+            width: 100%;
+            background: var(--bg-card);
+            border: none;
+            color: var(--text-primary);
+            padding: 20px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .faq-arrow {
+            transition: transform 0.3s;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .faq-item.open .faq-arrow {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            background: rgba(18, 18, 42, 0.5);
+        }
+
+        .faq-answer-inner {
+            padding: 0 24px 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 300px;
+        }
+
+        /* ===== CONTACT ===== */
+        .contact-section {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+        }
+
+        .contact-card {
+            text-align: center;
+            padding: 32px 24px;
+            background: rgba(108, 99, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+
+        .contact-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .contact-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .contact-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .contact-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* ===== SCROLL ANIMATIONS ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== FLOATING WHATSAPP ===== */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+            z-index: 999;
+            transition: transform 0.3s;
+            animation: pulse-wa 2s infinite;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes pulse-wa {
+            0%, 100% { box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
+            50% { box-shadow: 0 6px 30px rgba(37, 211, 102, 0.7); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-menu-btn { display: block; }
+
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(10, 10, 26, 0.98);
+                backdrop-filter: blur(20px);
+                padding: 24px;
+                border-bottom: 1px solid var(--border);
+                gap: 16px;
+            }
+
+            .apps-grid { grid-template-columns: 1fr; }
+            .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+            .hero-stats { gap: 24px; flex-wrap: wrap; }
+            .stat-number { font-size: 28px; }
+            .mode-btn { padding: 10px 20px; font-size: 13px; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .btn { width: 100%; justify-content: center; }
+        }
+
+        /* ===== CLOUD SECTION ===== */
+        .cloud-section {
+            background: linear-gradient(180deg, transparent 0%, rgba(108, 99, 255, 0.03) 50%, transparent 100%);
+        }
+
+        .cloud-features-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .cloud-feature {
+            display: flex;
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+
+        .cloud-feature:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .cloud-feature-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .cloud-feature h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .cloud-feature p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover { color: var(--text-primary); }
+
+        .modal h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .modal p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .modal-pricing-info {
+            background: rgba(108, 99, 255, 0.1);
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .modal-pricing-info p {
+            color: var(--text-primary);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .modal-pricing-info strong {
+            color: var(--secondary);
+        }
+
+        .modal-cta {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .modal-cta-wa {
+            background: #25D366;
+            color: white;
+        }
+
+        .modal-cta-wa:hover {
+            background: #20BD5A;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-icon">A2K</div>
+            <span class="nav-logo-text">DIGITAL STUDIO</span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#apps">Apps</a></li>
+            <li><a href="#pricing">Precios</a></li>
+            <li><a href="#cloud">Cloud</a></li>
+            <li><a href="#why">Ventajas</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#contact" class="nav-cta">Contactar</a></li>
+        </ul>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">&#9776;</button>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-particles" id="particles"></div>
+    <div class="hero-content">
+        <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            Soluciones Inteligentes para tu Negocio
+        </div>
+        <h1 class="hero-title">
+            Transforma tu negocio con <span class="hero-title-gradient">tecnología profesional</span>
+        </h1>
+        <p class="hero-subtitle">
+            Apps de punto de venta, inventario y gestión empresarial diseñadas para impulsar tu productividad. Desde barberías hasta bodegas, tenemos la solución perfecta para ti.
+        </p>
+        <div class="hero-buttons">
+            <a href="#apps" class="btn btn-primary">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                Ver Apps
+            </a>
+            <a href="#pricing" class="btn btn-secondary">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                Ver Precios
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-item">
+                <div class="stat-number" id="statApps">0</div>
+                <div class="stat-label">Apps Disponibles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="statClients">0</div>
+                <div class="stat-label">Negocios Activos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Soporte</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- APPS SECTION -->
+<section class="section" id="apps">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <div class="section-tag">Nuestras Aplicaciones</div>
+            <h2 class="section-title">Soluciones para <span style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">cada negocio</span></h2>
+            <p class="section-desc">Cada app está diseñada específicamente para satisfacer las necesidades únicas de tu tipo de negocio. Profesional, rápida y fácil de usar.</p>
+        </div>
+
+        <div class="apps-grid">
+            <!-- BARBERÍA PRO -->
+            <div class="app-card reveal">
+                <span class="app-card-badge badge-local">Local</span>
+                <img src="img/app-barberia-pro.png" alt="Barbería Pro" class="app-card-img" loading="lazy">
+                <div class="app-card-body">
+                    <div class="app-card-icon" style="background: rgba(108, 99, 255, 0.15);">💈</div>
+                    <h3 class="app-card-name">Barbería Pro</h3>
+                    <p class="app-card-desc">Sistema POS profesional para barberías. Gestiona turnos, servicios, clientes, caja y reportes de ventas con interfaz moderna.</p>
+                    <div class="app-features">
+                        <span class="app-feature-tag">Turnos</span>
+                        <span class="app-feature-tag">Servicios</span>
+                        <span class="app-feature-tag">Caja</span>
+                        <span class="app-feature-tag">Reportes</span>
+                        <span class="app-feature-tag">Facturas</span>
+                    </div>
+                    <div class="app-card-footer">
+                        <div>
+                            <div class="app-price">$25</div>
+                            <div class="app-price-small">+ $5 por terminal adicional</div>
+                        </div>
+                        <a href="https://tiendadigitalaipro.github.io/barberia-pro/" target="_blank" class="btn-demo btn-demo-local">Ver Demo ▶</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NAIL STUDIO PRO -->
+            <div class="app-card reveal">
+                <span class="app-card-badge badge-local">Local</span>
+                <img src="img/app-nail-studio-pro.png" alt="Nail Studio Pro" class="app-card-img" loading="lazy">
+                <div class="app-card-body">
+                    <div class="app-card-icon" style="background: rgba(255, 107, 107, 0.15);">💅</div>
+                    <h3 class="app-card-name">Nail Studio Pro</h3>
+                    <p class="app-card-desc">Sistema POS completo para nail studios y nailistas. Agenda, gestión de clientas, servicios, materiales y caja dual en dólares y bolívares.</p>
+                    <div class="app-features">
+                        <span class="app-feature-tag">Agenda</span>
+                        <span class="app-feature-tag">Clientas</span>
+                        <span class="app-feature-tag">Materiales</span>
+                        <span class="app-feature-tag">Caja Dual</span>
+                        <span class="app-feature-tag">Inventario</span>
+                    </div>
+                    <div class="app-card-footer">
+                        <div>
+                            <div class="app-price">$25</div>
+                            <div class="app-price-small">+ $5 por terminal adicional</div>
+                        </div>
+                        <a href="https://tiendadigitalaipro.github.io/nail-studio-pro/" target="_blank" class="btn-demo btn-demo-local">Ver Demo ▶</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPUESTOS DE MOTOS PRO -->
+            <div class="app-card reveal">
+                <span class="app-card-badge badge-local">Local</span>
+                <img src="img/app-repuestos-motos-pro.png" alt="Repuestos de Motos Pro" class="app-card-img" loading="lazy">
+                <div class="app-card-body">
+                    <div class="app-card-icon" style="background: rgba(255, 142, 83, 0.15);">🏍️</div>
+                    <h3 class="app-card-name">Repuestos de Motos Pro</h3>
+                    <p class="app-card-desc">Aplicación profesional para ventas e inventarios de repuestos de todo tipo de motos. Catálogo completo y gestión de stock.</p>
+                    <div class="app-features">
+                        <span class="app-feature-tag">Catálogo</span>
+                        <span class="app-feature-tag">Inventario</span>
+                        <span class="app-feature-tag">Ventas</span>
+                        <span class="app-feature-tag">Reportes</span>
+                        <span class="app-feature-tag">Licencias</span>
+                    </div>
+                    <div class="app-card-footer">
+                        <div>
+                            <div class="app-price">$25</div>
+                            <div class="app-price-small">+ $5 por terminal adicional</div>
+                        </div>
+                        <a href="https://tiendadigitalaipro.github.io/Repuestos-de-motos-pro-/" target="_blank" class="btn-demo btn-demo-local">Ver Demo ▶</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FERRETERÍA PRO -->
+            <div class="app-card reveal">
+                <span class="app-card-badge badge-local">Local</span>
+                <img src="img/app-ferreteria-pro.png" alt="Ferretería A2K Pro" class="app-card-img" loading="lazy">
+                <div class="app-card-body">
+                    <div class="app-card-icon" style="background: rgba(0, 212, 170, 0.15);">🔧</div>
+                    <h3 class="app-card-name">Ferretería A2K Pro</h3>
+                    <p class="app-card-desc">Sistema de inventario y ventas diseñado específicamente para ferreterías. Control total de herramientas, materiales y facturación.</p>
+                    <div class="app-features">
+                        <span class="app-feature-tag">Inventario</span>
+                        <span class="app-feature-tag">Ventas</span>
+                        <span class="app-feature-tag">Facturación</span>
+                        <span class="app-feature-tag">Proveedores</span>
+                        <span class="app-feature-tag">Reportes</span>
+                    </div>
+                    <div class="app-card-footer">
+                        <div>
+                            <div class="app-price">$25</div>
+                            <div class="app-price-small">+ $5 por terminal adicional</div>
+                        </div>
+                        <a href="https://tiendadigitalaipro.github.io/ferreteriaa2kDiitalStudioPro/" target="_blank" class="btn-demo btn-demo-local">Ver Demo ▶</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BODEGA PRO (CLOUD) -->
+            <div class="app-card reveal">
+                <span class="app-card-badge badge-cloud">Cloud</span>
+                <img src="img/app-bodega-pro.png" alt="Bodega Pro Cloud" class="app-card-img" loading="lazy">
+                <div class="app-card-body">
+                    <div class="app-card-icon" style="background: rgba(108, 99, 255, 0.15);">🏪</div>
+                    <h3 class="app-card-name">Bodega Pro Cloud</h3>
+                    <p class="app-card-desc">Sistema de gestión comercial para bodegas y tiendas con sincronización en tiempo real. Conecta múltiples tiendas desde un solo panel. Panel de cliente incluido con clave de acceso personalizada.</p>
+                    <div class="app-features">
+                        <span class="app-feature-tag">Multi-tienda</span>
+                        <span class="app-feature-tag">Sincronización</span>
+                        <span class="app-feature-tag">Panel Cliente</span>
+                        <span class="app-feature-tag">Inventario</span>
+                        <span class="app-feature-tag">Ventas</span>
+                    </div>
+                    <div class="app-card-footer">
+                        <div>
+                            <div class="app-price">$15<span style="font-size:13px;color:var(--text-muted)">/mes</span></div>
+                            <div class="app-price-small">Activación: $15 | + terminales según plan</div>
+                        </div>
+                        <a href="https://tiendadigitalaipro.github.io/bodega-pro-cloud/" target="_blank" class="btn-demo btn-demo-cloud">Ver Demo ▶</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FARMACIA PRO PLUS (CLOUD) -->
+            <div class="app-card reveal">
+                <span class="app-card-badge badge-cloud">Cloud</span>
+                <img src="img/app-farmacia-pro.png" alt="Farmacia Pro Plus" class="app-card-img" loading="lazy">
+                <div class="app-card-body">
+                    <div class="app-card-icon" style="background: rgba(0, 180, 216, 0.15);">💊</div>
+                    <h3 class="app-card-name">Farmacia Pro Plus</h3>
+                    <p class="app-card-desc">Sistema de gestión de ventas e inventario diseñado para farmacias. Control de medicamentos, recetas, vencimientos y más. En la nube con panel de cliente exclusivo.</p>
+                    <div class="app-features">
+                        <span class="app-feature-tag">Medicamentos</span>
+                        <span class="app-feature-tag">Recetas</span>
+                        <span class="app-feature-tag">Vencimientos</span>
+                        <span class="app-feature-tag">Multi-tienda</span>
+                        <span class="app-feature-tag">Panel Cliente</span>
+                    </div>
+                    <div class="app-card-footer">
+                        <div>
+                            <div class="app-price">$15<span style="font-size:13px;color:var(--text-muted)">/mes</span></div>
+                            <div class="app-price-small">Activación: $15 | + terminales según plan</div>
+                        </div>
+                        <a href="https://tiendadigitalaipro.github.io/FARMACIAPRO-PLUS/" target="_blank" class="btn-demo btn-demo-cloud">Ver Demo ▶</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FRUTERÍA PRO -->
+            <div class="app-card reveal">
+                <span class="app-card-badge badge-local">Local</span>
+                <img src="img/app-fruteria-pro.png" alt="Frutería Pro" class="app-card-img" loading="lazy">
+                <div class="app-card-body">
+                    <div class="app-card-icon" style="background: rgba(76, 175, 80, 0.15);">🍍</div>
+                    <h3 class="app-card-name">Frutería Pro</h3>
+                    <p class="app-card-desc">Sistema POS para fruterías con 74+ productos preconfigurados, inventario, ventas y reportes. Gestión completa de productos frescos por peso y unidad.</p>
+                    <div class="app-features">
+                        <span class="app-feature-tag">74+ Productos</span>
+                        <span class="app-feature-tag">Peso/Unidad</span>
+                        <span class="app-feature-tag">Inventario</span>
+                        <span class="app-feature-tag">Ventas</span>
+                        <span class="app-feature-tag">Reportes</span>
+                    </div>
+                    <div class="app-card-footer">
+                        <div>
+                            <div class="app-price">$25</div>
+                            <div class="app-price-small">+ $5 por terminal adicional</div>
+                        </div>
+                        <a href="https://tiendadigitalaipro.github.io/fruteria-pro/" target="_blank" class="btn-demo btn-demo-local">Ver Demo ▶</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING SECTION -->
+<section class="section cloud-section" id="pricing">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <div class="section-tag">Planes y Precios</div>
+            <h2 class="section-title">Elige el plan <span style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">perfecto</span></h2>
+            <p class="section-desc">Planes flexibles que se adaptan al tamaño de tu negocio. Más terminales = mayor descuento.</p>
+        </div>
+
+        <div class="mode-toggle-container reveal">
+            <div class="mode-toggle">
+                <div class="mode-slider" id="modeSlider"></div>
+                <button class="mode-btn active" id="modeLocal" onclick="switchMode('local')">💻 Apps Locales</button>
+                <button class="mode-btn" id="modeCloud" onclick="switchMode('cloud')">☁️ Apps Cloud</button>
+            </div>
+        </div>
+
+        <!-- LOCAL PRICING -->
+        <div class="pricing-grid reveal" id="pricingLocal">
+            <div class="pricing-card">
+                <div class="pricing-terminals">1</div>
+                <div class="pricing-terminals-label">Terminal</div>
+                <div class="pricing-amount">
+                    <span class="pricing-currency">$</span>
+                    <span class="pricing-value" style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">25</span>
+                </div>
+                <div class="pricing-period">Pago único</div>
+                <ul class="pricing-features">
+                    <li><span class="pricing-check">✓</span> 1 computadora / terminal</li>
+                    <li><span class="pricing-check">✓</span> Licencia vitalicia</li>
+                    <li><span class="pricing-check">✓</span> Todas las funciones</li>
+                    <li><span class="pricing-check">✓</span> Soporte técnico</li>
+                    <li><span class="pricing-check">✓</span> Actualizaciones gratuitas</li>
+                </ul>
+                <a href="https://wa.me/?text=Hola%2C%20me%20interesa%20el%20plan%20B%C3%A1sico%20(1%20terminal)%20de%20A2K%20Digital%20Studio%20por%20%2425" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+            </div>
+
+            <div class="pricing-card pricing-popular">
+                <div class="pricing-popular-badge">Popular</div>
+                <div class="pricing-terminals">3</div>
+                <div class="pricing-terminals-label">Terminales</div>
+                <div class="pricing-amount">
+                    <span class="pricing-currency">$</span>
+                    <span class="pricing-value" style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">35</span>
+                </div>
+                <div class="pricing-period">Pago único</div>
+                <div class="pricing-save">Ahorra $10</div>
+                <ul class="pricing-features">
+                    <li><span class="pricing-check">✓</span> 3 computadoras / terminales</li>
+                    <li><span class="pricing-check">✓</span> Licencia vitalicia</li>
+                    <li><span class="pricing-check">✓</span> Todas las funciones</li>
+                    <li><span class="pricing-check">✓</span> Soporte prioritario</li>
+                    <li><span class="pricing-check">✓</span> Actualizaciones gratuitas</li>
+                </ul>
+                <a href="https://wa.me/?text=Hola%2C%20me%20interesa%20el%20plan%20Negocio%20(3%20terminales)%20de%20A2K%20Digital%20Studio%20por%20%2435" target="_blank" class="pricing-btn pricing-btn-filled">Adquirir Ahora</a>
+            </div>
+
+            <div class="pricing-card">
+                <div class="pricing-terminals">5</div>
+                <div class="pricing-terminals-label">Terminales</div>
+                <div class="pricing-amount">
+                    <span class="pricing-currency">$</span>
+                    <span class="pricing-value" style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">45</span>
+                </div>
+                <div class="pricing-period">Pago único</div>
+                <div class="pricing-save">Ahorra $20</div>
+                <ul class="pricing-features">
+                    <li><span class="pricing-check">✓</span> 5 computadoras / terminales</li>
+                    <li><span class="pricing-check">✓</span> Licencia vitalicia</li>
+                    <li><span class="pricing-check">✓</span> Todas las funciones</li>
+                    <li><span class="pricing-check">✓</span> Soporte prioritario</li>
+                    <li><span class="pricing-check">✓</span> Actualizaciones gratuitas</li>
+                </ul>
+                <a href="https://wa.me/?text=Hola%2C%20me%20interesa%20el%20plan%20Premium%20(5%20terminales)%20de%20A2K%20Digital%20Studio%20por%20%2445" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+            </div>
+
+            <div class="pricing-card">
+                <div class="pricing-terminals">10</div>
+                <div class="pricing-terminals-label">Terminales</div>
+                <div class="pricing-amount">
+                    <span class="pricing-currency">$</span>
+                    <span class="pricing-value" style="background: var(--gradient-4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">65</span>
+                </div>
+                <div class="pricing-period">Pago único</div>
+                <div class="pricing-save">Ahorra $40</div>
+                <ul class="pricing-features">
+                    <li><span class="pricing-check">✓</span> 10 computadoras / terminales</li>
+                    <li><span class="pricing-check">✓</span> Licencia vitalicia</li>
+                    <li><span class="pricing-check">✓</span> Todas las funciones</li>
+                    <li><span class="pricing-check">✓</span> Soporte VIP</li>
+                    <li><span class="pricing-check">✓</span> Actualizaciones gratuitas</li>
+                </ul>
+                <a href="https://wa.me/?text=Hola%2C%20me%20interesa%20el%20plan%20Enterprise%20(10%20terminales)%20de%20A2K%20Digital%20Studio%20por%20%2465" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+            </div>
+        </div>
+
+        <!-- CLOUD PRICING -->
+        <div class="pricing-grid reveal" id="pricingCloud" style="display: none;">
+            <div class="pricing-card">
+                <div class="pricing-terminals">1</div>
+                <div class="pricing-terminals-label">Tienda</div>
+                <div class="pricing-amount">
+                    <span class="pricing-currency">$</span>
+                    <span class="pricing-value" style="background: var(--gradient-3); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">15</span>
+                </div>
+                <div class="pricing-period">+ $15 de activación</div>
+                <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">$15/mes por suscripción</div>
+                <ul class="pricing-features">
+                    <li><span class="pricing-check">✓</span> 1 tienda / terminal</li>
+                    <li><span class="pricing-check">✓</span> Panel de cliente con clave</li>
+                    <li><span class="pricing-check">✓</span> Sincronización en la nube</li>
+                    <li><span class="pricing-check">✓</span> Todas las funciones</li>
+                    <li><span class="pricing-check">✓</span> Soporte técnico</li>
+                </ul>
+                <a href="https://wa.me/?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20B%C3%A1sico%20(1%20tienda)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+            </div>
+
+            <div class="pricing-card pricing-popular">
+                <div class="pricing-popular-badge">Popular</div>
+                <div class="pricing-terminals">3</div>
+                <div class="pricing-terminals-label">Tiendas</div>
+                <div class="pricing-amount">
+                    <span class="pricing-currency">$</span>
+                    <span class="pricing-value" style="background: var(--gradient-3); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">35</span>
+                </div>
+                <div class="pricing-period">+ $15 de activación</div>
+                <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">$35/mes por suscripción</div>
+                <div class="pricing-save">Ahorra $10/mes</div>
+                <ul class="pricing-features">
+                    <li><span class="pricing-check">✓</span> 3 tiendas / terminales</li>
+                    <li><span class="pricing-check">✓</span> Panel de cliente con clave</li>
+                    <li><span class="pricing-check">✓</span> Sincronización en la nube</li>
+                    <li><span class="pricing-check">✓</span> Todas las funciones</li>
+                    <li><span class="pricing-check">✓</span> Soporte prioritario</li>
+                </ul>
+                <a href="https://wa.me/?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20Negocio%20(3%20tiendas)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn pricing-btn-filled">Adquirir Ahora</a>
+            </div>
+
+            <div class="pricing-card">
+                <div class="pricing-terminals">5</div>
+                <div class="pricing-terminals-label">Tiendas</div>
+                <div class="pricing-amount">
+                    <span class="pricing-currency">$</span>
+                    <span class="pricing-value" style="background: var(--gradient-3); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">50</span>
+                </div>
+                <div class="pricing-period">+ $15 de activación</div>
+                <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">$50/mes por suscripción</div>
+                <div class="pricing-save">Ahorra $25/mes</div>
+                <ul class="pricing-features">
+                    <li><span class="pricing-check">✓</span> 5 tiendas / terminales</li>
+                    <li><span class="pricing-check">✓</span> Panel de cliente con clave</li>
+                    <li><span class="pricing-check">✓</span> Sincronización en la nube</li>
+                    <li><span class="pricing-check">✓</span> Todas las funciones</li>
+                    <li><span class="pricing-check">✓</span> Soporte prioritario</li>
+                </ul>
+                <a href="https://wa.me/?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20Premium%20(5%20tiendas)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+            </div>
+
+            <div class="pricing-card">
+                <div class="pricing-terminals">10</div>
+                <div class="pricing-terminals-label">Tiendas</div>
+                <div class="pricing-amount">
+                    <span class="pricing-currency">$</span>
+                    <span class="pricing-value" style="background: var(--gradient-3); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">80</span>
+                </div>
+                <div class="pricing-period">+ $15 de activación</div>
+                <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">$80/mes por suscripción</div>
+                <div class="pricing-save">Ahorra $70/mes</div>
+                <ul class="pricing-features">
+                    <li><span class="pricing-check">✓</span> 10 tiendas / terminales</li>
+                    <li><span class="pricing-check">✓</span> Panel de cliente con clave</li>
+                    <li><span class="pricing-check">✓</span> Sincronización en la nube</li>
+                    <li><span class="pricing-check">✓</span> Todas las funciones</li>
+                    <li><span class="pricing-check">✓</span> Soporte VIP</li>
+                </ul>
+                <a href="https://wa.me/?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20Enterprise%20(10%20tiendas)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CLOUD SECTION -->
+<section class="section cloud-section" id="cloud">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <div class="section-tag">Apps en la Nube</div>
+            <h2 class="section-title">Tus datos siempre <span style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">sincronizados</span></h2>
+            <p class="section-desc">Nuestras apps Cloud usan Firebase para sincronización en tiempo real. Perfectas para negocios con múltiples sucursales.</p>
+        </div>
+
+        <div class="cloud-features-row reveal">
+            <div class="cloud-feature">
+                <div class="cloud-feature-icon">☁️</div>
+                <div>
+                    <h4>Sincronización en Tiempo Real</h4>
+                    <p>Todos tus datos se sincronizan automáticamente entre terminales. Vende en una tienda y ve el inventario actualizado al instante en todas las demás.</p>
+                </div>
+            </div>
+            <div class="cloud-feature">
+                <div class="cloud-feature-icon">🔑</div>
+                <div>
+                    <h4>Panel de Cliente con Clave</h4>
+                    <p>Al adquirir la licencia Cloud, se genera una clave de acceso personalizada. Cada cliente tiene su panel exclusivo para gestionar su negocio.</p>
+                </div>
+            </div>
+            <div class="cloud-feature">
+                <div class="cloud-feature-icon">🏪</div>
+                <div>
+                    <h4>Multi-Tienda</h4>
+                    <p>Conecta múltiples tiendas o sucursales bajo una misma licencia. Ideal para supermercados, cadenas de farmacias o franquicias en crecimiento.</p>
+                </div>
+            </div>
+            <div class="cloud-feature">
+                <div class="cloud-feature-icon">📊</div>
+                <div>
+                    <h4>Reportes Consolidados</h4>
+                    <p>Visualiza las ventas e inventario de todas tus tiendas en un solo lugar. Toma decisiones informadas con datos centralizados en tiempo real.</p>
+                </div>
+            </div>
+            <div class="cloud-feature">
+                <div class="cloud-feature-icon">🔄</div>
+                <div>
+                    <h4>Backup Automático</h4>
+                    <p>Tus datos están protegidos en la nube con respaldo automático. Olvídate de perder información por fallos del equipo o errores humanos.</p>
+                </div>
+            </div>
+            <div class="cloud-feature">
+                <div class="cloud-feature-icon">📱</div>
+                <div>
+                    <h4>Acceso desde cualquier dispositivo</h4>
+                    <p>Administra tu negocio desde cualquier computadora con conexión a internet. Sin instalaciones complicadas ni limitaciones de equipo.</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:48px;" class="reveal">
+            <a href="#pricing" class="btn btn-primary" style="background: var(--gradient-3); box-shadow: 0 8px 30px rgba(0, 212, 170, 0.3);">
+                Ver Precios Cloud
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- WHY US SECTION -->
+<section class="section" id="why">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <div class="section-tag">¿Por Qué Elegirnos?</div>
+            <h2 class="section-title">La diferencia <span style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">A2K Digital Studio</span></h2>
+            <p class="section-desc">No solo vendemos software, ofrecemos soluciones que impulsan tu negocio al siguiente nivel.</p>
+        </div>
+
+        <div class="why-grid">
+            <div class="why-card reveal">
+                <div class="why-icon" style="background: rgba(108, 99, 255, 0.15);">⚡</div>
+                <h3>Ultra Rápido</h3>
+                <p>Apps optimizadas para velocidad máxima. Sin tiempos de carga, sin lag, sin esperas. Tu negocio no puede esperar, nosotros tampoco.</p>
+            </div>
+            <div class="why-card reveal">
+                <div class="why-icon" style="background: rgba(0, 212, 170, 0.15);">🔒</div>
+                <h3>Licencias Seguras</h3>
+                <p>Sistema de licenciamiento IRON LOCK v2 con huella de dispositivo. Tu licencia está protegida contra copias no autorizadas.</p>
+            </div>
+            <div class="why-card reveal">
+                <div class="why-icon" style="background: rgba(255, 107, 107, 0.15);">🎨</div>
+                <h3>Diseño Profesional</h3>
+                <p>Interfaces modernas, intuitivas y profesionales. No necesitas capacitación especial, cualquier persona puede usarlas desde el día uno.</p>
+            </div>
+            <div class="why-card reveal">
+                <div class="why-icon" style="background: rgba(255, 193, 7, 0.15);">💰</div>
+                <h3>Mejor Precio</h3>
+                <p>Desde solo $25 por una licencia vitalicia. Sin pagos mensuales ocultos ni costos de mantenimiento en apps locales. El mejor retorno de inversión.</p>
+            </div>
+            <div class="why-card reveal">
+                <div class="why-icon" style="background: rgba(0, 150, 136, 0.15);">🛡️</div>
+                <h3>Soporte Dedicado</h3>
+                <p>Soporte técnico directo por WhatsApp. No bots, no formularios, hablas directamente con quien desarrolló tu sistema.</p>
+            </div>
+            <div class="why-card reveal">
+                <div class="why-icon" style="background: rgba(156, 39, 176, 0.15);">🔄</div>
+                <h3>Actualizaciones Constantes</h3>
+                <p>Todas nuestras apps reciben actualizaciones con nuevas funciones y mejoras. Tu sistema siempre está a la vanguardia tecnológica.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ SECTION -->
+<section class="section cloud-section" id="faq">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <div class="section-tag">Preguntas Frecuentes</div>
+            <h2 class="section-title">¿Tienes <span style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">dudas?</span></h2>
+            <p class="section-desc">Las preguntas más comunes de nuestros clientes resueltas.</p>
+        </div>
+
+        <div class="faq-list">
+            <div class="faq-item reveal">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    ¿Qué diferencia hay entre Apps Locales y Apps Cloud?
+                    <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Las <strong>Apps Locales</strong> se instalan en tu computadora y funcionan sin internet. Pagas una sola vez ($25) y la licencia es vitalicia. Ideal para negocios con una sola ubicación. Las <strong>Apps Cloud</strong> funcionan en la nube con Firebase, permitiendo sincronización en tiempo real entre múltiples tiendas. Tienen un costo de activación de $15 más una suscripción mensual según el número de tiendas. Perfectas para negocios con varias sucursales.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item reveal">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    ¿Qué son las terminales y cómo funcionan?
+                    <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Una <strong>terminal</strong> es una computadora o dispositivo donde instalas la app. Si compras una licencia de 1 terminal, solo puedes usar la app en UNA computadora. Si necesitas usarla en 3 computadoras (por ejemplo, 3 cajas en tu negocio), necesitas una licencia de 3 terminales. El sistema detecta automáticamente cada equipo mediante una huella digital única, garantizando que solo los equipos autorizados puedan usar la app.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item reveal">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    ¿Puedo probar antes de comprar?
+                    <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        ¡Sí! Cada app tiene un modo <strong>Demo</strong> completamente funcional que te permite explorar todas las funciones sin compromiso. Simplemente haz clic en "Ver Demo" en la tarjeta de cualquier app y podrás probarla en vivo. También ofrecemos licencias demo de 5 días para que pruebes la app completa en tu propio equipo de trabajo.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item reveal">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    ¿Cómo recibo la app después de comprar?
+                    <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Una vez que confirmes tu compra por WhatsApp, te enviamos la licencia personalizada para tu equipo. Para las <strong>apps locales</strong>, descargas la app y activas con tu licencia. Para las <strong>apps Cloud</strong>, se te genera un panel de cliente con una clave de acceso única, con la cual puedes conectarte desde cualquier navegador web. Todo el proceso toma menos de 10 minutos.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item reveal">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    ¿Puedo agregar más terminales después de comprar?
+                    <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        ¡Por supuesto! Puedes ampliar tu licencia en cualquier momento. Si compraste 1 terminal y luego necesitas 3, solo pagas la diferencia. Los terminales adicionales tienen un costo de $5 cada uno para apps locales. Contáctanos por WhatsApp y te ampliamos la licencia de inmediato sin perder tus datos ni configuraciones.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item reveal">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    ¿Las apps funcionan sin internet?
+                    <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-inner">
+                        Las <strong>Apps Locales</strong> (Barbería Pro, Nail Studio Pro, Ferretería Pro, etc.) funcionan completamente sin internet una vez activadas. Solo necesitas internet para la activación inicial de la licencia. Las <strong>Apps Cloud</strong> (Bodega Pro Cloud, Farmacia Pro Plus) requieren conexión a internet para sincronizar los datos entre tiendas, ya que usan Firebase para almacenamiento en la nube.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT SECTION -->
+<section class="section contact-section" id="contact">
+    <div class="section-container">
+        <div class="section-header reveal">
+            <div class="section-tag">Contacto</div>
+            <h2 class="section-title">¿Listo para <span style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">empezar?</span></h2>
+            <p class="section-desc">Escríbenos y te ayudamos a elegir la solución perfecta para tu negocio.</p>
+        </div>
+
+        <div class="contact-grid">
+            <a href="https://wa.me/?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="contact-card reveal" style="text-decoration:none;">
+                <div class="contact-icon" style="background: rgba(37, 211, 102, 0.15);">💬</div>
+                <h3>WhatsApp</h3>
+                <p>Escríbenos directo y recibe respuesta inmediata. ¡Es la forma más rápida!</p>
+            </a>
+            <a href="https://github.com/tiendadigitalaipro" target="_blank" class="contact-card reveal" style="text-decoration:none;">
+                <div class="contact-icon" style="background: rgba(108, 99, 255, 0.15);">🐙</div>
+                <h3>GitHub</h3>
+                <p>Visita nuestro perfil en GitHub y conoce nuestro código abierto.</p>
+            </a>
+            <a href="https://github.com/tiendadigitalaipro" target="_blank" class="contact-card reveal" style="text-decoration:none;">
+                <div class="contact-icon" style="background: rgba(255, 107, 107, 0.15);">🌐</div>
+                <h3>GitHub Pages</h3>
+                <p>Todas nuestras apps están desplegadas y funcionando en GitHub Pages.</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="section-container">
+        <div class="footer-logo">A2K DIGITAL STUDIO</div>
+        <p>&copy; 2026 A2K Digital Studio. Todos los derechos reservados. Soluciones inteligentes para tu negocio.</p>
+    </div>
+</footer>
+
+<!-- FLOATING WHATSAPP -->
+<a href="https://wa.me/?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="whatsapp-float" title="Contactar por WhatsApp">
+    💬
+</a>
+
+<!-- PURCHASE MODAL -->
+<div class="modal-overlay" id="purchaseModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <h3 id="modalAppName">App Name</h3>
+        <p id="modalAppDesc">Descripción de la app</p>
+        <div class="modal-pricing-info">
+            <p id="modalPricingInfo">Información de precios</p>
+        </div>
+        <a id="modalWhatsApp" href="#" target="_blank" class="modal-cta modal-cta-wa">
+            💬 Comprar por WhatsApp
+        </a>
+    </div>
+</div>
+
+<script>
+    // ===== NAVBAR SCROLL =====
+    window.addEventListener('scroll', () => {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // ===== MOBILE MENU =====
+    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+        document.getElementById('navLinks').classList.toggle('open');
+    });
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            document.getElementById('navLinks').classList.remove('open');
+        });
+    });
+
+    // ===== PARTICLES =====
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = (Math.random() * 10 + 8) + 's';
+        particle.style.animationDelay = (Math.random() * 10) + 's';
+        particle.style.width = (Math.random() * 4 + 2) + 'px';
+        particle.style.height = particle.style.width;
+        const colors = ['#6C63FF', '#00D4AA', '#FF6B6B', '#FF8E53'];
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        particlesContainer.appendChild(particle);
+    }
+
+    // ===== COUNTER ANIMATION =====
+    function animateCounter(element, target, duration = 2000) {
+        let start = 0;
+        const increment = target / (duration / 16);
+        const timer = setInterval(() => {
+            start += increment;
+            if (start >= target) {
+                start = target;
+                clearInterval(timer);
+            }
+            element.textContent = Math.floor(start) + '+';
+        }, 16);
+    }
+
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounter(document.getElementById('statApps'), 7, 1500);
+                animateCounter(document.getElementById('statClients'), 50, 2000);
+                statsObserver.disconnect();
+            }
+        });
+    }, { threshold: 0.5 });
+
+    const statsSection = document.querySelector('.hero-stats');
+    if (statsSection) statsObserver.observe(statsSection);
+
+    // ===== SCROLL REVEAL =====
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ===== PRICING MODE TOGGLE =====
+    function switchMode(mode) {
+        const slider = document.getElementById('modeSlider');
+        const localBtn = document.getElementById('modeLocal');
+        const cloudBtn = document.getElementById('modeCloud');
+        const localPricing = document.getElementById('pricingLocal');
+        const cloudPricing = document.getElementById('pricingCloud');
+
+        if (mode === 'cloud') {
+            slider.classList.add('cloud');
+            localBtn.classList.remove('active');
+            cloudBtn.classList.add('active');
+            localPricing.style.display = 'none';
+            cloudPricing.style.display = 'grid';
+        } else {
+            slider.classList.remove('cloud');
+            cloudBtn.classList.remove('active');
+            localBtn.classList.add('active');
+            cloudPricing.style.display = 'none';
+            localPricing.style.display = 'grid';
+        }
+    }
+
+    // ===== FAQ TOGGLE =====
+    function toggleFaq(button) {
+        const item = button.parentElement;
+        const isOpen = item.classList.contains('open');
+
+        // Close all
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+
+        // Open clicked if it was closed
+        if (!isOpen) {
+            item.classList.add('open');
+        }
+    }
+
+    // ===== PURCHASE MODAL =====
+    function openModal(appName, appDesc, pricingInfo, waLink) {
+        document.getElementById('modalAppName').textContent = appName;
+        document.getElementById('modalAppDesc').textContent = appDesc;
+        document.getElementById('modalPricingInfo').innerHTML = pricingInfo;
+        document.getElementById('modalWhatsApp').href = waLink;
+        document.getElementById('purchaseModal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('purchaseModal').classList.remove('active');
+    }
+
+    document.getElementById('purchaseModal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeModal();
+    });
+
+    // ===== SMOOTH SCROLL =====
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
