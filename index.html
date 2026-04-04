@@ -1350,6 +1350,31 @@
                 </div>
             </div>
 
+            <!-- BODEGA DESCARGA PRO -->
+            <div class="app-card reveal">
+                <span class="app-card-badge badge-local">Local</span>
+                <img src="img/app-bodega-pro.png" alt="Bodega Descarga Pro" class="app-card-img" loading="lazy">
+                <div class="app-card-body">
+                    <div class="app-card-icon" style="background: rgba(233, 30, 99, 0.15);">📦</div>
+                    <h3 class="app-card-name">Bodega Descarga Pro</h3>
+                    <p class="app-card-desc">Sistema de gestión comercial para bodegas y tiendas. Control de inventario completo, ventas, facturación y reportes. Se descarga e instala en tu computadora sin necesidad de internet.</p>
+                    <div class="app-features">
+                        <span class="app-feature-tag">Inventario</span>
+                        <span class="app-feature-tag">Ventas</span>
+                        <span class="app-feature-tag">Facturación</span>
+                        <span class="app-feature-tag">Reportes</span>
+                        <span class="app-feature-tag">Offline</span>
+                    </div>
+                    <div class="app-card-footer">
+                        <div>
+                            <div class="app-price">$25</div>
+                            <div class="app-price-small">+ $5 por terminal adicional</div>
+                        </div>
+                        <a href="https://tiendadigitalaipro.github.io/bodega-pro-descarga.html/" target="_blank" class="btn-demo btn-demo-local">Ver Demo ▶</a>
+                    </div>
+                </div>
+            </div>
+
             <!-- FRUTERÍA PRO -->
             <div class="app-card reveal">
                 <span class="app-card-badge badge-local">Local</span>
@@ -1390,8 +1415,8 @@
         <div class="mode-toggle-container reveal">
             <div class="mode-toggle">
                 <div class="mode-slider" id="modeSlider"></div>
-                <button class="mode-btn active" id="modeLocal" onclick="switchMode('local')">💻 Apps Locales</button>
-                <button class="mode-btn" id="modeCloud" onclick="switchMode('cloud')">☁️ Apps Cloud</button>
+                <button class="mode-btn active" id="modeLocal" onclick="switchMode('local')">💻 Apps Locales — Pago Único</button>
+                <button class="mode-btn" id="modeCloud" onclick="switchMode('cloud')">☁️ Apps Cloud — Suscripción</button>
             </div>
         </div>
 
@@ -1475,7 +1500,13 @@
         </div>
 
         <!-- CLOUD PRICING -->
-        <div class="pricing-grid reveal" id="pricingCloud" style="display: none;">
+        <div id="pricingCloud" style="display: none;">
+            <div class="reveal" style="text-align:center; margin-bottom:40px;">
+                <p style="color:var(--text-secondary); font-size:15px; max-width:600px; margin:0 auto;">
+                    Disponible para <strong style="color:var(--primary);">Bodega Pro Cloud</strong> y <strong style="color:var(--primary);">Farmacia Pro Plus</strong>. Conecta múltiples tiendas con sincronización en tiempo real.
+                </p>
+            </div>
+        <div class="pricing-grid reveal">
             <div class="pricing-card">
                 <div class="pricing-terminals">1</div>
                 <div class="pricing-terminals-label">Tienda</div>
@@ -1556,6 +1587,7 @@
                 <a href="https://wa.me/?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20Enterprise%20(10%20tiendas)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn">Adquirir Ahora</a>
             </div>
         </div>
+        </div>
     </div>
 </section>
 
@@ -1565,7 +1597,7 @@
         <div class="section-header reveal">
             <div class="section-tag">Apps en la Nube</div>
             <h2 class="section-title">Tus datos siempre <span style="background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">sincronizados</span></h2>
-            <p class="section-desc">Nuestras apps Cloud usan Firebase para sincronización en tiempo real. Perfectas para negocios con múltiples sucursales.</p>
+            <p class="section-desc">Nuestras apps Cloud usan Firebase para sincronización en tiempo real. Disponible actualmente para <strong>Bodega Pro Cloud</strong> y <strong>Farmacia Pro Plus</strong>. Perfectas para negocios con múltiples sucursales.</p>
         </div>
 
         <div class="cloud-features-row reveal">
@@ -1863,7 +1895,7 @@
     const statsObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                animateCounter(document.getElementById('statApps'), 7, 1500);
+                animateCounter(document.getElementById('statApps'), 8, 1500);
                 animateCounter(document.getElementById('statClients'), 50, 2000);
                 statsObserver.disconnect();
             }
