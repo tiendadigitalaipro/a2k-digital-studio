@@ -1124,6 +1124,150 @@
             background: #20BD5A;
             transform: translateY(-2px);
         }
+        /* ===== FORM MODALS ===== */
+        .modal-form { max-width: 560px !important; }
+        .modal-form .modal-close { top: 16px; right: 16px; }
+        .form-modal-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .form-modal-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+        .form-modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .form-modal-subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-group select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0A0C0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+        }
+        .form-group select option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .form-group .form-error {
+            color: var(--accent);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        .form-group.error .form-error { display: block; }
+        .form-group.error input,
+        .form-group.error select {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15) !important;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .form-submit-wa {
+            width: 100%;
+            padding: 14px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+        .form-submit-wa:hover {
+            background: #20BD5A;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+        }
+        .btn-demo-solicitar {
+            background: rgba(37, 211, 102, 0.15) !important;
+            color: #25D366 !important;
+            border: 1px solid rgba(37, 211, 102, 0.3);
+            padding: 10px 16px !important;
+            font-size: 12px !important;
+        }
+        .btn-demo-solicitar:hover {
+            background: #25D366 !important;
+            color: white !important;
+        }
+        .pricing-btn-solicitar {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(37, 211, 102, 0.4);
+            background: rgba(37, 211, 102, 0.08);
+            color: #25D366;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            margin-top: 8px;
+        }
+        .pricing-btn-solicitar:hover {
+            background: #25D366;
+            color: white;
+            border-color: #25D366;
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+        }
+        @media (max-width: 480px) {
+            .form-row { grid-template-columns: 1fr; }
+            .modal-form { padding: 24px !important; }
+        }
     </style>
 </head>
 <body>
@@ -1141,6 +1285,7 @@
             <li><a href="#cloud">Cloud</a></li>
             <li><a href="#why">Ventajas</a></li>
             <li><a href="#faq">FAQ</a></li>
+            <li><a href="#" onclick="openFormDemo('');return false;" class="nav-cta" style="background:#25D366;box-shadow:0 8px 25px rgba(37,211,102,0.4);-webkit-text-fill-color:white !important;">Solicitar Demo</a></li>
             <li><a href="#contact" class="nav-cta">Contactar</a></li>
         </ul>
         <button class="mobile-menu-btn" id="mobileMenuBtn">&#9776;</button>
@@ -1220,7 +1365,10 @@
                             <div class="app-price">$25</div>
                             <div class="app-price-small">+ $5 por terminal adicional</div>
                         </div>
-                        <button onclick="openDemo('Barbería Pro','💈','Sistema POS profesional para barberías. Gestiona turnos, servicios, clientes, caja y reportes de ventas.','https://tiendadigitalaipro.github.io/barberia-pro/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button onclick="openDemo('Barbería Pro','💈','Sistema POS profesional para barberías. Gestiona turnos, servicios, clientes, caja y reportes de ventas.','https://tiendadigitalaipro.github.io/barberia-pro/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                            <button onclick="openFormDemo('Barbería Pro')" class="btn-demo btn-demo-solicitar">Solicitar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1245,7 +1393,10 @@
                             <div class="app-price">$25</div>
                             <div class="app-price-small">+ $5 por terminal adicional</div>
                         </div>
-                        <button onclick="openDemo('Nail Studio Pro','💅','Sistema POS completo para nail studios y nailistas. Agenda, gestión de clientas, servicios, materiales y caja dual.','https://tiendadigitalaipro.github.io/nail-studio-pro/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button onclick="openDemo('Nail Studio Pro','💅','Sistema POS completo para nail studios y nailistas. Agenda, gestión de clientas, servicios, materiales y caja dual.','https://tiendadigitalaipro.github.io/nail-studio-pro/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                            <button onclick="openFormDemo('Nail Studio Pro')" class="btn-demo btn-demo-solicitar">Solicitar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1270,7 +1421,10 @@
                             <div class="app-price">$25</div>
                             <div class="app-price-small">+ $5 por terminal adicional</div>
                         </div>
-                        <button onclick="openDemo('Repuestos de Motos Pro','🏍️','Aplicación profesional para ventas e inventarios de repuestos de todo tipo de motos.','https://tiendadigitalaipro.github.io/Repuestos-de-motos-pro-/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button onclick="openDemo('Repuestos de Motos Pro','🏍️','Aplicación profesional para ventas e inventarios de repuestos de todo tipo de motos.','https://tiendadigitalaipro.github.io/Repuestos-de-motos-pro-/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                            <button onclick="openFormDemo('Repuestos de Motos Pro')" class="btn-demo btn-demo-solicitar">Solicitar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1295,7 +1449,10 @@
                             <div class="app-price">$25</div>
                             <div class="app-price-small">+ $5 por terminal adicional</div>
                         </div>
-                        <button onclick="openDemo('Ferretería A2K Pro','🔧','Sistema de inventario y ventas diseñado específicamente para ferreterías.','https://tiendadigitalaipro.github.io/ferreteriaa2kDiitalStudioPro/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button onclick="openDemo('Ferretería A2K Pro','🔧','Sistema de inventario y ventas diseñado específicamente para ferreterías.','https://tiendadigitalaipro.github.io/ferreteriaa2kDiitalStudioPro/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                            <button onclick="openFormDemo('Ferretería A2K Pro')" class="btn-demo btn-demo-solicitar">Solicitar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1320,7 +1477,10 @@
                             <div class="app-price">$15<span style="font-size:13px;color:var(--text-muted)">/mes</span></div>
                             <div class="app-price-small">Activación: $15 | + terminales según plan</div>
                         </div>
-                        <button onclick="openDemo('Bodega Pro Cloud','🏪','Sistema de gestión comercial para bodegas con sincronización en tiempo real.','https://tiendadigitalaipro.github.io/bodega-pro-cloud/')" class="btn-demo btn-demo-cloud">Ver Demo ▶</button>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button onclick="openDemo('Bodega Pro Cloud','🏪','Sistema de gestión comercial para bodegas con sincronización en tiempo real.','https://tiendadigitalaipro.github.io/bodega-pro-cloud/')" class="btn-demo btn-demo-cloud">Ver Demo ▶</button>
+                            <button onclick="openFormDemo('Bodega Pro Cloud')" class="btn-demo btn-demo-solicitar">Solicitar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1345,7 +1505,10 @@
                             <div class="app-price">$15<span style="font-size:13px;color:var(--text-muted)">/mes</span></div>
                             <div class="app-price-small">Activación: $15 | + terminales según plan</div>
                         </div>
-                        <button onclick="openDemo('Farmacia Pro Plus','💊','Sistema de gestión de ventas e inventario diseñado para farmacias.','https://tiendadigitalaipro.github.io/FARMACIAPRO-PLUS/')" class="btn-demo btn-demo-cloud">Ver Demo ▶</button>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button onclick="openDemo('Farmacia Pro Plus','💊','Sistema de gestión de ventas e inventario diseñado para farmacias.','https://tiendadigitalaipro.github.io/FARMACIAPRO-PLUS/')" class="btn-demo btn-demo-cloud">Ver Demo ▶</button>
+                            <button onclick="openFormDemo('Farmacia Pro Plus')" class="btn-demo btn-demo-solicitar">Solicitar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1370,7 +1533,10 @@
                             <div class="app-price">$25</div>
                             <div class="app-price-small">+ $5 por terminal adicional</div>
                         </div>
-                        <button onclick="openDemo('Bodega Descarga Pro','📦','Sistema de gestión comercial para bodegas. Se descarga e instala en tu computadora.','https://tiendadigitalaipro.github.io/bodega-pro-descarga.html/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button onclick="openDemo('Bodega Descarga Pro','📦','Sistema de gestión comercial para bodegas. Se descarga e instala en tu computadora.','https://tiendadigitalaipro.github.io/bodega-pro-descarga.html/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                            <button onclick="openFormDemo('Bodega Descarga Pro')" class="btn-demo btn-demo-solicitar">Solicitar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1395,7 +1561,10 @@
                             <div class="app-price">$25</div>
                             <div class="app-price-small">+ $5 por terminal adicional</div>
                         </div>
-                        <button onclick="openDemo('Frutería Pro','🍍','Sistema POS para fruterías con 74+ productos preconfigurados.','https://tiendadigitalaipro.github.io/fruteria-pro/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button onclick="openDemo('Frutería Pro','🍍','Sistema POS para fruterías con 74+ productos preconfigurados.','https://tiendadigitalaipro.github.io/fruteria-pro/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
+                            <button onclick="openFormDemo('Frutería Pro')" class="btn-demo btn-demo-solicitar">Solicitar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1437,7 +1606,8 @@
                     <li><span class="pricing-check">✓</span> Soporte técnico</li>
                     <li><span class="pricing-check">✓</span> Actualizaciones gratuitas</li>
                 </ul>
-                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20B%C3%A1sico%20(1%20terminal)%20de%20A2K%20Digital%20Studio%20por%20%2425" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20B%C3%A1sico%20(1%20terminal)%20de%20A2K%20Digital%20Studio%20por%20%2425" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                <button onclick="openFormPro('')" class="pricing-btn-solicitar">📋 Solicitar Licencia</button>
             </div>
 
             <div class="pricing-card pricing-popular">
@@ -1457,7 +1627,8 @@
                     <li><span class="pricing-check">✓</span> Soporte prioritario</li>
                     <li><span class="pricing-check">✓</span> Actualizaciones gratuitas</li>
                 </ul>
-                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Negocio%20(3%20terminales)%20de%20A2K%20Digital%20Studio%20por%20%2435" target="_blank" class="pricing-btn pricing-btn-filled">Adquirir Ahora</a>
+                                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Negocio%20(3%20terminales)%20de%20A2K%20Digital%20Studio%20por%20%2435" target="_blank" class="pricing-btn pricing-btn-filled">Adquirir Ahora</a>
+                <button onclick="openFormPro('')" class="pricing-btn-solicitar">📋 Solicitar Licencia</button>
             </div>
 
             <div class="pricing-card">
@@ -1476,7 +1647,8 @@
                     <li><span class="pricing-check">✓</span> Soporte prioritario</li>
                     <li><span class="pricing-check">✓</span> Actualizaciones gratuitas</li>
                 </ul>
-                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Premium%20(5%20terminales)%20de%20A2K%20Digital%20Studio%20por%20%2445" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Premium%20(5%20terminales)%20de%20A2K%20Digital%20Studio%20por%20%2445" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                <button onclick="openFormPro('')" class="pricing-btn-solicitar">📋 Solicitar Licencia</button>
             </div>
 
             <div class="pricing-card">
@@ -1495,7 +1667,8 @@
                     <li><span class="pricing-check">✓</span> Soporte VIP</li>
                     <li><span class="pricing-check">✓</span> Actualizaciones gratuitas</li>
                 </ul>
-                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Enterprise%20(10%20terminales)%20de%20A2K%20Digital%20Studio%20por%20%2465" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Enterprise%20(10%20terminales)%20de%20A2K%20Digital%20Studio%20por%20%2465" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                <button onclick="openFormPro('')" class="pricing-btn-solicitar">📋 Solicitar Licencia</button>
             </div>
         </div>
 
@@ -1523,7 +1696,8 @@
                     <li><span class="pricing-check">✓</span> Todas las funciones</li>
                     <li><span class="pricing-check">✓</span> Soporte técnico</li>
                 </ul>
-                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20B%C3%A1sico%20(1%20tienda)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20B%C3%A1sico%20(1%20tienda)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                <button onclick="openFormPro('')" class="pricing-btn-solicitar">📋 Solicitar Licencia</button>
             </div>
 
             <div class="pricing-card pricing-popular">
@@ -1544,7 +1718,8 @@
                     <li><span class="pricing-check">✓</span> Todas las funciones</li>
                     <li><span class="pricing-check">✓</span> Soporte prioritario</li>
                 </ul>
-                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20Negocio%20(3%20tiendas)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn pricing-btn-filled">Adquirir Ahora</a>
+                                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20Negocio%20(3%20tiendas)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn pricing-btn-filled">Adquirir Ahora</a>
+                <button onclick="openFormPro('')" class="pricing-btn-solicitar">📋 Solicitar Licencia</button>
             </div>
 
             <div class="pricing-card">
@@ -1564,7 +1739,8 @@
                     <li><span class="pricing-check">✓</span> Todas las funciones</li>
                     <li><span class="pricing-check">✓</span> Soporte prioritario</li>
                 </ul>
-                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20Premium%20(5%20tiendas)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20Premium%20(5%20tiendas)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                <button onclick="openFormPro('')" class="pricing-btn-solicitar">📋 Solicitar Licencia</button>
             </div>
 
             <div class="pricing-card">
@@ -1584,7 +1760,8 @@
                     <li><span class="pricing-check">✓</span> Todas las funciones</li>
                     <li><span class="pricing-check">✓</span> Soporte VIP</li>
                 </ul>
-                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20Enterprise%20(10%20tiendas)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                                <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesa%20el%20plan%20Cloud%20Enterprise%20(10%20tiendas)%20de%20A2K%20Digital%20Studio" target="_blank" class="pricing-btn">Adquirir Ahora</a>
+                <button onclick="openFormPro('')" class="pricing-btn-solicitar">📋 Solicitar Licencia</button>
             </div>
         </div>
         </div>
@@ -1826,6 +2003,152 @@
     💬
 </a>
 
+<!-- FORM MODAL DEMO -->
+<div class="modal-overlay" id="modalFormDemo">
+    <div class="modal modal-form">
+        <button class="modal-close" onclick="closeFormModal('modalFormDemo')">&times;</button>
+        <div class="form-modal-header">
+            <div class="form-modal-icon">📋</div>
+            <h3 class="form-modal-title">Solicitar Demo Gratuita</h3>
+            <p class="form-modal-subtitle">Prueba cualquier app gratis durante 5 días</p>
+        </div>
+        <form id="formDemo" onsubmit="submitFormDemo(event)">
+            <div class="form-group" id="fgDemoApp">
+                <label>App *</label>
+                <select id="demoApp" required>
+                    <option value="">Selecciona una app...</option>
+                    <option value="Barbería Pro">💈 Barbería Pro</option>
+                    <option value="Nail Studio Pro">💅 Nail Studio Pro</option>
+                    <option value="Repuestos de Motos Pro">🏍️ Repuestos de Motos Pro</option>
+                    <option value="Ferretería A2K Pro">🔧 Ferretería A2K Pro</option>
+                    <option value="Bodega Descarga Pro">📦 Bodega Descarga Pro</option>
+                    <option value="Frutería Pro">🍍 Frutería Pro</option>
+                    <option value="Bodega Pro Cloud">🏪 Bodega Pro Cloud</option>
+                    <option value="Farmacia Pro Plus">💊 Farmacia Pro Plus</option>
+                </select>
+                <div class="form-error">Selecciona una app</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" id="fgDemoNombre">
+                    <label>Nombre *</label>
+                    <input type="text" id="demoNombre" placeholder="Tu nombre" required>
+                    <div class="form-error">Ingresa tu nombre</div>
+                </div>
+                <div class="form-group" id="fgDemoWhatsApp">
+                    <label>WhatsApp *</label>
+                    <input type="tel" id="demoWhatsApp" placeholder="Ej: +58 416-1234567" required>
+                    <div class="form-error">Ingresa tu WhatsApp</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" id="fgDemoNegocio">
+                    <label>Nombre del negocio *</label>
+                    <input type="text" id="demoNegocio" placeholder="Tu negocio" required>
+                    <div class="form-error">Ingresa el nombre del negocio</div>
+                </div>
+                <div class="form-group" id="fgDemoCiudad">
+                    <label>Ciudad *</label>
+                    <input type="text" id="demoCiudad" placeholder="Tu ciudad" required>
+                    <div class="form-error">Ingresa tu ciudad</div>
+                </div>
+            </div>
+            <button type="submit" class="form-submit-wa">
+                💬 Enviar Solicitud por WhatsApp
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- FORM MODAL PRO -->
+<div class="modal-overlay" id="modalFormPro">
+    <div class="modal modal-form">
+        <button class="modal-close" onclick="closeFormModal('modalFormPro')">&times;</button>
+        <div class="form-modal-header">
+            <div class="form-modal-icon">🛒</div>
+            <h3 class="form-modal-title">Comprar Licencia PRO</h3>
+            <p class="form-modal-subtitle">Adquiere tu licencia y comienza a usar la app</p>
+        </div>
+        <form id="formPro" onsubmit="submitFormPro(event)">
+            <div class="form-group" id="fgProApp">
+                <label>App *</label>
+                <select id="proApp" required>
+                    <option value="">Selecciona una app...</option>
+                    <option value="Barbería Pro">💈 Barbería Pro</option>
+                    <option value="Nail Studio Pro">💅 Nail Studio Pro</option>
+                    <option value="Repuestos de Motos Pro">🏍️ Repuestos de Motos Pro</option>
+                    <option value="Ferretería A2K Pro">🔧 Ferretería A2K Pro</option>
+                    <option value="Bodega Descarga Pro">📦 Bodega Descarga Pro</option>
+                    <option value="Frutería Pro">🍍 Frutería Pro</option>
+                    <option value="Bodega Pro Cloud">🏪 Bodega Pro Cloud</option>
+                    <option value="Farmacia Pro Plus">💊 Farmacia Pro Plus</option>
+                </select>
+                <div class="form-error">Selecciona una app</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" id="fgProPlan">
+                    <label>Plan *</label>
+                    <select id="proPlan" required>
+                        <option value="">Selecciona plan...</option>
+                        <option value="Local - Pago único $25">💻 Local — Pago único $25</option>
+                        <option value="Cloud - Suscripción $15+$15/mes">☁️ Cloud — Activación $15 + Suscripción $15/mes</option>
+                    </select>
+                    <div class="form-error">Selecciona un plan</div>
+                </div>
+                <div class="form-group" id="fgProTerminales">
+                    <label>Terminales *</label>
+                    <select id="proTerminales" required>
+                        <option value="">Cantidad...</option>
+                        <option value="1">1 terminal</option>
+                        <option value="3">3 terminales</option>
+                        <option value="5">5 terminales</option>
+                        <option value="10">10 terminales</option>
+                    </select>
+                    <div class="form-error">Selecciona cantidad</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" id="fgProNombre">
+                    <label>Nombre *</label>
+                    <input type="text" id="proNombre" placeholder="Tu nombre" required>
+                    <div class="form-error">Ingresa tu nombre</div>
+                </div>
+                <div class="form-group" id="fgProWhatsApp">
+                    <label>WhatsApp *</label>
+                    <input type="tel" id="proWhatsApp" placeholder="Ej: +58 416-1234567" required>
+                    <div class="form-error">Ingresa tu WhatsApp</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" id="fgProCedula">
+                    <label>Cédula/RIF *</label>
+                    <input type="text" id="proCedula" placeholder="Ej: V-12345678" required>
+                    <div class="form-error">Ingresa tu Cédula/RIF</div>
+                </div>
+                <div class="form-group" id="fgProEmail">
+                    <label>Email *</label>
+                    <input type="email" id="proEmail" placeholder="tu@email.com" required>
+                    <div class="form-error">Ingresa un email válido</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" id="fgProNegocio">
+                    <label>Nombre del negocio *</label>
+                    <input type="text" id="proNegocio" placeholder="Tu negocio" required>
+                    <div class="form-error">Ingresa el nombre del negocio</div>
+                </div>
+                <div class="form-group" id="fgProCiudad">
+                    <label>Ciudad *</label>
+                    <input type="text" id="proCiudad" placeholder="Tu ciudad" required>
+                    <div class="form-error">Ingresa tu ciudad</div>
+                </div>
+            </div>
+            <button type="submit" class="form-submit-wa">
+                💬 Enviar Compra por WhatsApp
+            </button>
+        </form>
+    </div>
+</div>
+
 <!-- DEMO MODAL -->
 <div class="modal-overlay" id="demoModal">
     <div class="modal">
@@ -1984,6 +2307,131 @@
     document.getElementById('demoModal').addEventListener('click', (e) => {
         if (e.target === e.currentTarget) closeDemoModal();
     });
+
+    // ===== FORM MODALS =====
+    function openFormDemo(appName) {
+        document.getElementById('formDemo').reset();
+        document.querySelectorAll('#formDemo .form-group').forEach(g => g.classList.remove('error'));
+        const sel = document.getElementById('demoApp');
+        if (appName) sel.value = appName;
+        document.getElementById('modalFormDemo').classList.add('active');
+    }
+
+    function openFormPro(appName) {
+        document.getElementById('formPro').reset();
+        document.querySelectorAll('#formPro .form-group').forEach(g => g.classList.remove('error'));
+        const sel = document.getElementById('proApp');
+        if (appName) sel.value = appName;
+        document.getElementById('modalFormPro').classList.add('active');
+    }
+
+    function closeFormModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+
+    document.getElementById('modalFormDemo').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeFormModal('modalFormDemo');
+    });
+    document.getElementById('modalFormPro').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeFormModal('modalFormPro');
+    });
+
+    function submitFormDemo(e) {
+        e.preventDefault();
+        let valid = true;
+        const fields = [
+            { id: 'demoApp', fg: 'fgDemoApp' },
+            { id: 'demoNombre', fg: 'fgDemoNombre' },
+            { id: 'demoWhatsApp', fg: 'fgDemoWhatsApp' },
+            { id: 'demoNegocio', fg: 'fgDemoNegocio' },
+            { id: 'demoCiudad', fg: 'fgDemoCiudad' }
+        ];
+        fields.forEach(f => {
+            const val = document.getElementById(f.id).value.trim();
+            if (!val) {
+                document.getElementById(f.fg).classList.add('error');
+                valid = false;
+            } else {
+                document.getElementById(f.fg).classList.remove('error');
+            }
+        });
+        if (!valid) return;
+
+        const app = document.getElementById('demoApp').value;
+        const nombre = document.getElementById('demoNombre').value.trim();
+        const whatsapp = document.getElementById('demoWhatsApp').value.trim();
+        const negocio = document.getElementById('demoNegocio').value.trim();
+        const ciudad = document.getElementById('demoCiudad').value.trim();
+
+        const msg = encodeURIComponent(
+            'DEMO SOLICITADA - A2K Digital Studio\n\n' +
+            'App: ' + app + '\n' +
+            'Nombre: ' + nombre + '\n' +
+            'WhatsApp: ' + whatsapp + '\n' +
+            'Negocio: ' + negocio + '\n' +
+            'Ciudad: ' + ciudad + '\n\n' +
+            'Solicita prueba demo gratuita'
+        );
+        window.open('https://wa.me/584164117331?text=' + msg, '_blank');
+        closeFormModal('modalFormDemo');
+    }
+
+    function submitFormPro(e) {
+        e.preventDefault();
+        let valid = true;
+        const fields = [
+            { id: 'proApp', fg: 'fgProApp' },
+            { id: 'proPlan', fg: 'fgProPlan' },
+            { id: 'proTerminales', fg: 'fgProTerminales' },
+            { id: 'proNombre', fg: 'fgProNombre' },
+            { id: 'proWhatsApp', fg: 'fgProWhatsApp' },
+            { id: 'proCedula', fg: 'fgProCedula' },
+            { id: 'proEmail', fg: 'fgProEmail' },
+            { id: 'proNegocio', fg: 'fgProNegocio' },
+            { id: 'proCiudad', fg: 'fgProCiudad' }
+        ];
+        fields.forEach(f => {
+            const val = document.getElementById(f.id).value.trim();
+            if (!val) {
+                document.getElementById(f.fg).classList.add('error');
+                valid = false;
+            } else {
+                document.getElementById(f.fg).classList.remove('error');
+            }
+        });
+        const email = document.getElementById('proEmail').value.trim();
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            document.getElementById('fgProEmail').classList.add('error');
+            valid = false;
+        }
+        if (!valid) return;
+
+        const app = document.getElementById('proApp').value;
+        const plan = document.getElementById('proPlan').value;
+        const terminales = document.getElementById('proTerminales').value;
+        const nombre = document.getElementById('proNombre').value.trim();
+        const whatsapp = document.getElementById('proWhatsApp').value.trim();
+        const cedula = document.getElementById('proCedula').value.trim();
+        const proEmail = document.getElementById('proEmail').value.trim();
+        const negocio = document.getElementById('proNegocio').value.trim();
+        const ciudad = document.getElementById('proCiudad').value.trim();
+
+        const msg = encodeURIComponent(
+            'COMPRA LICENCIA PRO - A2K Digital Studio\n\n' +
+            'App: ' + app + '\n' +
+            'Plan: ' + plan + '\n' +
+            'Nombre: ' + nombre + '\n' +
+            'WhatsApp: ' + whatsapp + '\n' +
+            'Cédula/RIF: ' + cedula + '\n' +
+            'Email: ' + proEmail + '\n' +
+            'Negocio: ' + negocio + '\n' +
+            'Ciudad: ' + ciudad + '\n' +
+            'Terminales: ' + terminales + '\n\n' +
+            'Desea adquirir licencia PRO'
+        );
+        window.open('https://wa.me/584164117331?text=' + msg, '_blank');
+        closeFormModal('modalFormPro');
+    }
 
     // ===== SMOOTH SCROLL =====
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
