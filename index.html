@@ -382,6 +382,54 @@
             font-size: 16px;
         }
 
+        /* ===== APP FILTER BUTTONS ===== */
+        .app-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 24px;
+            border-radius: 50px;
+            border: 2px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-btn .count {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-left: 6px;
+        }
+
+        .filter-btn:not(.active) .count {
+            background: var(--surface-container);
+            color: var(--text-dim);
+        }
+
         /* ===== APPS GRID ===== */
         .apps-grid {
             display: grid;
@@ -1344,9 +1392,22 @@
             <p class="section-desc">Cada app está diseñada específicamente para satisfacer las necesidades únicas de tu tipo de negocio. Profesional, rápida y fácil de usar.</p>
         </div>
 
-        <div class="apps-grid">
+        <!-- Filter Buttons -->
+        <div class="app-filters reveal">
+            <button class="filter-btn active" onclick="filterApps('all')">
+                🚀 Todas <span class="count">9</span>
+            </button>
+            <button class="filter-btn" onclick="filterApps('local')">
+                💻 Locales <span class="count">7</span>
+            </button>
+            <button class="filter-btn" onclick="filterApps('cloud')">
+                ☁️ Cloud <span class="count">2</span>
+            </button>
+        </div>
+
+        <div class="apps-grid" id="appsGrid">
             <!-- BARBERÍA PRO -->
-            <div class="app-card reveal">
+            <div class="app-card reveal" data-type="local">
                 <span class="app-card-badge badge-local">Local</span>
                 <img src="img/app-barberia-pro.png" alt="Barbería Pro" class="app-card-img" loading="lazy">
                 <div class="app-card-body">
@@ -1374,7 +1435,7 @@
             </div>
 
             <!-- NAIL STUDIO PRO -->
-            <div class="app-card reveal">
+            <div class="app-card reveal" data-type="local">
                 <span class="app-card-badge badge-local">Local</span>
                 <img src="img/app-nail-studio-pro.png" alt="Nail Studio Pro" class="app-card-img" loading="lazy">
                 <div class="app-card-body">
@@ -1402,7 +1463,7 @@
             </div>
 
             <!-- REPUESTOS DE MOTOS PRO -->
-            <div class="app-card reveal">
+            <div class="app-card reveal" data-type="local">
                 <span class="app-card-badge badge-local">Local</span>
                 <img src="img/app-repuestos-motos-pro.png" alt="Repuestos de Motos Pro" class="app-card-img" loading="lazy">
                 <div class="app-card-body">
@@ -1430,7 +1491,7 @@
             </div>
 
             <!-- FERRETERÍA PRO -->
-            <div class="app-card reveal">
+            <div class="app-card reveal" data-type="local">
                 <span class="app-card-badge badge-local">Local</span>
                 <img src="img/app-ferreteria-pro.png" alt="Ferretería A2K Pro" class="app-card-img" loading="lazy">
                 <div class="app-card-body">
@@ -1457,64 +1518,10 @@
                 </div>
             </div>
 
-            <!-- BODEGA PRO (CLOUD) -->
-            <div class="app-card reveal">
-                <span class="app-card-badge badge-cloud">Cloud</span>
-                <img src="img/app-bodega-pro.png" alt="Bodega Pro Cloud" class="app-card-img" loading="lazy">
-                <div class="app-card-body">
-                    <div class="app-card-icon" style="background: rgba(108, 99, 255, 0.15);">🏪</div>
-                    <h3 class="app-card-name">Bodega Pro Cloud</h3>
-                    <p class="app-card-desc">Sistema de gestión comercial para bodegas y tiendas con sincronización en tiempo real. Conecta múltiples tiendas desde un solo panel. Panel de cliente incluido con clave de acceso personalizada.</p>
-                    <div class="app-features">
-                        <span class="app-feature-tag">Multi-tienda</span>
-                        <span class="app-feature-tag">Sincronización</span>
-                        <span class="app-feature-tag">Panel Cliente</span>
-                        <span class="app-feature-tag">Inventario</span>
-                        <span class="app-feature-tag">Ventas</span>
-                    </div>
-                    <div class="app-card-footer">
-                        <div>
-                            <div class="app-price">$15<span style="font-size:13px;color:var(--text-muted)">/mes</span></div>
-                            <div class="app-price-small">Activación: $15 | + terminales según plan</div>
-                        </div>
-                        <div style="display:flex;gap:8px;align-items:center;">
-                            <button onclick="openDemo('Bodega Pro Cloud','🏪','Sistema de gestión comercial para bodegas con sincronización en tiempo real.','https://tiendadigitalaipro.github.io/bodega-pro-cloud/')" class="btn-demo btn-demo-cloud">Ver Demo ▶</button>
-                            <button onclick="openFormDemo('Bodega Pro Cloud')" class="btn-demo btn-demo-solicitar">Solicitar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- FARMACIA PRO PLUS (CLOUD) -->
-            <div class="app-card reveal">
-                <span class="app-card-badge badge-cloud">Cloud</span>
-                <img src="img/app-farmacia-pro.png" alt="Farmacia Pro Plus" class="app-card-img" loading="lazy">
-                <div class="app-card-body">
-                    <div class="app-card-icon" style="background: rgba(0, 180, 216, 0.15);">💊</div>
-                    <h3 class="app-card-name">Farmacia Pro Plus</h3>
-                    <p class="app-card-desc">Sistema de gestión de ventas e inventario diseñado para farmacias. Control de medicamentos, recetas, vencimientos y más. En la nube con panel de cliente exclusivo.</p>
-                    <div class="app-features">
-                        <span class="app-feature-tag">Medicamentos</span>
-                        <span class="app-feature-tag">Recetas</span>
-                        <span class="app-feature-tag">Vencimientos</span>
-                        <span class="app-feature-tag">Multi-tienda</span>
-                        <span class="app-feature-tag">Panel Cliente</span>
-                    </div>
-                    <div class="app-card-footer">
-                        <div>
-                            <div class="app-price">$15<span style="font-size:13px;color:var(--text-muted)">/mes</span></div>
-                            <div class="app-price-small">Activación: $15 | + terminales según plan</div>
-                        </div>
-                        <div style="display:flex;gap:8px;align-items:center;">
-                            <button onclick="openDemo('Farmacia Pro Plus','💊','Sistema de gestión de ventas e inventario diseñado para farmacias.','https://tiendadigitalaipro.github.io/FARMACIAPRO-PLUS/')" class="btn-demo btn-demo-cloud">Ver Demo ▶</button>
-                            <button onclick="openFormDemo('Farmacia Pro Plus')" class="btn-demo btn-demo-solicitar">Solicitar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
 
             <!-- BODEGA DESCARGA PRO -->
-            <div class="app-card reveal">
+            <div class="app-card reveal" data-type="local">
                 <span class="app-card-badge badge-local">Local</span>
                 <img src="img/app-bodega-pro.png" alt="Bodega Descarga Pro" class="app-card-img" loading="lazy">
                 <div class="app-card-body">
@@ -1542,7 +1549,7 @@
             </div>
 
             <!-- MERCADO LOGIC PRO -->
-            <div class="app-card reveal">
+            <div class="app-card reveal" data-type="local">
                 <span class="app-card-badge badge-local">Local</span>
                 <img src="img/app-mercado-logic-pro.png" alt="Mercado Logic Pro" class="app-card-img" loading="lazy">
                 <div class="app-card-body">
@@ -1570,7 +1577,7 @@
             </div>
 
             <!-- FRUTERÍA PRO -->
-            <div class="app-card reveal">
+            <div class="app-card reveal" data-type="local">
                 <span class="app-card-badge badge-local">Local</span>
                 <img src="img/app-fruteria-pro.png" alt="Frutería Pro" class="app-card-img" loading="lazy">
                 <div class="app-card-body">
@@ -1592,6 +1599,63 @@
                         <div style="display:flex;gap:8px;align-items:center;">
                             <button onclick="openDemo('Frutería Pro','🍍','Sistema POS para fruterías con 74+ productos preconfigurados.','https://tiendadigitalaipro.github.io/fruteria-pro/')" class="btn-demo btn-demo-local">Ver Demo ▶</button>
                             <button onclick="openFormDemo('Frutería Pro')" class="btn-demo btn-demo-solicitar">Solicitar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- BODEGA PRO (CLOUD) -->
+            <div class="app-card reveal" data-type="cloud">
+                <span class="app-card-badge badge-cloud">Cloud</span>
+                <img src="img/app-bodega-pro.png" alt="Bodega Pro Cloud" class="app-card-img" loading="lazy">
+                <div class="app-card-body">
+                    <div class="app-card-icon" style="background: rgba(108, 99, 255, 0.15);">🏪</div>
+                    <h3 class="app-card-name">Bodega Pro Cloud</h3>
+                    <p class="app-card-desc">Sistema de gestión comercial para bodegas y tiendas con sincronización en tiempo real. Conecta múltiples tiendas desde un solo panel. Panel de cliente incluido con clave de acceso personalizada.</p>
+                    <div class="app-features">
+                        <span class="app-feature-tag">Multi-tienda</span>
+                        <span class="app-feature-tag">Sincronización</span>
+                        <span class="app-feature-tag">Panel Cliente</span>
+                        <span class="app-feature-tag">Inventario</span>
+                        <span class="app-feature-tag">Ventas</span>
+                    </div>
+                    <div class="app-card-footer">
+                        <div>
+                            <div class="app-price">$15<span style="font-size:13px;color:var(--text-muted)">/mes</span></div>
+                            <div class="app-price-small">Activación: $15 | + terminales según plan</div>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button onclick="openDemo('Bodega Pro Cloud','🏪','Sistema de gestión comercial para bodegas con sincronización en tiempo real.','https://tiendadigitalaipro.github.io/bodega-pro-cloud/')" class="btn-demo btn-demo-cloud">Ver Demo ▶</button>
+                            <button onclick="openFormDemo('Bodega Pro Cloud')" class="btn-demo btn-demo-solicitar">Solicitar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FARMACIA PRO PLUS (CLOUD) -->
+            <div class="app-card reveal" data-type="cloud">
+                <span class="app-card-badge badge-cloud">Cloud</span>
+                <img src="img/app-farmacia-pro.png" alt="Farmacia Pro Plus" class="app-card-img" loading="lazy">
+                <div class="app-card-body">
+                    <div class="app-card-icon" style="background: rgba(0, 180, 216, 0.15);">💊</div>
+                    <h3 class="app-card-name">Farmacia Pro Plus</h3>
+                    <p class="app-card-desc">Sistema de gestión de ventas e inventario diseñado para farmacias. Control de medicamentos, recetas, vencimientos y más. En la nube con panel de cliente exclusivo.</p>
+                    <div class="app-features">
+                        <span class="app-feature-tag">Medicamentos</span>
+                        <span class="app-feature-tag">Recetas</span>
+                        <span class="app-feature-tag">Vencimientos</span>
+                        <span class="app-feature-tag">Multi-tienda</span>
+                        <span class="app-feature-tag">Panel Cliente</span>
+                    </div>
+                    <div class="app-card-footer">
+                        <div>
+                            <div class="app-price">$15<span style="font-size:13px;color:var(--text-muted)">/mes</span></div>
+                            <div class="app-price-small">Activación: $15 | + terminales según plan</div>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button onclick="openDemo('Farmacia Pro Plus','💊','Sistema de gestión de ventas e inventario diseñado para farmacias.','https://tiendadigitalaipro.github.io/FARMACIAPRO-PLUS/')" class="btn-demo btn-demo-cloud">Ver Demo ▶</button>
+                            <button onclick="openFormDemo('Farmacia Pro Plus')" class="btn-demo btn-demo-solicitar">Solicitar</button>
                         </div>
                     </div>
                 </div>
@@ -2473,6 +2537,26 @@
             }
         });
     });
+
+    function filterApps(type) {
+        const cards = document.querySelectorAll('#appsGrid .app-card');
+        const btns = document.querySelectorAll('.filter-btn');
+        
+        btns.forEach(btn => btn.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        
+        cards.forEach(card => {
+            const cardType = card.getAttribute('data-type');
+            if (type === 'all' || cardType === type) {
+                card.style.display = '';
+                setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 50);
+            } else {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => { card.style.display = 'none'; }, 300);
+            }
+        });
+    }
 </script>
 
 </body>
