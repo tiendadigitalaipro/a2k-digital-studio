@@ -1000,6 +1000,460 @@
             50% { box-shadow: 0 6px 30px rgba(37, 211, 102, 0.7); }
         }
 
+        /* ===== FLOATING BOT SYSTEM ===== */
+        .fab-container {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 14px;
+        }
+        .fab-trigger {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gradient-1);
+            color: white;
+            font-size: 26px;
+            cursor: pointer;
+            box-shadow: 0 6px 24px rgba(108,99,255,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            animation: fabEnter 0.6s cubic-bezier(0.19,1,0.22,1) both;
+        }
+        .fab-trigger::before {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid rgba(108,99,255,0.3);
+            animation: fabPulse 2.8s ease-out infinite;
+        }
+        .fab-trigger:hover { transform: scale(1.08); box-shadow: 0 8px 32px rgba(108,99,255,0.6); }
+        .fab-trigger .fab-icon { transition: transform 0.3s; display: flex; }
+        .fab-container.is-open .fab-trigger .fab-icon { transform: rotate(45deg); }
+        .fab-actions {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 12px;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .fab-container.is-open .fab-actions {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .fab-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.25s, box-shadow 0.25s;
+            opacity: 0;
+            transform: scale(0.5) translateY(20px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .fab-container.is-open .fab-btn {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        .fab-container.is-open .fab-btn:nth-child(1) { transition-delay: 0.05s; }
+        .fab-container.is-open .fab-btn:nth-child(2) { transition-delay: 0.1s; }
+        .fab-container.is-open .fab-btn:nth-child(3) { transition-delay: 0.15s; }
+        .fab-btn:hover { transform: scale(1.12) !important; }
+        .fab-btn-wa { background: #25D366; box-shadow: 0 4px 16px rgba(37,211,102,0.4); }
+        .fab-btn-wa:hover { box-shadow: 0 6px 24px rgba(37,211,102,0.6); }
+        .fab-btn-tg { background: #0088cc; box-shadow: 0 4px 16px rgba(0,136,204,0.4); }
+        .fab-btn-tg:hover { box-shadow: 0 6px 24px rgba(0,136,204,0.6); }
+        .fab-btn-chat { background: linear-gradient(135deg, #00D4AA 0%, #00B4D8 100%); box-shadow: 0 4px 16px rgba(0,212,170,0.4); }
+        .fab-btn-chat:hover { box-shadow: 0 6px 24px rgba(0,212,170,0.6); }
+        .fab-label {
+            position: absolute;
+            right: calc(100% + 12px);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateX(8px);
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+        }
+        .fab-btn:hover .fab-label { opacity: 1; transform: translateX(0); }
+        @keyframes fabEnter { from { opacity:0; transform: scale(0) rotate(-90deg); } to { opacity:1; transform: scale(1) rotate(0); } }
+        @keyframes fabPulse { 0%,100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.15); opacity: 0; } }
+
+        /* ===== CHAT WIDGET ===== */
+        .chat-widget {
+            position: fixed;
+            bottom: 100px;
+            right: 28px;
+            width: 380px;
+            height: 520px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: scale(0.85) translateY(20px);
+            transform-origin: bottom right;
+            transition: opacity 0.35s cubic-bezier(0.19,1,0.22,1), visibility 0.35s, transform 0.35s cubic-bezier(0.19,1,0.22,1);
+        }
+        .chat-widget.is-open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+        }
+        .chat-header {
+            background: var(--gradient-1);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .chat-header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        .chat-avatar {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .chat-status {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: #4ade80;
+            border-radius: 50%;
+            border: 2px solid rgba(108,99,255,0.8);
+            animation: statusPulse 2s infinite;
+        }
+        @keyframes statusPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.5); } 50% { box-shadow: 0 0 0 5px rgba(74,222,128,0); } }
+        .chat-header-info h4 { font-size: 15px; font-weight: 700; color: white; }
+        .chat-header-info span { font-size: 12px; color: rgba(255,255,255,0.8); }
+        .chat-header-actions { margin-left: auto; display: flex; gap: 8px; }
+        .chat-header-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .chat-header-btn:hover { background: rgba(255,255,255,0.3); }
+        .chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+        .chat-body::-webkit-scrollbar { width: 5px; }
+        .chat-body::-webkit-scrollbar-track { background: transparent; }
+        .chat-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        .chat-msg {
+            max-width: 82%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            animation: msgFadeIn 0.4s ease both;
+        }
+        @keyframes msgFadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+        .chat-msg-bot {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .chat-msg-user {
+            background: var(--gradient-1);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .chat-quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 20px 14px;
+        }
+        .chat-quick-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+        }
+        .chat-quick-btn:hover { border-color: var(--primary); background: rgba(108,99,255,0.1); color: var(--primary); }
+        .chat-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+            background: rgba(10,10,26,0.5);
+        }
+        .chat-input {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .chat-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,99,255,0.15); }
+        .chat-input::placeholder { color: var(--text-muted); }
+        .chat-send {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gradient-1);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
+        }
+        .chat-send:hover { transform: scale(1.08); box-shadow: 0 4px 16px rgba(108,99,255,0.4); }
+        .chat-typing {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            align-self: flex-start;
+        }
+        .chat-typing span {
+            width: 8px;
+            height: 8px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            animation: typingBounce 1.4s ease-in-out infinite;
+        }
+        .chat-typing span:nth-child(2) { animation-delay: 0.15s; }
+        .chat-typing span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes typingBounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+        /* ===== WELCOME POPUP ===== */
+        .welcome-popup-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            animation: wpFadeIn 0.3s ease;
+        }
+        .welcome-popup-overlay.active { display: flex; }
+        @keyframes wpFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .welcome-popup {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            max-width: 440px;
+            width: 100%;
+            padding: 40px 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: wpSlideIn 0.5s cubic-bezier(0.19,1,0.22,1) both;
+        }
+        @keyframes wpSlideIn { from { opacity: 0; transform: translateY(40px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .welcome-popup::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 160px;
+            height: 160px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            opacity: 0.08;
+        }
+        .welcome-popup::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: -40px;
+            width: 120px;
+            height: 120px;
+            background: var(--gradient-3);
+            border-radius: 50%;
+            opacity: 0.08;
+        }
+        .welcome-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 2;
+        }
+        .welcome-close:hover { background: rgba(255,107,107,0.15); color: var(--accent); }
+        .welcome-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+            animation: wpBounce 0.6s cubic-bezier(0.19,1,0.22,1) 0.2s both;
+        }
+        @keyframes wpBounce { from { transform: scale(0); } to { transform: scale(1); } }
+        .welcome-popup h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .welcome-popup p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+        .welcome-bots {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        .welcome-bot-btn {
+            flex: 1;
+            max-width: 180px;
+            padding: 14px 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .welcome-bot-btn:hover { transform: translateY(-3px); }
+        .welcome-bot-btn.wa-btn:hover { border-color: #25D366; box-shadow: 0 8px 24px rgba(37,211,102,0.25); }
+        .welcome-bot-btn.tg-btn:hover { border-color: #0088cc; box-shadow: 0 8px 24px rgba(0,136,204,0.25); }
+        .welcome-bot-btn .bot-icon { font-size: 28px; }
+        .welcome-bot-btn .bot-name { font-size: 13px; font-weight: 700; }
+        .welcome-bot-btn .bot-status { font-size: 11px; color: var(--text-muted); }
+        .welcome-bot-btn .bot-status .online { color: #4ade80; }
+        .welcome-skip {
+            display: inline-block;
+            margin-top: 8px;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .welcome-skip:hover { color: var(--text-secondary); }
+
+        /* ===== BOT RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .fab-label { display: none; }
+            .chat-widget { right: 12px; bottom: 100px; width: calc(100vw - 24px); height: 480px; }
+            .fab-container { bottom: 20px; right: 16px; }
+            .welcome-popup { padding: 32px 24px; margin: 16px; }
+        }
+        @media (max-width: 400px) {
+            .chat-widget { width: calc(100vw - 16px); right: 8px; height: 420px; }
+            .fab-container { bottom: 16px; right: 12px; }
+            .fab-trigger { width: 56px; height: 56px; font-size: 22px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -2064,8 +2518,13 @@
         <div class="contact-grid">
             <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="contact-card reveal" style="text-decoration:none;">
                 <div class="contact-icon" style="background: rgba(37, 211, 102, 0.15);">💬</div>
-                <h3>WhatsApp</h3>
-                <p>+58 416-4117331</p>
+                <h3>WhatsApp Bot</h3>
+                <p>ZYNC Bot — Responde 24/7</p>
+            </a>
+            <a href="https://t.me/ZyncBot" target="_blank" class="contact-card reveal" style="text-decoration:none;">
+                <div class="contact-icon" style="background: rgba(0, 136, 204, 0.15);">✈️</div>
+                <h3>Telegram Bot</h3>
+                <p>Zync Bot — Catálogo interactivo</p>
             </a>
             <a href="mailto:a2kdigitalstudio2025@gmail.com" class="contact-card reveal" style="text-decoration:none;">
                 <div class="contact-icon" style="background: rgba(108, 99, 255, 0.15);">📧</div>
@@ -2086,14 +2545,82 @@
     <div class="section-container">
         <div class="footer-logo">A2K DIGITAL STUDIO</div>
         <p>&copy; 2026 A2K Digital Studio. Todos los derechos reservados.</p>
-        <p style="margin-top:8px;">📧 a2kdigitalstudio2025@gmail.com | 💬 +58 416-4117331</p>
+        <p style="margin-top:8px;">📧 a2kdigitalstudio2025@gmail.com | 💬 <a href="https://wa.me/584164117331" target="_blank" style="color:var(--text-muted);text-decoration:none;">+58 416-4117331</a> | ✈️ <a href="https://t.me/ZyncBot" target="_blank" style="color:var(--text-muted);text-decoration:none;">@ZyncBot</a></p>
     </div>
 </footer>
 
-<!-- FLOATING WHATSAPP -->
-<a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="whatsapp-float" title="Contactar por WhatsApp">
-    💬
-</a>
+<!-- FLOATING BOT SYSTEM -->
+<div class="fab-container" id="fabContainer">
+    <button class="fab-trigger" id="fabTrigger" onclick="toggleFab()" aria-label="Abrir menú de contacto">
+        <span class="fab-icon">✦</span>
+    </button>
+    <div class="fab-actions" id="fabActions">
+        <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="fab-btn fab-btn-wa" aria-label="WhatsApp">
+            💬
+            <span class="fab-label">WhatsApp Bot</span>
+        </a>
+        <a href="https://t.me/ZyncBot" target="_blank" class="fab-btn fab-btn-tg" aria-label="Telegram">
+            ✈️
+            <span class="fab-label">Telegram Bot</span>
+        </a>
+        <button class="fab-btn fab-btn-chat" onclick="openChatWidget()" aria-label="Chat en tienda">
+            💬
+            <span class="fab-label">Chat aquí</span>
+        </button>
+    </div>
+</div>
+
+<!-- CHAT WIDGET -->
+<div class="chat-widget" id="chatWidget">
+    <div class="chat-header">
+        <div class="chat-avatar">🤖<span class="chat-status"></span></div>
+        <div class="chat-header-info">
+            <h4>A2K Asistente</h4>
+            <span>En línea — Responde al instante</span>
+        </div>
+        <div class="chat-header-actions">
+            <button class="chat-header-btn" onclick="closeChatWidget()" aria-label="Cerrar chat">✕</button>
+        </div>
+    </div>
+    <div class="chat-body" id="chatBody">
+        <div class="chat-msg chat-msg-bot">
+            ¡Hola! 👋 Soy el <strong>Asistente A2K</strong>. ¿En qué te puedo ayudar?<br><br>Elige una opción o escribe tu consulta:
+        </div>
+    </div>
+    <div class="chat-quick-replies" id="chatQuickReplies">
+        <button class="chat-quick-btn" onclick="chatQuickReply('Ver Apps', 'Quiero ver el catálogo de apps disponibles')">📦 Ver Apps</button>
+        <button class="chat-quick-btn" onclick="chatQuickReply('Precios', '¿Cuáles son los precios y planes?')">💰 Precios</button>
+        <button class="chat-quick-btn" onclick="chatQuickReply('Demo', 'Quiero solicitar una prueba demo')">🎮 Solicitar Demo</button>
+        <button class="chat-quick-btn" onclick="chatQuickReply('Contacto', 'Quiero hablar con un humano')">🧑‍💼 Humano</button>
+    </div>
+    <div class="chat-footer">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Escribe tu mensaje..." onkeydown="if(event.key==='Enter')sendChatMsg()">
+        <button class="chat-send" onclick="sendChatMsg()" aria-label="Enviar">➤</button>
+    </div>
+</div>
+
+<!-- WELCOME POPUP -->
+<div class="welcome-popup-overlay" id="welcomePopup">
+    <div class="welcome-popup">
+        <button class="welcome-close" onclick="closeWelcomePopup()" aria-label="Cerrar">✕</button>
+        <div class="welcome-icon">🤖</div>
+        <h3>¡Bienvenido a A2K!</h3>
+        <p>Nuestros <strong>Asistentes Bot</strong> están disponibles 24/7 para ayudarte. Elige tu plataforma favorita y chatea con nosotros al instante.</p>
+        <div class="welcome-bots">
+            <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="welcome-bot-btn wa-btn">
+                <span class="bot-icon">💬</span>
+                <span class="bot-name">WhatsApp</span>
+                <span class="bot-status"><span class="online">●</span> En línea</span>
+            </a>
+            <a href="https://t.me/ZyncBot" target="_blank" class="welcome-bot-btn tg-btn">
+                <span class="bot-icon">✈️</span>
+                <span class="bot-name">Telegram</span>
+                <span class="bot-status"><span class="online">●</span> En línea</span>
+            </a>
+        </div>
+        <button class="welcome-skip" onclick="closeWelcomePopup()">No gracias, seguir navegando</button>
+    </div>
+</div>
 
 <!-- FORM MODAL DEMO -->
 <div class="modal-overlay" id="modalFormDemo">
@@ -2526,6 +3053,145 @@
         window.open('https://wa.me/584164117331?text=' + msg, '_blank');
         closeFormModal('modalFormPro');
     }
+
+    // ===== FLOATING BOT SYSTEM =====
+    let fabOpen = false;
+    let chatOpen = false;
+
+    function toggleFab() {
+        const container = document.getElementById('fabContainer');
+        fabOpen = !fabOpen;
+        container.classList.toggle('is-open', fabOpen);
+        if (fabOpen && chatOpen) closeChatWidget();
+    }
+
+    function openChatWidget() {
+        document.getElementById('chatWidget').classList.add('is-open');
+        chatOpen = true;
+        if (fabOpen) {
+            document.getElementById('fabContainer').classList.remove('is-open');
+            fabOpen = false;
+        }
+        document.getElementById('chatInput').focus();
+    }
+
+    function closeChatWidget() {
+        document.getElementById('chatWidget').classList.remove('is-open');
+        chatOpen = false;
+    }
+
+    document.addEventListener('click', (e) => {
+        if (fabOpen && !document.getElementById('fabContainer').contains(e.target)) {
+            document.getElementById('fabContainer').classList.remove('is-open');
+            fabOpen = false;
+        }
+    });
+
+    // ===== CHAT WIDGET LOGIC =====
+    const chatResponses = {
+        'apps': '📦 Tenemos <strong>9 apps profesionales</strong> disponibles:<br><br>' +
+            '💻 <strong>Locales</strong> (pago único $25):<br>' +
+            '• 💈 Barbería Pro<br>• 💅 Nail Studio Pro<br>• 🏍️ Repuestos de Motos Pro<br>' +
+            '• 🔧 Ferretería A2K Pro<br>• 📦 Bodega Descarga Pro<br>• 🛒 Mercado Logic Pro<br>• 🍍 Frutería Pro<br><br>' +
+            '☁️ <strong>Cloud</strong> (suscripción $15/mes):<br>' +
+            '• 🏪 Bodega Pro Cloud<br>• 💊 Farmacia Pro Plus<br><br>' +
+            '¿Te interesa alguna en particular?',
+        'precios': '💰 <strong>Planes Locales</strong> (pago único):<br>' +
+            '• 1 terminal: <strong>$25</strong><br>• 3 terminales: <strong>$35</strong> (ahorra $10)<br>' +
+            '• 5 terminales: <strong>$45</strong> (ahorra $20)<br>• 10 terminales: <strong>$65</strong> (ahorra $40)<br><br>' +
+            '☁️ <strong>Planes Cloud</strong> (suscripción):<br>' +
+            '• 1 tienda: <strong>$15/mes</strong> + $15 activación<br>• 3 tiendas: <strong>$35/mes</strong><br>' +
+            '• 5 tiendas: <strong>$50/mes</strong><br>• 10 tiendas: <strong>$80/mes</strong><br><br>' +
+            '¿Quieres adquirir una licencia?',
+        'demo': '🎮 ¡Genial! Puedes probar cualquier app <strong>gratis durante 5 días</strong>.<br><br>' +
+            'Para solicitar tu demo:<br>' +
+            '1️⃣ Haz clic en <strong>"Solicitar Demo"</strong> en cualquier app<br>' +
+            '2️⃣ O escríbenos por 💬 <a href="https://wa.me/584164117331?text=Hola%2C%20quiero%20solicitar%20una%20demo" target="_blank" style="color:#25D366">WhatsApp</a> / ✈️ <a href="https://t.me/ZyncBot" target="_blank" style="color:#0088cc">Telegram</a><br><br>' +
+            '¿Qué app te gustaría probar?',
+        'contacto': '🧑‍💼 Por supuesto:<br><br>' +
+            '💬 <strong>WhatsApp</strong>: <a href="https://wa.me/584164117331" target="_blank" style="color:#25D366">+58 416-4117331</a><br>' +
+            '✈️ <strong>Telegram</strong>: <a href="https://t.me/ZyncBot" target="_blank" style="color:#0088cc">@ZyncBot</a><br>' +
+            '📧 <strong>Email</strong>: a2kdigitalstudio2025@gmail.com<br><br>' +
+            '¡Te respondemos al instante!',
+        'default': '🤖 Gracias por tu mensaje. Puedo ayudarte con:<br><br>' +
+            '• 📦 Info sobre nuestras <strong>Apps</strong><br>• 💰 <strong>Precios</strong> y planes<br>' +
+            '• 🎮 Solicitar una <strong>Demo</strong><br>• 🧑‍💼 Hablar con un <strong>humano</strong><br><br>' +
+            '¿O puedes escribirnos directo por 💬 <a href="https://wa.me/584164117331" target="_blank" style="color:#25D366">WhatsApp</a> o ✈️ <a href="https://t.me/ZyncBot" target="_blank" style="color:#0088cc">Telegram</a>.'
+    };
+
+    function getChatResponse(text) {
+        const lower = text.toLowerCase();
+        if (lower.includes('app') || lower.includes('catalogo') || lower.includes('ver apps') || lower.includes('producto') || lower.includes('software')) return chatResponses.apps;
+        if (lower.includes('precio') || lower.includes('plan') || lower.includes('costo') || lower.includes('cuanto') || lower.includes('$')) return chatResponses.precios;
+        if (lower.includes('demo') || lower.includes('prueba') || lower.includes('gratis') || lower.includes('probar')) return chatResponses.demo;
+        if (lower.includes('humano') || lower.includes('persona') || lower.includes('contacto') || lower.includes('hablar') || lower.includes('whatsapp') || lower.includes('telegram')) return chatResponses.contacto;
+        return chatResponses.default;
+    }
+
+    function addChatMsg(text, isUser) {
+        const body = document.getElementById('chatBody');
+        const div = document.createElement('div');
+        div.className = 'chat-msg ' + (isUser ? 'chat-msg-user' : 'chat-msg-bot');
+        div.innerHTML = text;
+        body.appendChild(div);
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function showTyping() {
+        const body = document.getElementById('chatBody');
+        const div = document.createElement('div');
+        div.className = 'chat-typing';
+        div.id = 'chatTypingIndicator';
+        div.innerHTML = '<span></span><span></span><span></span>';
+        body.appendChild(div);
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function hideTyping() {
+        const el = document.getElementById('chatTypingIndicator');
+        if (el) el.remove();
+    }
+
+    function chatQuickReply(label, msg) {
+        addChatMsg(msg, true);
+        document.getElementById('chatInput').value = '';
+        showTyping();
+        setTimeout(() => {
+            hideTyping();
+            const resp = getChatResponse(label);
+            addChatMsg(resp, false);
+        }, 800 + Math.random() * 600);
+    }
+
+    function sendChatMsg() {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
+        addChatMsg(text, true);
+        input.value = '';
+        showTyping();
+        setTimeout(() => {
+            hideTyping();
+            const resp = getChatResponse(text);
+            addChatMsg(resp, false);
+        }, 600 + Math.random() * 800);
+    }
+
+    // ===== WELCOME POPUP =====
+    function closeWelcomePopup() {
+        document.getElementById('welcomePopup').classList.remove('active');
+        sessionStorage.setItem('a2k_welcome_seen', '1');
+    }
+
+    setTimeout(() => {
+        if (!sessionStorage.getItem('a2k_welcome_seen')) {
+            document.getElementById('welcomePopup').classList.add('active');
+        }
+    }, 8000);
+
+    document.getElementById('welcomePopup').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeWelcomePopup();
+    });
 
     // ===== SMOOTH SCROLL =====
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
