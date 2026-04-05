@@ -970,35 +970,29 @@
             transform: translateY(0);
         }
 
-        /* ===== FLOATING WHATSAPP ===== */
-        .whatsapp-float {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 60px;
-            height: 60px;
-            background: #25D366;
+        /* ===== FAB NOTIFICATION BADGE ===== */
+        .fab-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 11px;
+            font-weight: 800;
             color: white;
-            text-decoration: none;
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-            z-index: 999;
-            transition: transform 0.3s;
-            animation: pulse-wa 2s infinite;
+            z-index: 10;
+            animation: badgePulse 2s infinite;
+            border: 2px solid var(--bg-dark);
+            pointer-events: none;
+            transition: transform 0.3s, opacity 0.3s;
         }
-
-        .whatsapp-float:hover {
-            transform: scale(1.1);
-        }
-
-        @keyframes pulse-wa {
-            0%, 100% { box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
-            50% { box-shadow: 0 6px 30px rgba(37, 211, 102, 0.7); }
-        }
+        .fab-badge.hidden { transform: scale(0); opacity: 0; }
+        @keyframes badgePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
 
         /* ===== FLOATING BOT SYSTEM ===== */
         .fab-container {
@@ -1438,16 +1432,300 @@
         }
         .welcome-skip:hover { color: var(--text-secondary); }
 
+        /* ===== WELCOME POPUP GLOW ===== */
+        .welcome-popup-glow {
+            position: absolute;
+            inset: -2px;
+            background: conic-gradient(from 0deg, #6C63FF, #00D4AA, #FF6B6B, #FF8E53, #6C63FF);
+            border-radius: 26px;
+            z-index: -1;
+            animation: rotateBorder 3s linear infinite;
+            opacity: 0.6;
+        }
+        @keyframes rotateBorder {
+            from { filter: hue-rotate(0deg); }
+            to { filter: hue-rotate(360deg); }
+        }
+        .welcome-bot-btn {
+            transition: all 0.3s ease;
+        }
+        .welcome-bot-btn.wa-btn:hover { 
+            border-color: #25D366 !important; 
+            box-shadow: 0 8px 30px rgba(37,211,102,0.35) !important; 
+            background: rgba(37,211,102,0.1) !important;
+            transform: translateY(-4px) !important;
+        }
+        .welcome-bot-btn.tg-btn:hover { 
+            border-color: #0088cc !important; 
+            box-shadow: 0 8px 30px rgba(0,136,204,0.35) !important;
+            background: rgba(0,136,204,0.1) !important;
+            transform: translateY(-4px) !important;
+        }
+
+        /* ===== MOBILE STICKY BAR ===== */
+        .mobile-sticky-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 26, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 10px 16px;
+            z-index: 9990;
+            gap: 10px;
+        }
+        .mobile-sticky-bar a {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.2s;
+            color: white;
+        }
+        .mobile-sticky-bar .msb-wa {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            box-shadow: 0 4px 15px rgba(37,211,102,0.3);
+        }
+        .mobile-sticky-bar .msb-tg {
+            background: linear-gradient(135deg, #0088cc 0%, #005f8f 100%);
+            box-shadow: 0 4px 15px rgba(0,136,204,0.3);
+        }
+        .mobile-sticky-bar .msb-chat {
+            background: var(--gradient-1);
+            box-shadow: 0 4px 15px rgba(108,99,255,0.3);
+        }
+        .mobile-sticky-bar a:active { transform: scale(0.97); }
+
+        /* ===== EXIT INTENT OVERLAY ===== */
+        .exit-intent-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 10001;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            animation: wpFadeIn 0.3s ease;
+        }
+        .exit-intent-overlay.active { display: flex; }
+        .exit-intent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            max-width: 460px;
+            width: 100%;
+            padding: 40px 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: wpSlideIn 0.5s cubic-bezier(0.19,1,0.22,1) both;
+        }
+        .exit-intent-card .exit-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: wpBounce 0.6s cubic-bezier(0.19,1,0.22,1) 0.2s both;
+        }
+        .exit-intent-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .exit-intent-card p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+        .exit-intent-bots {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .exit-intent-bot {
+            flex: 1;
+            max-width: 190px;
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .exit-intent-bot:hover { transform: translateY(-3px); }
+        .exit-intent-bot.ei-wa:hover { border-color: #25D366; box-shadow: 0 8px 24px rgba(37,211,102,0.3); }
+        .exit-intent-bot.ei-tg:hover { border-color: #0088cc; box-shadow: 0 8px 24px rgba(0,136,204,0.3); }
+        .exit-intent-bot .ei-icon { font-size: 32px; }
+        .exit-intent-bot .ei-name { font-size: 14px; font-weight: 700; }
+        .exit-intent-bot .ei-desc { font-size: 11px; color: var(--text-muted); }
+        .exit-skip {
+            display: inline-block;
+            margin-top: 8px;
+            color: var(--text-muted);
+            font-size: 12px;
+            cursor: pointer;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .exit-skip:hover { color: var(--text-secondary); }
+
+        /* ===== CHAT REDIRECT BUTTONS ===== */
+        .chat-msg-bot .chat-redirect-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .chat-msg-bot .chat-redirect-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            color: white;
+            transition: all 0.2s;
+        }
+        .chat-redirect-btn.crb-wa { background: #25D366; }
+        .chat-redirect-btn.crb-wa:hover { background: #20BD5A; }
+        .chat-redirect-btn.crb-tg { background: #0088cc; }
+        .chat-redirect-btn.crb-tg:hover { background: #006fa1; }
+
+        /* ===== BOT POWERED SECTION ===== */
+        .bot-powered-section {
+            padding: 60px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .bot-powered-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+            text-align: center;
+        }
+        .bot-powered-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(108, 99, 255, 0.1);
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            padding: 10px 24px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .bot-powered-badge .bp-dot {
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+        .bot-powered-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .bot-powered-desc {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .bot-powered-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .bot-powered-card {
+            padding: 24px 20px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .bot-powered-card:hover { transform: translateY(-4px); }
+        .bot-powered-card.bpc-wa:hover { border-color: #25D366; box-shadow: 0 8px 30px rgba(37,211,102,0.2); }
+        .bot-powered-card.bpc-tg:hover { border-color: #0088cc; box-shadow: 0 8px 30px rgba(0,136,204,0.2); }
+        .bot-powered-card .bpc-icon { font-size: 40px; }
+        .bot-powered-card .bpc-name { font-size: 18px; font-weight: 800; }
+        .bot-powered-card .bpc-handle { font-size: 13px; color: var(--text-muted); }
+        .bot-powered-card .bpc-status { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            font-size: 12px; 
+            color: #4ade80; 
+            font-weight: 600; 
+        }
+        .bot-powered-card .bpc-status .bpc-status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+        .bot-powered-card .bpc-features {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.5;
+        }
+
         /* ===== BOT RESPONSIVE ===== */
         @media (max-width: 768px) {
             .fab-label { display: none; }
             .chat-widget { right: 12px; bottom: 100px; width: calc(100vw - 24px); height: 480px; }
-            .fab-container { bottom: 20px; right: 16px; }
+            .fab-container { bottom: 80px; right: 16px; }
             .welcome-popup { padding: 32px 24px; margin: 16px; }
+            .mobile-sticky-bar { display: flex; }
         }
         @media (max-width: 400px) {
             .chat-widget { width: calc(100vw - 16px); right: 8px; height: 420px; }
-            .fab-container { bottom: 16px; right: 12px; }
+            .fab-container { bottom: 76px; right: 12px; }
             .fab-trigger { width: 56px; height: 56px; font-size: 22px; }
         }
         @media (prefers-reduced-motion: reduce) {
@@ -2540,6 +2818,34 @@
     </div>
 </section>
 
+<!-- POWERED BY ZYNC BOT -->
+<section class="bot-powered-section reveal" id="botpowered">
+    <div class="bot-powered-inner">
+        <div class="bot-powered-badge">
+            <span class="bp-dot"></span>
+            Powered by ZYNC Bot — Asistencia 24/7
+        </div>
+        <h2 class="bot-powered-title">Nuestros Bots Inteligentes</h2>
+        <p class="bot-powered-desc">Dos asistentes virtuales siempre disponibles para ti. Consulta nuestro catálogo, solicita demos y compra licencias directamente desde WhatsApp o Telegram. Rápido, fácil y sin complicaciones.</p>
+        <div class="bot-powered-cards">
+            <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="bot-powered-card bpc-wa">
+                <span class="bpc-icon">💬</span>
+                <span class="bpc-name">WhatsApp Bot</span>
+                <span class="bpc-handle">+58 416-4117331</span>
+                <span class="bpc-status"><span class="bpc-status-dot"></span> En línea ahora</span>
+                <span class="bpc-features">Catálogo • Precios • Compras • Soporte</span>
+            </a>
+            <a href="https://t.me/ZyncBot" target="_blank" class="bot-powered-card bpc-tg">
+                <span class="bpc-icon">✈️</span>
+                <span class="bpc-name">Telegram Bot</span>
+                <span class="bpc-handle">@ZyncBot</span>
+                <span class="bpc-status"><span class="bpc-status-dot"></span> En línea ahora</span>
+                <span class="bpc-features">Catálogo interactivo • Comandos • Inline</span>
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- FOOTER -->
 <footer class="footer">
     <div class="section-container">
@@ -2553,6 +2859,7 @@
 <div class="fab-container" id="fabContainer">
     <button class="fab-trigger" id="fabTrigger" onclick="toggleFab()" aria-label="Abrir menú de contacto">
         <span class="fab-icon">✦</span>
+        <span class="fab-badge hidden" id="fabBadge">2</span>
     </button>
     <div class="fab-actions" id="fabActions">
         <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="fab-btn fab-btn-wa" aria-label="WhatsApp">
@@ -2568,6 +2875,13 @@
             <span class="fab-label">Chat aquí</span>
         </button>
     </div>
+</div>
+
+<!-- MOBILE STICKY BAR -->
+<div class="mobile-sticky-bar" id="mobileStickyBar">
+    <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="msb-wa">💬 WhatsApp</a>
+    <a href="https://t.me/ZyncBot" target="_blank" class="msb-tg">✈️ Telegram</a>
+    <button class="msb-chat" onclick="openChatWidget()" style="border:none;cursor:pointer;">🤖 Chat</button>
 </div>
 
 <!-- CHAT WIDGET -->
@@ -2602,6 +2916,7 @@
 <!-- WELCOME POPUP -->
 <div class="welcome-popup-overlay" id="welcomePopup">
     <div class="welcome-popup">
+        <div class="welcome-popup-glow"></div>
         <button class="welcome-close" onclick="closeWelcomePopup()" aria-label="Cerrar">✕</button>
         <div class="welcome-icon">🤖</div>
         <h3>¡Bienvenido a A2K!</h3>
@@ -2619,6 +2934,29 @@
             </a>
         </div>
         <button class="welcome-skip" onclick="closeWelcomePopup()">No gracias, seguir navegando</button>
+    </div>
+</div>
+
+<!-- EXIT INTENT POPUP -->
+<div class="exit-intent-overlay" id="exitIntent">
+    <div class="exit-intent-card">
+        <button class="welcome-close" onclick="closeExitIntent()" aria-label="Cerrar">✕</button>
+        <div class="exit-icon">🚀</div>
+        <h3>¡Espera! No te vayas sin ver esto</h3>
+        <p>Nuestros bots <strong>ZYNC</strong> pueden mostrarte el catálogo completo, precios y darte una demo al instante. ¡Habla con nosotros en segundos!</p>
+        <div class="exit-intent-bots">
+            <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="exit-intent-bot ei-wa">
+                <span class="ei-icon">💬</span>
+                <span class="ei-name">WhatsApp</span>
+                <span class="ei-desc">+58 416-4117331</span>
+            </a>
+            <a href="https://t.me/ZyncBot" target="_blank" class="exit-intent-bot ei-tg">
+                <span class="ei-icon">✈️</span>
+                <span class="ei-name">Telegram</span>
+                <span class="ei-desc">@ZyncBot</span>
+            </a>
+        </div>
+        <button class="exit-skip" onclick="closeExitIntent()">No gracias, seguir navegando</button>
     </div>
 </div>
 
@@ -3095,28 +3433,43 @@
             '• 🔧 Ferretería A2K Pro<br>• 📦 Bodega Descarga Pro<br>• 🛒 Mercado Logic Pro<br>• 🍍 Frutería Pro<br><br>' +
             '☁️ <strong>Cloud</strong> (suscripción $15/mes):<br>' +
             '• 🏪 Bodega Pro Cloud<br>• 💊 Farmacia Pro Plus<br><br>' +
-            '¿Te interesa alguna en particular?',
+            '<div class="chat-redirect-btns">' +
+            '<a href="https://wa.me/584164117331?text=Hola%2C%20quiero%20info%20de%20las%20apps" target="_blank" class="chat-redirect-btn crb-wa">💬 Preguntar por WhatsApp</a>' +
+            '<a href="https://t.me/ZyncBot" target="_blank" class="chat-redirect-btn crb-tg">✈️ Ver en Telegram</a>' +
+            '</div>',
         'precios': '💰 <strong>Planes Locales</strong> (pago único):<br>' +
             '• 1 terminal: <strong>$25</strong><br>• 3 terminales: <strong>$35</strong> (ahorra $10)<br>' +
             '• 5 terminales: <strong>$45</strong> (ahorra $20)<br>• 10 terminales: <strong>$65</strong> (ahorra $40)<br><br>' +
             '☁️ <strong>Planes Cloud</strong> (suscripción):<br>' +
             '• 1 tienda: <strong>$15/mes</strong> + $15 activación<br>• 3 tiendas: <strong>$35/mes</strong><br>' +
             '• 5 tiendas: <strong>$50/mes</strong><br>• 10 tiendas: <strong>$80/mes</strong><br><br>' +
-            '¿Quieres adquirir una licencia?',
+            '<div class="chat-redirect-btns">' +
+            '<a href="https://wa.me/584164117331?text=Hola%2C%20quiero%20comprar%20una%20licencia" target="_blank" class="chat-redirect-btn crb-wa">💬 Comprar por WhatsApp</a>' +
+            '<a href="https://t.me/ZyncBot" target="_blank" class="chat-redirect-btn crb-tg">✈️ Comprar por Telegram</a>' +
+            '</div>',
         'demo': '🎮 ¡Genial! Puedes probar cualquier app <strong>gratis durante 5 días</strong>.<br><br>' +
             'Para solicitar tu demo:<br>' +
             '1️⃣ Haz clic en <strong>"Solicitar Demo"</strong> en cualquier app<br>' +
-            '2️⃣ O escríbenos por 💬 <a href="https://wa.me/584164117331?text=Hola%2C%20quiero%20solicitar%20una%20demo" target="_blank" style="color:#25D366">WhatsApp</a> / ✈️ <a href="https://t.me/ZyncBot" target="_blank" style="color:#0088cc">Telegram</a><br><br>' +
-            '¿Qué app te gustaría probar?',
-        'contacto': '🧑‍💼 Por supuesto:<br><br>' +
+            '2️⃣ O usa nuestros bots directamente:<br><br>' +
+            '<div class="chat-redirect-btns">' +
+            '<a href="https://wa.me/584164117331?text=Hola%2C%20quiero%20solicitar%20una%20demo" target="_blank" class="chat-redirect-btn crb-wa">💬 Demo por WhatsApp</a>' +
+            '<a href="https://t.me/ZyncBot" target="_blank" class="chat-redirect-btn crb-tg">✈️ Demo por Telegram</a>' +
+            '</div>',
+        'contacto': '🧑‍💼 Por supuesto, puedes contactarnos directo:<br><br>' +
             '💬 <strong>WhatsApp</strong>: <a href="https://wa.me/584164117331" target="_blank" style="color:#25D366">+58 416-4117331</a><br>' +
             '✈️ <strong>Telegram</strong>: <a href="https://t.me/ZyncBot" target="_blank" style="color:#0088cc">@ZyncBot</a><br>' +
             '📧 <strong>Email</strong>: a2kdigitalstudio2025@gmail.com<br><br>' +
-            '¡Te respondemos al instante!',
-        'default': '🤖 Gracias por tu mensaje. Puedo ayudarte con:<br><br>' +
+            '<div class="chat-redirect-btns">' +
+            '<a href="https://wa.me/584164117331" target="_blank" class="chat-redirect-btn crb-wa">💬 Ir a WhatsApp</a>' +
+            '<a href="https://t.me/ZyncBot" target="_blank" class="chat-redirect-btn crb-tg">✈️ Ir a Telegram</a>' +
+            '</div>',
+        'default': '🤖 Soy el <strong>Asistente A2K</strong>. Puedo ayudarte con:<br><br>' +
             '• 📦 Info sobre nuestras <strong>Apps</strong><br>• 💰 <strong>Precios</strong> y planes<br>' +
             '• 🎮 Solicitar una <strong>Demo</strong><br>• 🧑‍💼 Hablar con un <strong>humano</strong><br><br>' +
-            '¿O puedes escribirnos directo por 💬 <a href="https://wa.me/584164117331" target="_blank" style="color:#25D366">WhatsApp</a> o ✈️ <a href="https://t.me/ZyncBot" target="_blank" style="color:#0088cc">Telegram</a>.'
+            '<div class="chat-redirect-btns">' +
+            '<a href="https://wa.me/584164117331" target="_blank" class="chat-redirect-btn crb-wa">💬 WhatsApp Bot</a>' +
+            '<a href="https://t.me/ZyncBot" target="_blank" class="chat-redirect-btn crb-tg">✈️ Telegram Bot</a>' +
+            '</div>'
     };
 
     function getChatResponse(text) {
@@ -3187,10 +3540,47 @@
         if (!sessionStorage.getItem('a2k_welcome_seen')) {
             document.getElementById('welcomePopup').classList.add('active');
         }
-    }, 8000);
+    }, 12000);
 
     document.getElementById('welcomePopup').addEventListener('click', (e) => {
         if (e.target === e.currentTarget) closeWelcomePopup();
+    });
+
+    // ===== FAB NOTIFICATION BADGE =====
+    setTimeout(() => {
+        const badge = document.getElementById('fabBadge');
+        if (badge && !sessionStorage.getItem('a2k_fab_clicked')) {
+            badge.classList.remove('hidden');
+        }
+    }, 12000);
+
+    // Hide badge when FAB is first opened
+    const origToggleFab = toggleFab;
+    toggleFab = function() {
+        origToggleFab();
+        const badge = document.getElementById('fabBadge');
+        if (badge && !badge.classList.contains('hidden')) {
+            badge.classList.add('hidden');
+            sessionStorage.setItem('a2k_fab_clicked', '1');
+        }
+    };
+
+    // ===== EXIT INTENT DETECTION =====
+    let exitIntentShown = false;
+    document.addEventListener('mouseout', function(e) {
+        if (e.clientY < 5 && !exitIntentShown && !sessionStorage.getItem('a2k_exit_seen')) {
+            exitIntentShown = true;
+            document.getElementById('exitIntent').classList.add('active');
+            sessionStorage.setItem('a2k_exit_seen', '1');
+        }
+    });
+
+    function closeExitIntent() {
+        document.getElementById('exitIntent').classList.remove('active');
+    }
+
+    document.getElementById('exitIntent').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeExitIntent();
     });
 
     // ===== SMOOTH SCROLL =====
