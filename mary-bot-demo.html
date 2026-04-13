@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mary Bot — Demo A2K Digital Studio</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #12121a;
+    --neon: #00ff88;
+    --blue: #0088ff;
+    --purple: #8844ff;
+    --red: #ff3355;
+    --yellow: #ffcc00;
+    --white: #ffffff;
+    --gray: #888899;
+    --green-wa: #25d366;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    color: var(--white);
+  }
+
+  .scene {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 60px;
+    gap: 40px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+
+  .scene.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--neon), var(--blue));
+    width: 0%;
+    transition: width 0.3s linear;
+    z-index: 999;
+    box-shadow: 0 0 12px var(--neon);
+  }
+
+  /* ── SCENE COUNTER ── */
+  .scene-counter {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    font-size: 16px;
+    color: var(--gray);
+    z-index: 999;
+    font-weight: 600;
+  }
+
+  /* ── PLAY BUTTON ── */
+  .play-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--neon);
+    color: var(--bg);
+    border: none;
+    border-radius: 50px;
+    padding: 14px 36px;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 0 20px var(--neon)88;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .play-btn:hover { transform: translateX(-50%) scale(1.05); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.5); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes slideLeft {
+    from { opacity: 0; transform: translateX(-40px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 20px var(--green-wa)88; }
+    50% { transform: scale(1.04); box-shadow: 0 0 40px var(--green-wa)cc; }
+  }
+  @keyframes phoneShake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+  }
+  @keyframes waveBar {
+    0%,100% { transform: scaleY(0.3); }
+    50% { transform: scaleY(1); }
+  }
+  @keyframes countUp {
+    from { content: "0"; }
+  }
+  @keyframes flash {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-60px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes glowPulse {
+    0%,100% { text-shadow: 0 0 20px var(--neon)66; }
+    50% { text-shadow: 0 0 50px var(--neon)cc, 0 0 80px var(--neon)44; }
+  }
+
+  .anim-fadeUp   { animation: fadeUp 0.7s ease forwards; }
+  .anim-fadeIn   { animation: fadeIn 0.7s ease forwards; }
+  .anim-scaleIn  { animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+  .anim-slideLeft { animation: slideLeft 0.6s ease forwards; }
+
+  .delay-1 { animation-delay: 0.3s; opacity: 0; }
+  .delay-2 { animation-delay: 0.6s; opacity: 0; }
+  .delay-3 { animation-delay: 0.9s; opacity: 0; }
+  .delay-4 { animation-delay: 1.2s; opacity: 0; }
+  .delay-5 { animation-delay: 1.5s; opacity: 0; }
+  .delay-6 { animation-delay: 1.8s; opacity: 0; }
+
+  /* ── SCENE 1: INTRO ── */
+  #s1 { background: radial-gradient(ellipse at center, #0d0d1a 0%, var(--bg) 70%); }
+  .phone-icon {
+    font-size: 160px;
+    animation: phoneShake 0.5s ease infinite, fadeIn 0.5s ease forwards;
+    filter: drop-shadow(0 0 30px var(--red)) drop-shadow(0 0 60px var(--red)44);
+  }
+  .s1-title {
+    font-size: 60px;
+    font-weight: 900;
+    text-align: center;
+    line-height: 1.2;
+    letter-spacing: -1px;
+  }
+  .s1-sub { font-size: 26px; color: var(--gray); text-align: center; }
+  .red-line {
+    width: 200px; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    border-radius: 2px;
+  }
+
+  /* ── SCENE 2: PAIN POINT ── */
+  #s2 { background: radial-gradient(ellipse at top, #1a0510 0%, var(--bg) 60%); gap: 20px; }
+  .counter-box {
+    background: linear-gradient(135deg, #2a0815, #1a050e);
+    border: 2px solid #ff335544;
+    border-radius: 24px;
+    padding: 24px 60px;
+    text-align: center;
+  }
+  .counter-num {
+    font-size: 80px;
+    font-weight: 900;
+    color: var(--red);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .counter-label { font-size: 20px; color: var(--gray); margin-top: 8px; }
+  .pain-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #ff335511;
+    border: 1px solid #ff335533;
+    border-radius: 16px;
+    padding: 18px 24px;
+    width: 100%;
+  }
+  .pain-icon { font-size: 30px; flex-shrink: 0; }
+  .pain-text { font-size: 20px; font-weight: 500; }
+
+  /* ── SCENE 3: SOLUTION ── */
+  #s3 { background: radial-gradient(ellipse at center, #001a0d 0%, var(--bg) 65%); }
+  .flash-overlay {
+    position: absolute; inset: 0;
+    background: var(--neon);
+    animation: flash 0.4s ease forwards;
+    pointer-events: none;
+  }
+  .bot-icon {
+    font-size: 160px;
+    filter: drop-shadow(0 0 30px var(--neon)) drop-shadow(0 0 60px var(--neon)44);
+    animation: scaleIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, glowPulse 2s ease infinite 0.7s;
+  }
+  .wave-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 70px;
+  }
+  .wave-bar {
+    width: 10px;
+    border-radius: 5px;
+    background: linear-gradient(180deg, var(--neon), var(--blue));
+    box-shadow: 0 0 8px var(--neon)88;
+    transform-origin: bottom;
+  }
+  .wave-bar:nth-child(1) { height: 30px; animation: waveBar 0.6s 0.0s ease infinite; }
+  .wave-bar:nth-child(2) { height: 50px; animation: waveBar 0.6s 0.1s ease infinite; }
+  .wave-bar:nth-child(3) { height: 65px; animation: waveBar 0.6s 0.2s ease infinite; }
+  .wave-bar:nth-child(4) { height: 55px; animation: waveBar 0.6s 0.3s ease infinite; }
+  .wave-bar:nth-child(5) { height: 70px; animation: waveBar 0.6s 0.4s ease infinite; }
+  .wave-bar:nth-child(6) { height: 60px; animation: waveBar 0.6s 0.3s ease infinite; }
+  .wave-bar:nth-child(7) { height: 70px; animation: waveBar 0.6s 0.2s ease infinite; }
+  .wave-bar:nth-child(8) { height: 50px; animation: waveBar 0.6s 0.1s ease infinite; }
+  .wave-bar:nth-child(9) { height: 30px; animation: waveBar 0.6s 0.0s ease infinite; }
+
+  .mary-title {
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--neon);
+    letter-spacing: -2px;
+    text-shadow: 0 0 40px var(--neon)66;
+  }
+  .mary-sub { font-size: 34px; font-weight: 600; }
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+  }
+  .badge {
+    background: #00ff8815;
+    border: 1px solid #00ff8844;
+    border-radius: 50px;
+    padding: 12px 28px;
+    font-size: 22px;
+    color: var(--neon);
+    font-weight: 600;
+  }
+
+  /* ── SCENE 4: HOW IT WORKS ── */
+  #s4 { background: radial-gradient(ellipse at top left, #001520 0%, var(--bg) 60%); justify-content: flex-start; padding-top: 70px; }
+  .call-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #00ff8822;
+    border: 2px solid #00ff8866;
+    border-radius: 20px;
+    padding: 20px 40px;
+    width: 100%;
+    box-shadow: 0 0 30px #00ff8822;
+  }
+  .call-answered {
+    background: var(--neon);
+    color: var(--bg);
+    border-radius: 50px;
+    padding: 8px 24px;
+    font-size: 18px;
+    font-weight: 800;
+    margin-left: auto;
+  }
+  .chat-area { display: flex; flex-direction: column; gap: 16px; width: 100%; }
+  .bubble {
+    max-width: 85%;
+    padding: 20px 26px;
+    border-radius: 20px;
+    font-size: 24px;
+    line-height: 1.4;
+  }
+  .bubble.client {
+    align-self: flex-end;
+    background: var(--card);
+    border: 1px solid #ffffff22;
+    border-radius: 20px 4px 20px 20px;
+  }
+  .bubble.mary {
+    align-self: flex-start;
+    background: linear-gradient(135deg, #00ff8822, #0088ff22);
+    border: 1px solid #00ff8855;
+    border-radius: 4px 20px 20px 20px;
+  }
+  .mary-label { font-size: 14px; color: var(--neon); font-weight: 700; margin-bottom: 6px; letter-spacing: 1px; }
+  .confirm-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #00ff8820;
+    border: 2px solid var(--neon);
+    border-radius: 16px;
+    padding: 20px 36px;
+    width: 100%;
+    font-size: 22px;
+    color: var(--neon);
+    font-weight: 700;
+    box-shadow: 0 0 40px #00ff8833;
+  }
+
+  /* ── SCENE 5: WHATSAPP ── */
+  #s5 { background: radial-gradient(ellipse at center, #001a08 0%, var(--bg) 65%); }
+  .phone-mockup {
+    width: min(420px, 45vw);
+    background: #111118;
+    border-radius: 50px;
+    border: 3px solid #333344;
+    box-shadow: 0 40px 100px #00000088, 0 0 50px #00ff8822;
+    overflow: hidden;
+  }
+  .status-bar {
+    background: #1a1a24;
+    padding: 14px 24px 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .wa-header {
+    background: #075E54;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .wa-avatar {
+    width: 48px; height: 48px;
+    border-radius: 24px;
+    background: var(--neon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  .wa-chat { background: #0b141a; padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; }
+  .wa-msg {
+    background: #1f2c33;
+    border-radius: 4px 14px 14px 14px;
+    padding: 14px 18px;
+    max-width: 90%;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .wa-msg-title { color: #25d366; font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+  .wa-time { color: var(--gray); font-size: 11px; text-align: right; margin-top: 6px; }
+
+  /* ── SCENE 6: ADMIN ── */
+  #s6 { background: var(--bg); justify-content: flex-start; padding-top: 60px; }
+  .panel-header {
+    width: 100%;
+    background: var(--card);
+    border-radius: 18px;
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #00ff8833;
+  }
+  .live-badge {
+    background: #00ff8822;
+    border: 1px solid var(--neon);
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 14px;
+    color: var(--neon);
+    font-weight: 700;
+  }
+  .stats-row { display: flex; gap: 18px; width: 100%; }
+  .stat-card {
+    flex: 1;
+    background: var(--card);
+    border-radius: 18px;
+    padding: 28px 20px;
+    text-align: center;
+    border: 1px solid #ffffff11;
+  }
+  .stat-icon { font-size: 36px; margin-bottom: 12px; }
+  .stat-num { font-size: 48px; font-weight: 900; line-height: 1; }
+  .stat-lbl { font-size: 15px; color: var(--gray); margin-top: 8px; }
+  .chart-area {
+    width: 100%;
+    background: var(--card);
+    border-radius: 18px;
+    padding: 28px;
+    border: 1px solid #ffffff11;
+  }
+  .chart-title { font-size: 16px; color: var(--gray); margin-bottom: 20px; font-weight: 600; }
+  .bars { display: flex; align-items: flex-end; gap: 14px; height: 130px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+  .bar {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    transition: height 1s ease;
+  }
+  .bar-day { font-size: 13px; color: var(--gray); }
+
+  /* ── SCENE 7: FEATURES ── */
+  #s7 { background: var(--bg); justify-content: flex-start; padding-top: 60px; }
+  .feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; width: 100%; }
+  .feat-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .feat-icon { font-size: 40px; }
+  .feat-title { font-size: 22px; font-weight: 800; }
+  .feat-desc { font-size: 16px; color: var(--gray); line-height: 1.4; }
+
+  /* ── SCENE 8: PRICING ── */
+  #s8 { background: var(--bg); justify-content: flex-start; padding-top: 60px; }
+  .plan-row { display: flex; gap: 16px; width: 100%; align-items: flex-start; }
+  .plan-card {
+    flex: 1;
+    background: var(--card);
+    border-radius: 22px;
+    padding: 28px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    border: 1px solid #ffffff22;
+  }
+  .plan-card.featured {
+    background: linear-gradient(135deg, #00ff8822, #00ff8811);
+    border: 2px solid #00ff8899;
+    box-shadow: 0 0 50px #00ff8822;
+  }
+  .popular-badge {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--neon);
+    color: var(--bg);
+    border-radius: 50px;
+    padding: 4px 18px;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .plan-name { font-size: 20px; font-weight: 800; }
+  .plan-price { font-size: 52px; font-weight: 900; line-height: 1; }
+  .plan-period { font-size: 18px; color: var(--gray); }
+  .plan-calls { font-size: 16px; font-weight: 600; }
+  .plan-perk { font-size: 14px; color: var(--gray); display: flex; gap: 8px; align-items: center; }
+  .setup-banner {
+    width: 100%;
+    background: #ffcc0011;
+    border: 1px solid #ffcc0044;
+    border-radius: 16px;
+    padding: 20px 28px;
+    font-size: 22px;
+    text-align: center;
+  }
+  .speed-badge {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #00ff8822;
+    border: 2px solid #00ff8866;
+    border-radius: 16px;
+    padding: 18px 36px;
+    font-size: 22px;
+    color: var(--neon);
+    font-weight: 800;
+    box-shadow: 0 0 30px #00ff8822;
+  }
+  .roi-text { font-size: 20px; color: var(--gray); text-align: center; }
+
+  /* ── SCENE 9: TESTIMONIAL ── */
+  #s9 { background: radial-gradient(ellipse at center, #0d0d1a 0%, var(--bg) 65%); }
+  .stars { font-size: 44px; letter-spacing: 6px; }
+  .quote-text {
+    font-size: 32px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.5;
+    font-style: italic;
+    max-width: 900px;
+  }
+  .author { display: flex; align-items: center; gap: 18px; }
+  .author-avatar {
+    width: 64px; height: 64px;
+    border-radius: 32px;
+    background: linear-gradient(135deg, var(--neon), var(--blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+  }
+  .author-name { font-size: 20px; font-weight: 700; }
+  .author-loc { font-size: 16px; color: var(--gray); }
+  .quote2 { font-size: 26px; color: var(--gray); font-style: italic; text-align: center; max-width: 900px; line-height: 1.5; }
+  .divider { width: 60px; height: 2px; background: #00ff8844; border-radius: 1px; }
+
+  /* ── SCENE 10: CTA ── */
+  #s10 { background: radial-gradient(ellipse at center bottom, #001a10 0%, var(--bg) 55%); }
+  .a2k-label { font-size: 20px; font-weight: 800; color: var(--gray); letter-spacing: 4px; text-transform: uppercase; }
+  .cta-title { font-size: 66px; font-weight: 900; text-align: center; line-height: 1.1; letter-spacing: -2px; }
+  .cta-sub { font-size: 28px; color: var(--gray); }
+  .wa-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--green-wa);
+    border-radius: 60px;
+    padding: 26px 60px;
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    box-shadow: 0 0 30px #25d36688;
+    animation: pulse 2s ease infinite;
+    cursor: pointer;
+    border: none;
+  }
+  .contact-row { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+  .contact-item { font-size: 18px; color: var(--gray); display: flex; align-items: center; gap: 10px; }
+  .tagline { font-size: 20px; color: #ffffff44; font-style: italic; text-align: center; }
+  .footer-line { width: 100%; height: 1px; background: #ffffff11; }
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar" id="progressBar"></div>
+<div class="scene-counter" id="sceneCounter">1 / 10</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- SCENE 1: INTRO -->
+<!-- ═══════════════════════════════ -->
+<div class="scene active" id="s1">
+  <div class="phone-icon">📵</div>
+  <div class="s1-title anim-fadeUp">
+    ¿Cuántas clientas<br>
+    <span style="color:var(--red)">perdiste hoy</span><br>
+    por no contestar?
+  </div>
+  <div class="s1-sub anim-fadeUp delay-2">Cada llamada sin respuesta es una cita perdida.</div>
+  <div class="red-line anim-fadeIn delay-3"></div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- SCENE 2: PAIN POINT -->
+<!-- ═══════════════════════════════ -->
+<div class="scene" id="s2">
+  <div style="font-size:52px;font-weight:900;color:var(--red)" class="anim-fadeUp">El problema real</div>
+  <div style="font-size:110px;animation:phoneShake 0.4s ease infinite" class="anim-scaleIn delay-1">📳</div>
+  <div class="counter-box anim-scaleIn delay-2">
+    <div class="counter-num" id="lostCounter">0</div>
+    <div class="counter-label">llamadas perdidas hoy</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px;width:100%">
+    <div class="pain-card anim-slideLeft delay-3">
+      <span class="pain-icon">😰</span>
+      <span class="pain-text">Estabas ocupada atendiendo otra clienta</span>
+    </div>
+    <div class="pain-card anim-slideLeft delay-4">
+      <span class="pain-icon">🌙</span>
+      <span class="pain-text">Era fuera de tu horario de atención</span>
+    </div>
+    <div class="pain-card anim-slideLeft delay-5">
+      <span class="pain-icon">💸</span>
+      <span class="pain-text">Esa clienta llamó a otro salón</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- SCENE 3: SOLUTION REVEAL -->
+<!-- ═══════════════════════════════ -->
+<div class="scene" id="s3">
+  <div class="flash-overlay"></div>
+  <div class="bot-icon">🤖</div>
+  <div class="wave-container anim-fadeIn delay-2">
+    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+  </div>
+  <div class="mary-title anim-scaleIn delay-1">Mary Bot</div>
+  <div class="mary-sub anim-fadeUp delay-2">Tu recepcionista virtual <span style="color:var(--blue)">24/7</span></div>
+  <div class="badge-row anim-fadeIn delay-3">
+    <span class="badge">🧠 IA Real</span>
+    <span class="badge">🎙️ Voz Natural</span>
+    <span class="badge">📞 Atiende Sola</span>
+    <span class="badge">📲 WhatsApp</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- SCENE 4: HOW IT WORKS -->
+<!-- ═══════════════════════════════ -->
+<div class="scene" id="s4">
+  <div style="font-size:46px;font-weight:900;text-align:center" class="anim-fadeUp">
+    ¿Cómo funciona? <span style="color:var(--blue)">En vivo</span>
+  </div>
+  <div class="call-banner anim-scaleIn delay-1">
+    <span style="font-size:40px">📞</span>
+    <div>
+      <div style="font-size:16px;color:var(--neon);font-weight:700">LLAMADA ENTRANTE</div>
+      <div style="font-size:26px;font-weight:600">+1 (305) 555-8821</div>
+    </div>
+    <div class="call-answered">RESPONDIDA ✓</div>
+  </div>
+  <div class="chat-area">
+    <div class="bubble client anim-fadeUp delay-2">💅 Hola! Quiero sacar una cita para manicure esta semana</div>
+    <div class="bubble mary anim-fadeUp delay-3">
+      <div class="mary-label">🤖 MARY BOT</div>
+      ¡Hola! Soy Mary, la asistente del salón. Con gusto te ayudo 😊 ¿Qué día prefieres, martes o jueves?
+    </div>
+    <div class="bubble client anim-fadeUp delay-4">El martes a las 3pm me viene perfecto</div>
+    <div class="bubble mary anim-fadeUp delay-5">
+      <div class="mary-label">🤖 MARY BOT</div>
+      ¡Perfecto! Tu cita queda confirmada para el martes a las 3:00pm. ¡Te esperamos! 🗓️✨
+    </div>
+  </div>
+  <div class="confirm-banner anim-scaleIn delay-6">
+    <span style="font-size:40px">✅</span>
+    Cita agendada automáticamente — sin tocar tu teléfono
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- SCENE 5: WHATSAPP -->
+<!-- ═══════════════════════════════ -->
+<div class="scene" id="s5">
+  <div class="phone-mockup anim-scaleIn">
+    <div class="status-bar"><span>9:41</span><span>●●●● 🔋</span></div>
+    <div class="wa-header">
+      <div class="wa-avatar">🤖</div>
+      <div><div style="font-weight:700;font-size:16px">Mary Bot</div><div style="color:#aaffcc;font-size:12px">en línea</div></div>
+    </div>
+    <div class="wa-chat">
+      <div class="wa-msg anim-slideDown delay-1" style="border:1px solid #00ff8833">
+        <div class="wa-msg-title">🗓️ NUEVA CITA AGENDADA</div>
+        <strong>Clienta:</strong> María García<br>
+        <strong>Servicio:</strong> Manicure<br>
+        <strong>Día:</strong> Martes 3:00 PM<br>
+        <strong>Tel:</strong> +1 (305) 555-8821
+        <div class="wa-time">✓✓ 3:07 PM</div>
+      </div>
+      <div class="wa-msg anim-slideDown delay-3" style="border:1px solid #0088ff33">
+        <div class="wa-msg-title" style="color:var(--blue)">📊 RESUMEN DE LLAMADA</div>
+        Duración: 1m 42s<br>
+        Intención: Agendar cita ✅<br>
+        Resultado: Confirmada 🎉
+        <div class="wa-time">✓✓ 3:07 PM</div>
+      </div>
+    </div>
+  </div>
+  <div class="anim-fadeUp delay-4" style="text-align:center">
+    <div style="font-size:36px;font-weight:800">Te avisamos por <span style="color:var(--green-wa)">WhatsApp</span> al instante</div>
+    <div style="font-size:22px;color:var(--gray);margin-top:12px">Tú siempre sabes qué pasó — sin revisar nada</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- SCENE 6: ADMIN PANEL -->
+<!-- ═══════════════════════════════ -->
+<div class="scene" id="s6">
+  <div class="panel-header anim-fadeIn">
+    <div style="display:flex;align-items:center;gap:14px">
+      <span style="font-size:30px">🤖</span>
+      <div>
+        <div style="font-size:20px;font-weight:800">Panel de Mary Bot</div>
+        <div style="font-size:14px;color:var(--gray)">nail-bot-mary.web.app</div>
+      </div>
+    </div>
+    <div class="live-badge">🟢 EN VIVO</div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card anim-scaleIn delay-1" style="border-color:#0088ff33">
+      <div class="stat-icon">📞</div>
+      <div class="stat-num" style="color:var(--blue)">47</div>
+      <div class="stat-lbl">Llamadas esta semana</div>
+    </div>
+    <div class="stat-card anim-scaleIn delay-2" style="border-color:#00ff8833">
+      <div class="stat-icon">🗓️</div>
+      <div class="stat-num" style="color:var(--neon)">23</div>
+      <div class="stat-lbl">Citas agendadas</div>
+    </div>
+    <div class="stat-card anim-scaleIn delay-3" style="border-color:#ffcc0033">
+      <div class="stat-icon">🚫</div>
+      <div class="stat-num" style="color:var(--yellow)">0</div>
+      <div class="stat-lbl">Llamadas perdidas</div>
+    </div>
+  </div>
+  <div class="chart-area anim-fadeUp delay-3">
+    <div class="chart-title">Llamadas por día — esta semana</div>
+    <div class="bars" id="chartBars">
+      <div class="bar-wrap"><div class="bar" style="background:linear-gradient(180deg,#0088ff88,#0088ff44);height:0%" data-h="60"></div><div class="bar-day">L</div></div>
+      <div class="bar-wrap"><div class="bar" style="background:linear-gradient(180deg,#0088ff88,#0088ff44);height:0%" data-h="80"></div><div class="bar-day">M</div></div>
+      <div class="bar-wrap"><div class="bar" style="background:linear-gradient(180deg,#0088ff88,#0088ff44);height:0%" data-h="45"></div><div class="bar-day">X</div></div>
+      <div class="bar-wrap"><div class="bar" style="background:linear-gradient(180deg,#0088ff88,#0088ff44);height:0%" data-h="95"></div><div class="bar-day">J</div></div>
+      <div class="bar-wrap"><div class="bar" style="background:linear-gradient(180deg,#0088ff88,#0088ff44);height:0%" data-h="75"></div><div class="bar-day">V</div></div>
+      <div class="bar-wrap"><div class="bar" style="background:linear-gradient(180deg,var(--neon),var(--blue));height:0%;box-shadow:0 0 12px #00ff8844" data-h="100"></div><div class="bar-day" style="color:var(--neon)">S</div></div>
+      <div class="bar-wrap"><div class="bar" style="background:linear-gradient(180deg,#0088ff88,#0088ff44);height:0%" data-h="30"></div><div class="bar-day">D</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- SCENE 7: FEATURES -->
+<!-- ═══════════════════════════════ -->
+<div class="scene" id="s7">
+  <div style="font-size:46px;font-weight:900;text-align:center" class="anim-fadeUp">
+    Todo lo que incluye <span style="color:var(--neon)">Mary Bot</span>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card anim-scaleIn delay-1" style="border:1px solid #0088ff33">
+      <div class="feat-icon">📞</div>
+      <div class="feat-title" style="color:var(--blue)">24/7 Sin Descanso</div>
+      <div class="feat-desc">Atiende llamadas de noche, fines de semana y feriados</div>
+    </div>
+    <div class="feat-card anim-scaleIn delay-2" style="border:1px solid #00ff8833">
+      <div class="feat-icon">🧠</div>
+      <div class="feat-title" style="color:var(--neon)">IA Real</div>
+      <div class="feat-desc">Google Gemini 2.0 — conversación real, no menú de opciones</div>
+    </div>
+    <div class="feat-card anim-scaleIn delay-3" style="border:1px solid #8844ff33">
+      <div class="feat-icon">🎙️</div>
+      <div class="feat-title" style="color:var(--purple)">Voz Natural</div>
+      <div class="feat-desc">Amazon Polly Neural — suena como una persona, no un robot</div>
+    </div>
+    <div class="feat-card anim-scaleIn delay-4" style="border:1px solid #25d36633">
+      <div class="feat-icon">📲</div>
+      <div class="feat-title" style="color:#25d366">WhatsApp Instantáneo</div>
+      <div class="feat-desc">Notificación en WhatsApp cada vez que se agenda una cita</div>
+    </div>
+    <div class="feat-card anim-scaleIn delay-5" style="border:1px solid #ffcc0033">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title" style="color:var(--yellow)">Panel de Control</div>
+      <div class="feat-desc">Dashboard con estadísticas, historial y transcripciones</div>
+    </div>
+    <div class="feat-card anim-scaleIn delay-6" style="border:1px solid #ff335533">
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title" style="color:var(--red)">Lista en 72 Horas</div>
+      <div class="feat-desc">Configuramos todo — sin que sepas nada de tecnología</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- SCENE 8: PRICING -->
+<!-- ═══════════════════════════════ -->
+<div class="scene" id="s8">
+  <div style="font-size:46px;font-weight:900;text-align:center" class="anim-fadeUp">Planes y Precios</div>
+  <div class="setup-banner anim-fadeIn delay-1">
+    Setup único: <span style="color:var(--yellow);font-weight:800">$150</span> — Todo configurado por nosotros ⚙️
+  </div>
+  <div class="plan-row">
+    <div class="plan-card anim-scaleIn delay-2">
+      <div class="plan-name" style="color:var(--blue)">Básico</div>
+      <div><span class="plan-price">$49</span><span class="plan-period">/mes</span></div>
+      <div class="plan-calls" style="color:var(--blue)">200 llamadas</div>
+      <div style="border-top:1px solid #ffffff11;padding-top:12px;display:flex;flex-direction:column;gap:8px">
+        <div class="plan-perk"><span style="color:var(--blue)">✓</span> 1 número</div>
+        <div class="plan-perk"><span style="color:var(--blue)">✓</span> Panel admin</div>
+        <div class="plan-perk"><span style="color:var(--blue)">✓</span> Historial</div>
+      </div>
+    </div>
+    <div class="plan-card featured anim-scaleIn delay-3">
+      <div class="popular-badge">⭐ MÁS POPULAR</div>
+      <div class="plan-name" style="color:var(--neon)">Pro</div>
+      <div><span class="plan-price" style="color:var(--neon)">$89</span><span class="plan-period">/mes</span></div>
+      <div class="plan-calls" style="color:var(--neon)">500 llamadas</div>
+      <div style="border-top:1px solid #00ff8822;padding-top:12px;display:flex;flex-direction:column;gap:8px">
+        <div class="plan-perk"><span style="color:var(--neon)">✓</span> 1 número</div>
+        <div class="plan-perk"><span style="color:var(--neon)">✓</span> Panel completo</div>
+        <div class="plan-perk"><span style="color:var(--neon)">✓</span> WhatsApp ✓</div>
+      </div>
+    </div>
+    <div class="plan-card anim-scaleIn delay-4">
+      <div class="plan-name" style="color:var(--purple)">Élite</div>
+      <div><span class="plan-price">$149</span><span class="plan-period">/mes</span></div>
+      <div class="plan-calls" style="color:var(--purple)">Ilimitadas</div>
+      <div style="border-top:1px solid #ffffff11;padding-top:12px;display:flex;flex-direction:column;gap:8px">
+        <div class="plan-perk"><span style="color:var(--purple)">✓</span> 2 números</div>
+        <div class="plan-perk"><span style="color:var(--purple)">✓</span> Todo incluido</div>
+        <div class="plan-perk"><span style="color:var(--purple)">✓</span> Soporte 24/7</div>
+      </div>
+    </div>
+  </div>
+  <div class="speed-badge anim-fadeIn delay-5"><span style="font-size:34px">⚡</span> Implementación en 72 horas — Garantizado</div>
+  <div class="roi-text anim-fadeIn delay-6">💡 Solo <span style="color:var(--white);font-weight:700">5 clientas extra al mes</span> recuperan tu inversión completa</div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- SCENE 9: TESTIMONIAL -->
+<!-- ═══════════════════════════════ -->
+<div class="scene" id="s9">
+  <div style="font-size:90px;color:#00ff8833;line-height:0.8;font-family:Georgia,serif">"</div>
+  <div class="stars anim-scaleIn">⭐⭐⭐⭐⭐</div>
+  <div class="quote-text anim-fadeUp delay-1">
+    "Mary contestó <span style="color:var(--neon);font-weight:800">47 llamadas en una semana</span> mientras yo estaba ocupada con mis clientas.
+    No puedo imaginar mi salón sin ella."
+  </div>
+  <div class="author anim-fadeIn delay-3">
+    <div class="author-avatar">💅</div>
+    <div>
+      <div class="author-name">Propietaria de Nail Salon</div>
+      <div class="author-loc">Miami, Florida 🇺🇸</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="quote2 anim-fadeUp delay-4">
+    "Mis clientas preguntaron quién era la chica tan amable.
+    <span style="color:var(--white)"> ¡No podían creer que era un bot!</span>"
+    <div style="font-size:18px;color:var(--gray);margin-top:12px">— Dueña de Spa, Caracas 🇻🇪</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- SCENE 10: CTA -->
+<!-- ═══════════════════════════════ -->
+<div class="scene" id="s10">
+  <div class="a2k-label anim-fadeIn">A2K Digital Studio</div>
+  <div style="width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--neon),transparent)"></div>
+  <div class="cta-title anim-fadeUp delay-1">
+    ¿Lista para nunca<br>perder una clienta?
+  </div>
+  <div class="cta-sub anim-fadeIn delay-2">
+    Pídenos el <span style="color:var(--neon);font-weight:700">video demo GRATIS</span> hoy
+  </div>
+  <button class="wa-btn anim-scaleIn delay-3">
+    <span style="font-size:36px">💬</span>
+    Pídenos el Video Demo
+  </button>
+  <script>document.querySelector('.wa-btn').onclick=()=>window.open('https://wa.me/584164117331?text=Hola!%20Quiero%20el%20video%20demo%20de%20Mary%20Bot','_blank')</script>
+  <div class="contact-row anim-fadeIn delay-4">
+    <div class="contact-item">🌐 nail-bot-mary.web.app</div>
+    <div class="contact-item">📧 a2kdigitalstudio2025@gmail.com</div>
+    <div class="contact-item">📱 WhatsApp: +58 416-411-7331</div>
+  </div>
+  <div class="footer-line"></div>
+  <div class="tagline anim-fadeIn delay-5">
+    "La tecnología que trabaja para ti — para que tú trabajes para tus clientas."
+  </div>
+</div>
+
+<!-- PLAY BUTTON -->
+<button class="play-btn" id="playBtn" onclick="startPresentation()">▶ Iniciar Presentación</button>
+
+<script>
+const scenes = document.querySelectorAll('.scene');
+const progressBar = document.getElementById('progressBar');
+const sceneCounter = document.getElementById('sceneCounter');
+const playBtn = document.getElementById('playBtn');
+let current = 0;
+let timer = null;
+let isPlaying = false;
+
+// Duración de cada escena en ms
+const durations = [4000, 6000, 6000, 9000, 7000, 7000, 7000, 8000, 7000, 9000];
+const total = scenes.length;
+
+function showScene(idx) {
+  scenes.forEach(s => s.classList.remove('active'));
+  scenes[idx].classList.add('active');
+  sceneCounter.textContent = `${idx + 1} / ${total}`;
+  progressBar.style.width = `${((idx + 1) / total) * 100}%`;
+  if (isPlaying) narrar(idx);
+
+  // Animar barras del gráfico en scene 6
+  if (idx === 5) {
+    // Reset primero
+    document.querySelectorAll('#chartBars .bar').forEach(bar => {
+      bar.style.height = '0%';
+      bar.style.transition = 'none';
+    });
+    setTimeout(() => {
+      document.querySelectorAll('#chartBars .bar').forEach(bar => {
+        bar.style.transition = 'height 1s ease';
+        bar.style.height = bar.dataset.h + '%';
+      });
+    }, 900);
+  }
+
+  // Animar counter en scene 2
+  if (idx === 1) {
+    let count = 0;
+    const el = document.getElementById('lostCounter');
+    const interval = setInterval(() => {
+      count++;
+      el.textContent = count;
+      if (count >= 3) clearInterval(interval);
+    }, 800);
+  }
+}
+
+function nextScene() {
+  if (current < total - 1) {
+    current++;
+    showScene(current);
+    scheduleNext();
+  } else {
+    isPlaying = false;
+    playBtn.textContent = '🔄 Repetir';
+    playBtn.style.display = 'block';
+    current = 0;
+  }
+}
+
+function scheduleNext() {
+  clearTimeout(timer);
+  timer = setTimeout(nextScene, durations[current]);
+}
+
+function startPresentation() {
+  if (!isPlaying) {
+    isPlaying = true;
+    current = 0;
+    showScene(0);
+    playBtn.style.display = 'none';
+    scheduleNext();
+  } else {
+    current = 0;
+    showScene(0);
+    scheduleNext();
+  }
+}
+
+// Teclas de navegación
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    clearTimeout(timer);
+    if (current < total - 1) { current++; showScene(current); scheduleNext(); }
+  }
+  if (e.key === 'ArrowLeft') {
+    clearTimeout(timer);
+    if (current > 0) { current--; showScene(current); scheduleNext(); }
+  }
+  if (e.key === 'Enter') startPresentation();
+});
+
+// ── NARRACIÓN DE VOZ ──
+const narraciones = [
+  "¿Cuántas clientas perdiste hoy por no contestar el teléfono? Cada llamada sin respuesta es dinero perdido.",
+  "Este es el problema real. Mientras tú trabajas, el teléfono suena... y nadie contesta. Hoy ya perdiste 3 llamadas.",
+  "Presentamos Mary Bot. Tu recepcionista virtual con inteligencia artificial, disponible las 24 horas, los 7 días de la semana.",
+  "Así funciona Mary Bot en vivo. Una clienta llama, Mary contesta, entiende lo que necesita y agenda la cita automáticamente. Sin que tú hagas nada.",
+  "Y al instante, tú recibes una notificación por WhatsApp con todos los detalles de la cita. Siempre informada, sin esfuerzo.",
+  "Desde tu panel de administración puedes ver todo: cuántas llamadas recibiste, cuántas citas se agendaron, y cero llamadas perdidas.",
+  "Mary Bot incluye atención 24 horas, inteligencia artificial real, voz 100 por ciento natural, notificaciones por WhatsApp, panel de control completo, y está lista en solo 72 horas.",
+  "Elige tu plan: Básico desde 49 dólares al mes, Pro a 89 dólares, o Élite a 149 dólares. Setup único de 150 dólares. Implementación garantizada en 72 horas.",
+  "Escucha lo que dicen nuestras clientas: Mary contestó 47 llamadas en una semana mientras yo estaba ocupada. No puedo imaginar mi salón sin ella.",
+  "¿Estás lista para nunca más perder una clienta? Escríbenos por WhatsApp y te enviamos el video demo gratis. Somos A2K Digital Studio."
+];
+
+function narrar(idx) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const msg = new SpeechSynthesisUtterance(narraciones[idx]);
+  msg.lang = 'es-ES';
+  msg.rate = 0.92;
+  msg.pitch = 1.05;
+  msg.volume = 1;
+  // Intentar voz en español
+  const voces = window.speechSynthesis.getVoices();
+  const vozES = voces.find(v => v.lang.startsWith('es') && v.name.toLowerCase().includes('female'))
+              || voces.find(v => v.lang.startsWith('es'))
+              || voces[0];
+  if (vozES) msg.voice = vozES;
+  window.speechSynthesis.speak(msg);
+}
+
+// Cargar voces (Chrome necesita esto)
+window.speechSynthesis.onvoiceschanged = () => {};
+
+// Init
+showScene(0);
+</script>
+</body>
+</html>
