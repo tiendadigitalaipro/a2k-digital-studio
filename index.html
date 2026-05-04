@@ -994,6 +994,22 @@
         .fab-badge.hidden { transform: scale(0); opacity: 0; }
         @keyframes badgePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
 
+        /* ===== CARD HERO ANIMATIONS ===== */
+        @keyframes floatParticle {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            25% { transform: translateY(-15px) translateX(8px); opacity: 0.5; }
+            50% { transform: translateY(-8px) translateX(-5px); opacity: 0.35; }
+            75% { transform: translateY(-20px) translateX(3px); opacity: 0.45; }
+        }
+        @keyframes floatBubble {
+            0%, 100% { transform: translateY(0); opacity: 0.6; }
+            50% { transform: translateY(-12px); opacity: 1; }
+        }
+        .card-hero-visual:hover {
+            filter: brightness(1.15);
+            transition: filter 0.5s ease;
+        }
+
         /* ===== FLOATING BOT SYSTEM ===== */
         .fab-container {
             position: fixed;
@@ -2395,13 +2411,27 @@
 
 
             <!-- ═══ ZYNC DENTAL PRO ═══ -->
-            <div class="app-card reveal" data-type="cloud">
-                <span class="app-card-badge badge-cloud">Cloud</span>
-                <div style="height:160px;background:linear-gradient(135deg,#001530,#00152a);display:flex;align-items:center;justify-content:center;border-bottom:1px solid #0088ff33;">
-                    <div style="text-align:center">
-                        <div style="font-size:64px;filter:drop-shadow(0 0 20px #0088ff)">🦷</div>
-                        <div style="color:#0088ff;font-size:13px;font-weight:800;letter-spacing:2px;margin-top:8px">DENTAL POS</div>
+            <div class="app-card reveal" data-type="cloud" style="border-color:rgba(0,136,255,0.25);">
+                <span class="app-card-badge badge-cloud" style="background:linear-gradient(135deg,#0088ff,#6366f1);color:#fff">🏥 Cloud</span>
+                <div class="card-hero-visual" style="height:180px;background:linear-gradient(135deg,#001530 0%,#00152a 50%,#0a001a 100%);display:flex;align-items:center;justify-content:center;border-bottom:1px solid #0088ff33;position:relative;overflow:hidden;">
+                    <!-- Animated background pattern -->
+                    <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(0,136,255,0.06) 1px,transparent 1px);background-size:20px 20px;"></div>
+                    <!-- DNA helix decoration -->
+                    <svg style="position:absolute;left:10%;top:0;bottom:0;width:60px;opacity:0.08;" viewBox="0 0 60 200" preserveAspectRatio="none">
+                        <path d="M20,0 Q40,25 20,50 Q0,75 20,100 Q40,125 20,150 Q0,175 20,200" fill="none" stroke="#0088ff" stroke-width="1.5"><animate attributeName="d" values="M20,0 Q40,25 20,50 Q0,75 20,100 Q40,125 20,150 Q0,175 20,200;M20,0 Q0,25 20,50 Q40,75 20,100 Q0,125 20,150 Q40,175 20,200;M20,0 Q40,25 20,50 Q0,75 20,100 Q40,125 20,150 Q0,175 20,200" dur="6s" repeatCount="indefinite"/></path>
+                        <path d="M40,0 Q20,25 40,50 Q60,75 40,100 Q20,125 40,150 Q60,175 40,200" fill="none" stroke="#6366f1" stroke-width="1.5"><animate attributeName="d" values="M40,0 Q20,25 40,50 Q60,75 40,100 Q20,125 40,150 Q60,175 40,200;M40,0 Q60,25 40,50 Q20,75 40,100 Q60,125 40,150 Q20,175 40,200;M40,0 Q20,25 40,50 Q60,75 40,100 Q20,125 40,150 Q60,175 40,200" dur="6s" repeatCount="indefinite"/></path>
+                    </svg>
+                    <!-- Main icon -->
+                    <div style="text-align:center;position:relative;z-index:2;">
+                        <div style="width:88px;height:88px;margin:0 auto;border-radius:24px;background:linear-gradient(135deg,#0088ff 0%,#6366f1 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,136,255,0.3),0 0 80px rgba(99,102,241,0.15);transform:rotate(-5deg);">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 4 6 4 10c0 2.5 1.5 5 3 6.5V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-3.5c1.5-1.5 3-4 3-6.5 0-4-4-8-8-8z"/><path d="M9 22h6"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="10" y1="10" x2="14" y2="10"/></svg>
+                        </div>
+                        <div style="color:#0088ff;font-size:12px;font-weight:800;letter-spacing:3px;margin-top:14px;text-shadow:0 0 20px rgba(0,136,255,0.5);">DENTAL PRO</div>
+                        <div style="color:#6366f1;font-size:10px;font-weight:600;letter-spacing:2px;margin-top:4px;opacity:0.7;">SISTEMA CLÍNICO</div>
                     </div>
+                    <!-- Cross decoration -->
+                    <svg style="position:absolute;right:12%;top:15%;opacity:0.08;" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0088ff" stroke-width="2"><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>
+                    <svg style="position:absolute;right:20%;bottom:20%;opacity:0.06;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><line x1="12" y1="4" x2="12" y2="20"/><line x1="4" y1="12" x2="20" y2="12"/></svg>
                 </div>
                 <div class="app-card-body">
                     <div class="app-card-icon" style="background:rgba(0,136,255,0.1);">🦷</div>
@@ -2428,12 +2458,27 @@
             </div>
 
             <!-- ═══ BOT TELEGRAM ═══ -->
-            <div class="app-card reveal" data-type="cloud">
-                <span class="app-card-badge" style="background:linear-gradient(135deg,#0088cc,#005fa3);color:#fff">Automatización</span>
-                <div style="height:160px;background:linear-gradient(135deg,#001525,#00101a);display:flex;align-items:center;justify-content:center;border-bottom:1px solid #0088cc33;">
-                    <div style="text-align:center">
-                        <div style="font-size:64px;filter:drop-shadow(0 0 20px #0088cc)">✈️</div>
-                        <div style="color:#0088cc;font-size:13px;font-weight:800;letter-spacing:2px;margin-top:8px">TELEGRAM BOT</div>
+            <div class="app-card reveal" data-type="cloud" style="border-color:rgba(0,136,204,0.25);">
+                <span class="app-card-badge" style="background:linear-gradient(135deg,#0088cc,#005fa3);color:#fff">🤖 Automatización</span>
+                <div class="card-hero-visual" style="height:180px;background:linear-gradient(135deg,#001525 0%,#00101a 50%,#050a15 100%);display:flex;align-items:center;justify-content:center;border-bottom:1px solid #0088cc33;position:relative;overflow:hidden;">
+                    <!-- Animated chat bubbles background -->
+                    <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,136,204,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,136,204,0.03) 1px,transparent 1px);background-size:25px 25px;"></div>
+                    <!-- Floating chat bubbles -->
+                    <div style="position:absolute;left:8%;top:20%;width:50px;height:30px;background:rgba(0,136,204,0.08);border-radius:12px 12px 12px 4px;animation:floatBubble 5s ease-in-out infinite;"></div>
+                    <div style="position:absolute;right:10%;top:35%;width:60px;height:28px;background:rgba(0,136,204,0.06);border-radius:12px 12px 4px 12px;animation:floatBubble 6s ease-in-out 1s infinite;"></div>
+                    <div style="position:absolute;left:15%;bottom:20%;width:45px;height:24px;background:rgba(0,136,204,0.05);border-radius:12px 12px 12px 4px;animation:floatBubble 7s ease-in-out 2s infinite;"></div>
+                    <!-- Paper plane trail -->
+                    <svg style="position:absolute;right:8%;bottom:10%;opacity:0.1;" width="80" height="80" viewBox="0 0 80 80">
+                        <path d="M10,70 Q30,40 70,10" fill="none" stroke="#0088cc" stroke-width="1" stroke-dasharray="4 4"><animate attributeName="stroke-dashoffset" values="0;-16" dur="1.5s" repeatCount="indefinite"/></path>
+                        <polygon points="60,5 75,15 65,20" fill="#0088cc" opacity="0.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></polygon>
+                    </svg>
+                    <!-- Main icon -->
+                    <div style="text-align:center;position:relative;z-index:2;">
+                        <div style="width:88px;height:88px;margin:0 auto;border-radius:50%;background:linear-gradient(135deg,#0088cc 0%,#005fa3 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(0,136,204,0.3),0 0 80px rgba(0,95,163,0.15);">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="#fff"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg>
+                        </div>
+                        <div style="color:#0088cc;font-size:12px;font-weight:800;letter-spacing:3px;margin-top:14px;text-shadow:0 0 20px rgba(0,136,204,0.5);">TELEGRAM BOT</div>
+                        <div style="color:#005fa3;font-size:10px;font-weight:600;letter-spacing:2px;margin-top:4px;opacity:0.7;">ASISTENTE 24/7</div>
                     </div>
                 </div>
                 <div class="app-card-body">
@@ -2471,12 +2516,27 @@
             </div>
 
             <!-- ═══ BOT WHATSAPP ═══ -->
-            <div class="app-card reveal" data-type="cloud">
-                <span class="app-card-badge" style="background:linear-gradient(135deg,#25d366,#128c4e);color:#fff">Automatización</span>
-                <div style="height:160px;background:linear-gradient(135deg,#001a0a,#00120a);display:flex;align-items:center;justify-content:center;border-bottom:1px solid #25d36633;">
-                    <div style="text-align:center">
-                        <div style="font-size:64px;filter:drop-shadow(0 0 20px #25d366)">💬</div>
-                        <div style="color:#25d366;font-size:13px;font-weight:800;letter-spacing:2px;margin-top:8px">WHATSAPP BOT</div>
+            <div class="app-card reveal" data-type="cloud" style="border-color:rgba(37,211,102,0.25);">
+                <span class="app-card-badge" style="background:linear-gradient(135deg,#25d366,#128c4e);color:#fff">🤖 Automatización</span>
+                <div class="card-hero-visual" style="height:180px;background:linear-gradient(135deg,#001a0a 0%,#00120a 50%,#0a0a00 100%);display:flex;align-items:center;justify-content:center;border-bottom:1px solid #25d36633;position:relative;overflow:hidden;">
+                    <!-- Animated background -->
+                    <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(37,211,102,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(37,211,102,0.03) 1px,transparent 1px);background-size:25px 25px;"></div>
+                    <!-- Floating chat bubbles -->
+                    <div style="position:absolute;right:8%;top:18%;width:55px;height:32px;background:rgba(37,211,102,0.08);border-radius:12px 12px 4px 12px;animation:floatBubble 5.5s ease-in-out infinite;"></div>
+                    <div style="position:absolute;left:10%;top:40%;width:48px;height:26px;background:rgba(37,211,102,0.06);border-radius:12px 12px 12px 4px;animation:floatBubble 6.5s ease-in-out 0.8s infinite;"></div>
+                    <div style="position:absolute;right:15%;bottom:22%;width:52px;height:28px;background:rgba(37,211,102,0.05);border-radius:12px 12px 4px 12px;animation:floatBubble 7s ease-in-out 1.5s infinite;"></div>
+                    <!-- Notification ping -->
+                    <svg style="position:absolute;left:8%;bottom:15%;opacity:0.1;" width="60" height="60" viewBox="0 0 60 60">
+                        <circle cx="30" cy="30" r="10" fill="#25d366" opacity="0.3"><animate attributeName="r" values="8;25;8" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite"/></circle>
+                        <circle cx="30" cy="30" r="6" fill="#25d366"/>
+                    </svg>
+                    <!-- Main icon -->
+                    <div style="text-align:center;position:relative;z-index:2;">
+                        <div style="width:88px;height:88px;margin:0 auto;border-radius:50%;background:linear-gradient(135deg,#25d366 0%,#128c4e 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(37,211,102,0.3),0 0 80px rgba(18,140,78,0.15);">
+                            <svg width="42" height="42" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </div>
+                        <div style="color:#25d366;font-size:12px;font-weight:800;letter-spacing:3px;margin-top:14px;text-shadow:0 0 20px rgba(37,211,102,0.5);">WHATSAPP BOT</div>
+                        <div style="color:#128c4e;font-size:10px;font-weight:600;letter-spacing:2px;margin-top:4px;opacity:0.7;">BUSINESS AI</div>
                     </div>
                 </div>
                 <div class="app-card-body">
@@ -3006,12 +3066,16 @@
 
         <div class="contact-grid">
             <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="contact-card reveal" style="text-decoration:none;">
-                <div class="contact-icon" style="background: rgba(37, 211, 102, 0.15);">💬</div>
+                <div class="contact-icon" style="background: rgba(37, 211, 102, 0.15);border-radius:50%;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                </div>
                 <h3>WhatsApp Bot</h3>
                 <p>ZYNC Bot — Responde 24/7</p>
             </a>
             <a href="https://t.me/zync_shop_bot" target="_blank" class="contact-card reveal" style="text-decoration:none;">
-                <div class="contact-icon" style="background: rgba(0, 136, 204, 0.15);">✈️</div>
+                <div class="contact-icon" style="background: rgba(0, 136, 204, 0.15);border-radius:50%;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="#0088cc"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg>
+                </div>
                 <h3>Telegram Bot</h3>
                 <p>Zync Bot — Catálogo interactivo</p>
             </a>
@@ -3040,14 +3104,14 @@
         <p class="bot-powered-desc">Dos asistentes virtuales siempre disponibles para ti. Consulta nuestro catálogo, solicita demos y compra licencias directamente desde WhatsApp o Telegram. Rápido, fácil y sin complicaciones.</p>
         <div class="bot-powered-cards">
             <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="bot-powered-card bpc-wa">
-                <span class="bpc-icon">💬</span>
+                <span class="bpc-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>
                 <span class="bpc-name">WhatsApp Bot</span>
                 <span class="bpc-handle">+58 416-4117331</span>
                 <span class="bpc-status"><span class="bpc-status-dot"></span> En línea ahora</span>
                 <span class="bpc-features">Catálogo • Precios • Compras • Soporte</span>
             </a>
             <a href="https://t.me/zync_shop_bot" target="_blank" class="bot-powered-card bpc-tg">
-                <span class="bpc-icon">✈️</span>
+                <span class="bpc-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="#0088cc"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg></span>
                 <span class="bpc-name">Telegram Bot</span>
                 <span class="bpc-handle">@zync_shop_bot</span>
                 <span class="bpc-status"><span class="bpc-status-dot"></span> En línea ahora</span>
@@ -3074,11 +3138,11 @@
     </button>
     <div class="fab-actions" id="fabActions">
         <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="fab-btn fab-btn-wa" aria-label="WhatsApp">
-            💬
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             <span class="fab-label">WhatsApp Bot</span>
         </a>
         <a href="https://t.me/zync_shop_bot" target="_blank" class="fab-btn fab-btn-tg" aria-label="Telegram">
-            ✈️
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg>
             <span class="fab-label">Telegram Bot</span>
         </a>
         <button class="fab-btn fab-btn-chat" onclick="openChatWidget()" aria-label="Chat en tienda">
@@ -3090,8 +3154,8 @@
 
 <!-- MOBILE STICKY BAR -->
 <div class="mobile-sticky-bar" id="mobileStickyBar">
-    <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="msb-wa">💬 WhatsApp</a>
-    <a href="https://t.me/zync_shop_bot" target="_blank" class="msb-tg">✈️ Telegram</a>
+    <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="msb-wa"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" style="vertical-align:middle;margin-right:6px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a>
+    <a href="https://t.me/zync_shop_bot" target="_blank" class="msb-tg"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" style="vertical-align:middle;margin-right:6px"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg>Telegram</a>
     <button class="msb-chat" onclick="openChatWidget()" style="border:none;cursor:pointer;">🤖 Chat</button>
 </div>
 
@@ -3134,12 +3198,12 @@
         <p>Nuestros <strong>Asistentes Bot</strong> están disponibles 24/7 para ayudarte. Elige tu plataforma favorita y chatea con nosotros al instante.</p>
         <div class="welcome-bots">
             <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="welcome-bot-btn wa-btn">
-                <span class="bot-icon">💬</span>
+                <span class="bot-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>
                 <span class="bot-name">WhatsApp</span>
                 <span class="bot-status"><span class="online">●</span> En línea</span>
             </a>
             <a href="https://t.me/zync_shop_bot" target="_blank" class="welcome-bot-btn tg-btn">
-                <span class="bot-icon">✈️</span>
+                <span class="bot-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="#0088cc"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg></span>
                 <span class="bot-name">Telegram</span>
                 <span class="bot-status"><span class="online">●</span> En línea</span>
             </a>
@@ -3157,12 +3221,12 @@
         <p>Nuestros bots <strong>ZYNC</strong> pueden mostrarte el catálogo completo, precios y darte una demo al instante. ¡Habla con nosotros en segundos!</p>
         <div class="exit-intent-bots">
             <a href="https://wa.me/584164117331?text=Hola%2C%20me%20interesan%20las%20apps%20de%20A2K%20Digital%20Studio" target="_blank" class="exit-intent-bot ei-wa">
-                <span class="ei-icon">💬</span>
+                <span class="ei-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>
                 <span class="ei-name">WhatsApp</span>
                 <span class="ei-desc">+58 416-4117331</span>
             </a>
             <a href="https://t.me/zync_shop_bot" target="_blank" class="exit-intent-bot ei-tg">
-                <span class="ei-icon">✈️</span>
+                <span class="ei-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="#0088cc"><path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/></svg></span>
                 <span class="ei-name">Telegram</span>
                 <span class="ei-desc">@zync_shop_bot</span>
             </a>
