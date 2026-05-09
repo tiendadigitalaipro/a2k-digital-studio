@@ -804,14 +804,70 @@ body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
               </label>
             </div>
           </div>
-          <!-- PIN Empleado -->
-          <div class="bg-white rounded-2xl p-6 border border-surface-highest shadow-sm">
-            <h3 class="font-bold text-sm mb-4">Modo Empleado — PIN de Acceso</h3>
-            <p class="text-xs text-outline mb-3">El empleado solo verá Ventas POS y Pesaje. Para volver a modo admin se requiere este PIN.</p>
-            <label class="flex flex-col gap-1">
-              <span class="text-[10px] font-bold uppercase tracking-widest text-outline">PIN (4–6 dígitos)</span>
-              <input id="cfgEmpPin" type="password" maxlength="6" placeholder="••••••" class="px-4 py-2.5 rounded-xl border border-surface-highest text-sm outline-none w-40 focus:ring-2 focus:ring-primary/20"/>
-            </label>
+          <!-- Modo Empleado -->
+          <div class="rounded-2xl p-6 shadow-sm" style="background:#fff;border:2px solid #583100;">
+            <!-- Header -->
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(88,49,0,0.1);">
+                <span class="material-symbols-outlined fill-icon text-xl" style="color:#583100;">badge</span>
+              </div>
+              <div>
+                <h3 class="font-black text-sm" style="color:#583100;">Modo Empleado — Control de Acceso</h3>
+                <p class="text-[10px] text-outline">Define el PIN para activar el modo restringido desde la barra superior</p>
+              </div>
+            </div>
+
+            <!-- Mapa de acceso -->
+            <div class="grid grid-cols-2 gap-2 mb-5">
+              <div>
+                <p class="text-[9px] font-black uppercase tracking-widest mb-2" style="color:#3e6a00;">✓ Empleado puede acceder</p>
+                <div class="flex flex-col gap-1">
+                  <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold" style="background:rgba(62,106,0,0.08);color:#3e6a00;">
+                    <span class="material-symbols-outlined fill-icon text-sm">point_of_sale</span>Punto de Venta (POS)
+                  </div>
+                  <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold" style="background:rgba(62,106,0,0.08);color:#3e6a00;">
+                    <span class="material-symbols-outlined fill-icon text-sm">scale</span>Pesaje gr/L
+                  </div>
+                </div>
+              </div>
+              <div>
+                <p class="text-[9px] font-black uppercase tracking-widest mb-2" style="color:#ba1a1a;">✗ Bloqueado en modo empleado</p>
+                <div class="flex flex-col gap-1">
+                  <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold" style="background:rgba(186,26,26,0.07);color:#ba1a1a;">
+                    <span class="material-symbols-outlined text-sm">inventory_2</span>Inventario
+                  </div>
+                  <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold" style="background:rgba(186,26,26,0.07);color:#ba1a1a;">
+                    <span class="material-symbols-outlined text-sm">account_balance_wallet</span>Caja
+                  </div>
+                  <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold" style="background:rgba(186,26,26,0.07);color:#ba1a1a;">
+                    <span class="material-symbols-outlined text-sm">handshake</span>Fiados y Créditos
+                  </div>
+                  <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold" style="background:rgba(186,26,26,0.07);color:#ba1a1a;">
+                    <span class="material-symbols-outlined text-sm">bar_chart</span>Reportes · Fórmula · Etiquetas · Config
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PIN input -->
+            <div class="flex flex-col gap-2">
+              <span class="text-[10px] font-black uppercase tracking-widest text-outline">PIN de Administrador (4–6 dígitos)</span>
+              <div class="flex items-center gap-3">
+                <div class="relative">
+                  <input id="cfgEmpPin" type="password" maxlength="6" placeholder="••••••"
+                    class="px-4 py-2.5 rounded-xl border text-sm outline-none w-36 focus:ring-2 focus:ring-primary/20 mono font-black tracking-widest"
+                    style="border-color:#583100;"/>
+                  <button type="button" onclick="cfgTogglePin()"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors">
+                    <span id="cfgPinEyeIcon" class="material-symbols-outlined text-base">visibility_off</span>
+                  </button>
+                </div>
+                <p id="cfgEmpPinStatus" class="text-xs font-bold hidden" style="color:#3e6a00;">
+                  <span class="material-symbols-outlined fill-icon text-sm">check_circle</span> PIN guardado
+                </p>
+              </div>
+              <p class="text-[10px] text-outline">Este PIN se solicitará cuando el admin quiera salir del modo empleado. <strong>Sin PIN configurado el modo empleado no puede activarse.</strong></p>
+            </div>
           </div>
           <!-- Respaldo automático -->
           <div class="bg-white rounded-2xl p-6 border border-surface-highest shadow-sm">
@@ -2140,6 +2196,16 @@ function cfgLoad() {
   document.getElementById('cfgEmpPin').value = cfg.empPin || '';
   document.getElementById('cfgBackupTime').value = cfg.backupTime || '';
   document.getElementById('cfgNextBackup').textContent = cfg.backupTime ? `Todos los días a las ${cfg.backupTime}` : 'No programado';
+  // Mostrar estado del PIN
+  const st = document.getElementById('cfgEmpPinStatus');
+  if (st) st.classList.toggle('hidden', !cfg.empPin);
+}
+
+function cfgTogglePin() {
+  const inp = document.getElementById('cfgEmpPin');
+  const ico = document.getElementById('cfgPinEyeIcon');
+  if (inp.type === 'password') { inp.type = 'text'; ico.textContent = 'visibility'; }
+  else { inp.type = 'password'; ico.textContent = 'visibility_off'; }
 }
 
 function cfgSave() {
@@ -2153,10 +2219,13 @@ function cfgSave() {
     empPin: document.getElementById('cfgEmpPin').value.trim(),
     backupTime: document.getElementById('cfgBackupTime').value,
   };
+  if (cfg.empPin && cfg.empPin.length < 4) { toast('El PIN debe tener al menos 4 dígitos', 'error'); return; }
   DB.set('config', cfg);
   document.getElementById('sidebarUser').textContent = cfg.vendedor || 'Administrador';
   document.getElementById('sidebarRole').textContent = cfg.name || 'ZYNC Electronics';
   document.getElementById('cfgNextBackup').textContent = cfg.backupTime ? `Todos los días a las ${cfg.backupTime}` : 'No programado';
+  const st = document.getElementById('cfgEmpPinStatus');
+  if (st) st.classList.toggle('hidden', !cfg.empPin);
   startBackupScheduler();
   toast('Configuración guardada', 'success');
 }
@@ -2317,7 +2386,7 @@ function aiRespond(q) {
 // EMPLOYEE MODE MODULE
 // ════════════════════════════════════════════
 let empMode = false;
-const EMP_HIDDEN_VIEWS = ['inventario','fiados','reportes','config','formula','etiquetas'];
+const EMP_HIDDEN_VIEWS = ['inventario','caja','fiados','reportes','config','formula','etiquetas'];
 
 function empToggle() {
   if (!empMode) {
