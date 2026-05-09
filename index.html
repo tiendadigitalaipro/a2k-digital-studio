@@ -227,6 +227,47 @@ body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
 </div>
 
 <!-- ════════════════════════════════════════════
+     DEMO EXPIRADO — PANTALLA DE BLOQUEO
+════════════════════════════════════════════ -->
+<div id="demoExpiredScreen" style="display:none;position:fixed;inset:0;z-index:10000;background:#06060a;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="position:absolute;top:0;height:1px;width:100%;background:linear-gradient(90deg,transparent,rgba(212,175,55,0.3),transparent);animation:scan 4s linear infinite;pointer-events:none;"></div>
+  <div style="position:absolute;top:20%;left:20%;width:350px;height:350px;background:#ba1a1a;border-radius:50%;filter:blur(200px);opacity:0.06;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:20%;right:20%;width:350px;height:350px;background:#D4AF37;border-radius:50%;filter:blur(200px);opacity:0.04;pointer-events:none;"></div>
+  <div style="position:relative;z-index:1;width:100%;max-width:420px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-top:3px solid #ba1a1a;backdrop-filter:blur(20px);border-radius:1.5rem;padding:2.5rem;text-align:center;">
+    <!-- Icono -->
+    <div style="width:72px;height:72px;margin:0 auto 1.5rem;background:rgba(186,26,26,0.12);border:1px solid rgba(186,26,26,0.25);border-radius:18px;display:flex;align-items:center;justify-content:center;">
+      <span class="material-symbols-outlined fill-icon" style="font-size:36px;color:#ff8a80;">timer_off</span>
+    </div>
+    <h1 style="font-size:1.2rem;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:-0.02em;margin-bottom:0.4rem;">Período de Prueba Finalizado</h1>
+    <p style="font-size:10px;font-weight:700;color:#D4AF37;text-transform:uppercase;letter-spacing:0.3em;margin-bottom:1.75rem;">ZYNC DEMO · 5 DÍAS COMPLETADOS</p>
+    <!-- Info -->
+    <div style="background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.15);border-radius:14px;padding:1.25rem;margin-bottom:1.5rem;text-align:left;">
+      <p style="font-size:12px;color:#c8c8d4;line-height:1.7;margin-bottom:1rem;">
+        Tu prueba gratuita de <strong style="color:#D4AF37;">5 días</strong> ha finalizado. Activa una <strong style="color:#D4AF37;">Licencia PRO</strong> para continuar usando ZYNC Electronics sin interrupciones.
+      </p>
+      <div style="background:rgba(0,56,126,0.15);border:1px solid rgba(0,56,126,0.25);border-radius:10px;padding:0.75rem 1rem;">
+        <p style="font-size:9px;text-transform:uppercase;letter-spacing:0.25em;color:#737783;margin-bottom:6px;">Licencia PRO incluye</p>
+        <p style="font-size:11px;font-weight:700;color:#abc5ff;line-height:1.7;">
+          ✓ Acceso ilimitado &nbsp;·&nbsp; Sin vencimiento<br>
+          ✓ Todos los módulos &nbsp;·&nbsp; Soporte técnico
+        </p>
+      </div>
+    </div>
+    <!-- Botón principal -->
+    <button onclick="lockShowForUpgrade()"
+      style="width:100%;padding:1rem;background:linear-gradient(135deg,#D4AF37,#a08820);color:#06060a;font-weight:900;font-size:12px;text-transform:uppercase;letter-spacing:0.15em;border-radius:12px;cursor:pointer;border:none;margin-bottom:0.75rem;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <span class="material-symbols-outlined fill-icon" style="font-size:18px;">workspace_premium</span>
+      Activar Licencia PRO
+    </button>
+    <!-- Meta -->
+    <p style="font-size:9px;color:#444;margin-top:1.25rem;font-family:'JetBrains Mono',monospace;">
+      Código demo: <span id="demoExpiredCode" style="color:#666;"></span>
+    </p>
+    <p style="font-size:9px;color:#333;margin-top:3px;">© 2026 A2K Digital Studio · ZYNC Electronics</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
      APP SHELL
 ════════════════════════════════════════════ -->
 <div id="appShell">
@@ -300,7 +341,14 @@ body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
         <span id="licBadge" class="px-2 py-0.5 rounded text-[9px] font-black uppercase" style="background:#D4AF37;color:#06060a">DEMO</span>
         <span id="licExpiry" class="text-[9px] text-blue-300">Exp: —</span>
       </div>
-      <p class="text-[9px] text-gray-500">v2.0.0 · A2K Digital Studio</p>
+      <!-- Banner días restantes DEMO -->
+      <div id="demoDaysBanner" style="display:none;margin-top:5px;padding:4px 8px;background:rgba(186,26,26,0.15);border:1px solid rgba(186,26,26,0.3);border-radius:6px;">
+        <p style="font-size:9px;font-weight:700;color:#ff8a80;text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:4px;">
+          <span class="material-symbols-outlined" style="font-size:12px;">timer</span>
+          <span id="demoDaysLeftText">—</span>
+        </p>
+      </div>
+      <p class="text-[9px] text-gray-500 mt-1">v2.0.0 · A2K Digital Studio</p>
     </div>
   </aside>
 
@@ -1336,7 +1384,11 @@ function lockActivate() {
   if (!found) { lockShowError('Código de activación inválido o no existe'); return; }
   if (found.status !== 'Activa') { lockShowError('Esta licencia está suspendida'); return; }
   if (found.expiresAt) {
-    if (new Date(found.expiresAt) < new Date()) { lockShowError('Esta licencia ha expirado'); return; }
+    if (new Date(found.expiresAt) < new Date()) {
+      if (found.type === 'DEMO') { lockShowExpiredDemo(found); }
+      else { lockShowError('Esta licencia ha expirado'); }
+      return;
+    }
   }
   if (found.deviceId && found.deviceId !== DEVICE_ID) {
     lockShowError('Esta licencia pertenece a otro dispositivo: ' + found.deviceId);
@@ -1354,6 +1406,22 @@ function lockShowError(msg) {
   st.classList.remove('hidden');
 }
 
+function lockShowExpiredDemo(lic) {
+  document.getElementById('demoExpiredCode').textContent = lic ? lic.code : '';
+  const el = document.getElementById('demoExpiredScreen');
+  el.style.display = 'flex';
+}
+
+function lockShowForUpgrade() {
+  document.getElementById('demoExpiredScreen').style.display = 'none';
+  const ls = document.getElementById('lockScreen');
+  ls.style.display = 'flex';
+  ls.style.opacity = '1';
+  ls.style.transition = 'none';
+  document.getElementById('lockInput').value = '';
+  document.getElementById('lockInput').focus();
+}
+
 function lockEnter(lic) {
   document.getElementById('lockScreen').style.opacity = '0';
   document.getElementById('lockScreen').style.transition = 'opacity 0.4s';
@@ -1367,6 +1435,16 @@ function lockEnter(lic) {
     badge.style.background = lic.type === 'PRO' ? '#D4AF37' : '#3e6a00';
     badge.style.color = lic.type === 'PRO' ? '#06060a' : '#fff';
     document.getElementById('licExpiry').textContent = lic.expiresAt ? 'Exp: '+lic.expiresAt : 'Sin expiración';
+    // Banner días restantes para DEMO con expiración
+    const demoBanner = document.getElementById('demoDaysBanner');
+    if (lic.type === 'DEMO' && lic.expiresAt) {
+      const msLeft = new Date(lic.expiresAt) - new Date();
+      const daysLeft = Math.max(0, Math.ceil(msLeft / 86400000));
+      document.getElementById('demoDaysLeftText').textContent = daysLeft + ' día(s) de prueba restante(s)';
+      demoBanner.style.display = 'block';
+    } else {
+      demoBanner.style.display = 'none';
+    }
     appInit();
   }, 400);
 }
@@ -2502,6 +2580,8 @@ window.addEventListener('DOMContentLoaded', () => {
       if (!lic.expiresAt || new Date(lic.expiresAt) >= new Date()) {
         lockEnter(lic); return;
       }
+      // Licencia expirada — si es DEMO mostrar pantalla especial
+      if (lic.type === 'DEMO') { lockShowExpiredDemo(lic); return; }
     }
     DB.remove('session');
   }

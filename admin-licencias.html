@@ -331,16 +331,38 @@ body { font-family: 'Inter', sans-serif; background: #06060a; color: #e2e2e9; mi
       </button>
     </div>
     <div class="flex flex-col gap-4">
+      <!-- Tipo selector -->
       <div class="flex gap-2">
-        <button onclick="setGenPrefix('ZYNC')" id="gPro" class="flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider"
-          style="background:#D4AF37;color:#06060a">PRO</button>
-        <button onclick="setGenPrefix('DEMO')" id="gDemo" class="flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider"
-          style="background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.1)">DEMO</button>
+        <button onclick="setGenPrefix('ZYNC')" id="gPro"
+          class="flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all active:scale-95 flex items-center justify-center gap-1.5"
+          style="background:#D4AF37;color:#06060a">
+          <span class="material-symbols-outlined fill-icon" style="font-size:14px;vertical-align:middle;">workspace_premium</span>
+          PRO
+        </button>
+        <button onclick="setGenPrefix('DEMO')" id="gDemo"
+          class="flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all active:scale-95 flex items-center justify-center gap-1.5"
+          style="background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.1)">
+          <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">timer</span>
+          DEMO 5 DÍAS
+        </button>
       </div>
+
+      <!-- Info DEMO — solo visible cuando DEMO está activo -->
+      <div id="genDemoInfo" style="display:none;background:rgba(186,26,26,0.08);border:1px dashed rgba(186,26,26,0.35);border-radius:12px;padding:12px;text-align:center;">
+        <p style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.25em;color:#ff8a80;margin-bottom:5px;">
+          <span class="material-symbols-outlined fill-icon" style="font-size:12px;vertical-align:middle;">timer_off</span>
+          Licencia de prueba — 5 días desde hoy
+        </p>
+        <p id="genDemoExpiry" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff8a80;margin-bottom:4px;"></p>
+        <p style="font-size:9px;color:#555;line-height:1.5;">Al vencer, el sistema bloquea automáticamente<br>y solicita activar Licencia PRO</p>
+      </div>
+
+      <!-- Código generado -->
       <div class="rounded-2xl p-6 text-center" style="background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.2)">
         <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Código Generado</p>
-        <p id="genCode" class="mono text-2xl font-black" style="color:#D4AF37">—</p>
+        <p id="genCode" class="mono text-xl font-black break-all" style="color:#D4AF37">—</p>
       </div>
+
       <button onclick="doGenerate()"
         class="py-3 rounded-xl font-black text-sm uppercase tracking-wider transition-all active:scale-95"
         style="background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.1)">
@@ -585,33 +607,62 @@ function copyCode(code) {
 
 // ── CODE GENERATOR ─────────────────────────────
 let genPrefix = 'ZYNC';
+let genDays = 0; // 0 = sin expiración (PRO), 5 = DEMO 5 días
+
+const GEN_BTN_ACTIVE_GOLD = 'background:#D4AF37;color:#06060a;flex:1;padding:12px 8px;border-radius:12px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;transition:all 0.15s';
+const GEN_BTN_ACTIVE_RED  = 'background:#ba1a1a;color:#fff;flex:1;padding:12px 8px;border-radius:12px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;transition:all 0.15s';
+const GEN_BTN_INACTIVE    = 'background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.1);flex:1;padding:12px 8px;border-radius:12px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all 0.15s';
+
 function setGenPrefix(p) {
   genPrefix = p;
-  document.getElementById('gPro').style.cssText = p==='ZYNC' ? 'background:#D4AF37;color:#06060a;flex:1;padding:8px;border-radius:12px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.05em' : 'background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.1);flex:1;padding:8px;border-radius:12px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.05em';
-  document.getElementById('gDemo').style.cssText = p==='DEMO' ? 'background:#D4AF37;color:#06060a;flex:1;padding:8px;border-radius:12px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.05em' : 'background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.1);flex:1;padding:8px;border-radius:12px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.05em';
+  genDays = p === 'DEMO' ? 5 : 0;
+  document.getElementById('gPro').style.cssText  = p === 'ZYNC' ? GEN_BTN_ACTIVE_GOLD : GEN_BTN_INACTIVE;
+  document.getElementById('gDemo').style.cssText = p === 'DEMO' ? GEN_BTN_ACTIVE_RED  : GEN_BTN_INACTIVE;
+  const demoInfo = document.getElementById('genDemoInfo');
+  if (p === 'DEMO') {
+    const exp = new Date(); exp.setDate(exp.getDate() + 5);
+    document.getElementById('genDemoExpiry').textContent =
+      'Vence: ' + exp.toLocaleDateString('es-VE', {day:'2-digit', month:'long', year:'numeric'});
+    demoInfo.style.display = 'block';
+  } else {
+    demoInfo.style.display = 'none';
+  }
   doGenerate();
 }
 
 function doGenerate() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const seg = () => Array.from({length:4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
-  const code = `${genPrefix}-${seg()}-${seg()}-${new Date().getFullYear()}`;
+  const code = genPrefix === 'DEMO'
+    ? `DEMO-${seg()}-${seg()}-${seg()}`
+    : `ZYNC-${seg()}-${seg()}-${new Date().getFullYear()}`;
   document.getElementById('genCode').textContent = code;
 }
 
 function openGenerateModal() {
+  genPrefix = 'ZYNC'; genDays = 0;
+  document.getElementById('gPro').style.cssText  = GEN_BTN_ACTIVE_GOLD;
+  document.getElementById('gDemo').style.cssText = GEN_BTN_INACTIVE;
+  document.getElementById('genDemoInfo').style.display = 'none';
   doGenerate();
   document.getElementById('modalGenerate').classList.add('open');
 }
 
 function copyGenCode() {
   const code = document.getElementById('genCode').textContent;
+  if (!code || code === '—') return;
   navigator.clipboard.writeText(code).then(() => {
-    showToast('Código copiado. Úsalo en Nueva Licencia.', 'success');
-    document.getElementById('fCode').value = code;
     closeModal('modalGenerate');
     openAddModal();
     document.getElementById('fCode').value = code;
+    document.getElementById('fType').value = genPrefix === 'DEMO' ? 'DEMO' : 'PRO';
+    if (genDays > 0) {
+      const exp = new Date(); exp.setDate(exp.getDate() + genDays);
+      document.getElementById('fExpiry').value = exp.toISOString().split('T')[0];
+    } else {
+      document.getElementById('fExpiry').value = '';
+    }
+    showToast('Código listo. Completa el nombre del cliente y guarda.', 'success');
   });
 }
 
