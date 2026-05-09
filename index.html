@@ -190,13 +190,10 @@ body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
       <p id="lockStatusMsg" class="text-red-400 text-sm font-bold"></p>
     </div>
 
-    <!-- Código demo visible -->
-    <div class="mb-5 px-4 py-2 rounded-lg text-center cursor-pointer hover:opacity-80 transition-all"
-         style="background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.1)"
-         onclick="document.getElementById('lockInput').value='ZYNC-DEMO-2026-FREE'; lockActivate();"
-         title="Clic para activar con el código demo">
-      <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Código demo gratuito — Clic para entrar directo</p>
-      <p class="mono text-sm font-bold" style="color:#D4AF37">ZYNC-DEMO-2026-FREE</p>
+    <!-- Mensaje contacto -->
+    <div class="mb-5 px-4 py-3 rounded-lg text-center" style="background:rgba(212,175,55,0.04); border:1px solid rgba(212,175,55,0.1)">
+      <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">¿No tienes un código?</p>
+      <p class="text-xs font-bold" style="color:#D4AF37">Contacta a tu proveedor para obtener tu licencia</p>
     </div>
 
     <!-- Input -->
@@ -1522,8 +1519,13 @@ function lockActivate() {
     return;
   }
 
-  // Guardar sesión
-  DB.set('session', { code: found.code, type: found.type, name: found.name, loginAt: Date.now() });
+  // PRO guarda sesión (entra directo la próxima vez)
+  // DEMO NO guarda sesión (siempre debe ingresar el código para que sienta la fricción)
+  if (found.type === 'PRO') {
+    DB.set('session', { code: found.code, type: found.type, name: found.name, loginAt: Date.now() });
+  } else {
+    DB.remove('session');
+  }
   lockEnter(found);
 }
 
@@ -2728,18 +2730,19 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('lockDeviceId').textContent = DEVICE_ID;
   // Auto-login si hay sesión válida
   const sess = DB.get('session');
-  if (sess) {
+  if (sess && sess.type === 'PRO') {
+    // Solo las licencias PRO hacen auto-login
     let lic = LICENSES.find(l => l.code === sess.code)
            || validateLicCode(sess.code)
            || (DB.get('licenses')||[]).find(l => l.code === sess.code);
-    if (lic) {
-      // Re-evaluar DEMO algorítmico (puede haber expirado entre sesiones)
-      if (lic.status === 'Expirada' || (lic.expiresAt && new Date(lic.expiresAt) < new Date())) {
-        if (lic.type === 'DEMO') { lockShowExpiredDemo(lic); return; }
-        DB.remove('session'); return;
+    if (lic && lic.status === 'Activa') {
+      if (!lic.expiresAt || new Date(lic.expiresAt) >= new Date()) {
+        lockEnter(lic); return;
       }
-      if (lic.status === 'Activa') { lockEnter(lic); return; }
     }
+    DB.remove('session');
+  } else if (sess) {
+    // DEMO o sesión inválida — limpiar, siempre pedir código
     DB.remove('session');
   }
 });
