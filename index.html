@@ -782,17 +782,33 @@ body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
           </div>
           <!-- Tasas -->
           <div class="bg-white rounded-2xl p-6 border border-surface-highest shadow-sm">
-            <h3 class="font-bold text-sm mb-4">Tasas de Cambio</h3>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-sm">Tasas de Cambio</h3>
+              <span id="cfgRateSavedAt" class="text-[10px] text-outline hidden">
+                <span class="material-symbols-outlined fill-icon text-sm" style="color:#3e6a00;vertical-align:middle;">check_circle</span>
+                <span id="cfgRateSavedTime"></span>
+              </span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
               <label class="flex flex-col gap-1">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Tasa BCV (Bs/$)</span>
-                <input id="cfgBcv" type="number" step="0.01" class="px-4 py-2.5 rounded-xl border border-surface-highest text-sm outline-none focus:ring-2 focus:ring-primary/20"/>
+                <input id="cfgBcv" type="number" step="0.01"
+                  class="px-4 py-2.5 rounded-xl border border-surface-highest text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  onkeydown="if(event.key==='Enter')cfgSaveRates()"/>
               </label>
               <label class="flex flex-col gap-1">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Tasa Paralelo (Bs/$)</span>
-                <input id="cfgParalelo" type="number" step="0.01" class="px-4 py-2.5 rounded-xl border border-surface-highest text-sm outline-none focus:ring-2 focus:ring-primary/20"/>
+                <input id="cfgParalelo" type="number" step="0.01"
+                  class="px-4 py-2.5 rounded-xl border border-surface-highest text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  onkeydown="if(event.key==='Enter')cfgSaveRates()"/>
               </label>
             </div>
+            <button onclick="cfgSaveRates()"
+              class="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 hover:opacity-90"
+              style="background:#00387e;color:#fff;">
+              <span class="material-symbols-outlined fill-icon text-base">currency_exchange</span>
+              Actualizar Tasas del Día
+            </button>
           </div>
           <!-- Vendedor -->
           <div class="bg-white rounded-2xl p-6 border border-surface-highest shadow-sm">
@@ -2206,6 +2222,21 @@ function cfgTogglePin() {
   const ico = document.getElementById('cfgPinEyeIcon');
   if (inp.type === 'password') { inp.type = 'text'; ico.textContent = 'visibility'; }
   else { inp.type = 'password'; ico.textContent = 'visibility_off'; }
+}
+
+function cfgSaveRates() {
+  const bcv = parseFloat(document.getElementById('cfgBcv').value) || 0;
+  const par = parseFloat(document.getElementById('cfgParalelo').value) || 0;
+  if (!bcv) { toast('Ingresa la tasa BCV', 'error'); return; }
+  const cfg = DB.get('config') || {};
+  cfg.bcv = bcv;
+  cfg.paralelo = par;
+  DB.set('config', cfg);
+  // Mostrar sello de hora
+  const now = new Date().toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('cfgRateSavedTime').textContent = 'Guardado ' + now;
+  document.getElementById('cfgRateSavedAt').classList.remove('hidden');
+  toast(`Tasa BCV Bs.${bcv.toFixed(2)}/$ guardada`, 'success');
 }
 
 function cfgSave() {
