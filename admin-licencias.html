@@ -60,14 +60,14 @@ body { font-family: 'Inter', sans-serif; background: #06060a; color: #e2e2e9; mi
     <div class="flex flex-col gap-3">
       <label class="flex flex-col gap-1">
         <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Usuario Admin</span>
-        <input id="loginUser" type="text" placeholder="admin"
+        <input id="loginUser" type="text" value="admin" placeholder="admin"
           class="mono px-4 py-3 rounded-xl text-sm outline-none"
           style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff"
           onkeydown="if(event.key==='Enter')adminLogin()"/>
       </label>
       <label class="flex flex-col gap-1">
         <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Contraseña</span>
-        <input id="loginPass" type="password" placeholder="••••••"
+        <input id="loginPass" type="password" value="zync2026" placeholder="••••••"
           class="mono px-4 py-3 rounded-xl text-sm outline-none"
           style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff"
           onkeydown="if(event.key==='Enter')adminLogin()"/>
@@ -78,7 +78,7 @@ body { font-family: 'Inter', sans-serif; background: #06060a; color: #e2e2e9; mi
         Ingresar al Panel
       </button>
     </div>
-    <p class="text-[10px] text-center text-gray-600 mt-5">Default: admin / zync2026</p>
+    <p class="text-[10px] text-center text-gray-600 mt-5">Credenciales ya cargadas — solo presiona Ingresar</p>
     <div class="mt-4 text-center">
       <a href="index.html" class="text-[10px]" style="color:#D4AF37;opacity:0.5">← Volver al Sistema</a>
     </div>
