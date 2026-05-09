@@ -202,10 +202,10 @@ body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
     <!-- Input -->
     <div class="mb-4">
       <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2 block">Clave de Activación</label>
-      <input id="lockInput" type="text" maxlength="19"
+      <input id="lockInput" type="text"
         placeholder="XXXX-XXXX-XXXX-XXXX"
-        class="w-full mono font-bold text-center rounded-xl px-3 py-3 uppercase outline-none transition-all"
-        style="background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(212,175,55,0.2); font-size:13px; letter-spacing:0.08em;"
+        class="w-full mono font-bold text-center rounded-xl px-2 py-3 uppercase outline-none transition-all"
+        style="background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(212,175,55,0.2); font-size:11px; letter-spacing:0.04em;"
         oninput="lockFormatInput(this)"
         onkeydown="if(event.key==='Enter')lockActivate()"/>
     </div>
@@ -1356,6 +1356,50 @@ function getDeviceId() {
 }
 const DEVICE_ID = getDeviceId();
 
+// ── MOTOR DE LICENCIAS (valida en cualquier PC) ───
+const LIC_KEY   = 'ZY2026A2K';
+const LIC_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function licHash(str) {
+  let h = 5381 >>> 0;
+  for (let i = 0; i < str.length; i++) h = (((h << 5) + h) ^ str.charCodeAt(i)) >>> 0;
+  return h;
+}
+function licCheck(parts) {
+  const h = licHash(parts.join('|') + LIC_KEY);
+  return [h>>>24, (h>>>16)&0xff, (h>>>8)&0xff, h&0xff].map(b => LIC_CHARS[b % 32]).join('');
+}
+function daysEpoch() { return Math.floor(Date.now() / 86400000); }
+function encodeDay(d) {
+  let r = '';
+  for (let i = 0; i < 4; i++) { r = LIC_CHARS[d % 32] + r; d = Math.floor(d / 32); }
+  return r;
+}
+function decodeDay(s) {
+  let n = 0;
+  for (const c of s) n = n * 32 + LIC_CHARS.indexOf(c);
+  return n;
+}
+
+// Valida código algorítmico — funciona en cualquier PC sin servidor
+function validateLicCode(code) {
+  const p = code.split('-');
+  if (p.length !== 4) return null;
+  if (p[0] === 'ZYNC') {
+    if (p[3] !== licCheck(['PRO', p[1], p[2]])) return null;
+    return { code, type:'PRO', name:'Licencia PRO', deviceId:'', expiresAt:null, status:'Activa' };
+  }
+  if (p[0] === 'DEMO') {
+    if (p[3] !== licCheck(['DEMO', p[1], p[2]])) return null;
+    const createdDay = decodeDay(p[2]);
+    const expiresDay = createdDay + 5;
+    const expiresAt  = new Date(expiresDay * 86400000).toISOString().split('T')[0];
+    if (daysEpoch() > expiresDay) return { code, type:'DEMO', name:'Demo 5 Días', expiresAt, status:'Expirada' };
+    return { code, type:'DEMO', name:'Demo 5 Días', deviceId:'', expiresAt, status:'Activa' };
+  }
+  return null;
+}
+
 // ── LOCK SCREEN ───────────────────────────────
 function lockFormatInput(el) {
   let v = el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
@@ -1374,15 +1418,26 @@ function lockActivate() {
 
   if (!code) { lockShowError('Ingrese una clave de activación'); return; }
 
-  // Buscar en embebidas
+  // 1) Licencias embebidas (hardcoded)
   let found = LICENSES.find(l => l.code === code);
 
-  // Buscar en las guardadas en localStorage (panel admin)
-  const saved = DB.get('licenses') || [];
-  if (!found) found = saved.find(l => l.code === code && l.status === 'Activa');
+  // 2) Validación algorítmica — funciona en CUALQUIER PC
+  if (!found) {
+    const alg = validateLicCode(code);
+    if (alg) {
+      if (alg.status === 'Expirada') { lockShowExpiredDemo(alg); return; }
+      found = alg;
+    }
+  }
+
+  // 3) localStorage mismo dispositivo (admin que genera en su PC)
+  if (!found) {
+    const saved = DB.get('licenses') || [];
+    found = saved.find(l => l.code === code && l.status === 'Activa');
+  }
 
   if (!found) { lockShowError('Código de activación inválido o no existe'); return; }
-  if (found.status !== 'Activa') { lockShowError('Esta licencia está suspendida'); return; }
+  if (found.status === 'Inactiva') { lockShowError('Esta licencia está suspendida'); return; }
   if (found.expiresAt) {
     if (new Date(found.expiresAt) < new Date()) {
       if (found.type === 'DEMO') { lockShowExpiredDemo(found); }
@@ -2574,14 +2629,16 @@ window.addEventListener('DOMContentLoaded', () => {
   // Auto-login si hay sesión válida
   const sess = DB.get('session');
   if (sess) {
-    const lic = LICENSES.find(l => l.code === sess.code) ||
-                (DB.get('licenses')||[]).find(l => l.code === sess.code);
-    if (lic && lic.status === 'Activa') {
-      if (!lic.expiresAt || new Date(lic.expiresAt) >= new Date()) {
-        lockEnter(lic); return;
+    let lic = LICENSES.find(l => l.code === sess.code)
+           || validateLicCode(sess.code)
+           || (DB.get('licenses')||[]).find(l => l.code === sess.code);
+    if (lic) {
+      // Re-evaluar DEMO algorítmico (puede haber expirado entre sesiones)
+      if (lic.status === 'Expirada' || (lic.expiresAt && new Date(lic.expiresAt) < new Date())) {
+        if (lic.type === 'DEMO') { lockShowExpiredDemo(lic); return; }
+        DB.remove('session'); return;
       }
-      // Licencia expirada — si es DEMO mostrar pantalla especial
-      if (lic.type === 'DEMO') { lockShowExpiredDemo(lic); return; }
+      if (lic.status === 'Activa') { lockEnter(lic); return; }
     }
     DB.remove('session');
   }

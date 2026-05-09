@@ -389,6 +389,39 @@ const DB = {
   set: (k,v) => localStorage.setItem('zync_'+k, JSON.stringify(v)),
 };
 
+// ── MOTOR DE LICENCIAS (mismo algoritmo que el sistema) ──
+const LIC_KEY   = 'ZY2026A2K';
+const LIC_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function licHash(str) {
+  let h = 5381 >>> 0;
+  for (let i = 0; i < str.length; i++) h = (((h << 5) + h) ^ str.charCodeAt(i)) >>> 0;
+  return h;
+}
+function licCheck(parts) {
+  const h = licHash(parts.join('|') + LIC_KEY);
+  return [h>>>24, (h>>>16)&0xff, (h>>>8)&0xff, h&0xff].map(b => LIC_CHARS[b % 32]).join('');
+}
+function daysEpoch() { return Math.floor(Date.now() / 86400000); }
+function encodeDay(d) {
+  let r = '';
+  for (let i = 0; i < 4; i++) { r = LIC_CHARS[d % 32] + r; d = Math.floor(d / 32); }
+  return r;
+}
+
+function genProCode() {
+  const seg = () => Array.from({length:4}, () => LIC_CHARS[Math.floor(Math.random()*32)]).join('');
+  const s1 = seg(), s2 = seg();
+  return `ZYNC-${s1}-${s2}-${licCheck(['PRO', s1, s2])}`;
+}
+
+function genDemoCode() {
+  const seg = () => Array.from({length:4}, () => LIC_CHARS[Math.floor(Math.random()*32)]).join('');
+  const s1 = seg();
+  const dateEnc = encodeDay(daysEpoch());
+  return `DEMO-${s1}-${dateEnc}-${licCheck(['DEMO', s1, dateEnc])}`;
+}
+
 // ── LICENCIAS EMBEBIDAS (mirror del sistema) ──
 const EMBEDDED = [
   { code:'ZYNC-DEMO-2026-FREE', type:'DEMO', name:'Demo Pública', deviceId:'', expiresAt:'2026-12-31', status:'Activa' },
@@ -631,11 +664,7 @@ function setGenPrefix(p) {
 }
 
 function doGenerate() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const seg = () => Array.from({length:4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
-  const code = genPrefix === 'DEMO'
-    ? `DEMO-${seg()}-${seg()}-${seg()}`
-    : `ZYNC-${seg()}-${seg()}-${new Date().getFullYear()}`;
+  const code = genPrefix === 'DEMO' ? genDemoCode() : genProCode();
   document.getElementById('genCode').textContent = code;
 }
 
@@ -655,10 +684,17 @@ function copyGenCode() {
     closeModal('modalGenerate');
     openAddModal();
     document.getElementById('fCode').value = code;
-    document.getElementById('fType').value = genPrefix === 'DEMO' ? 'DEMO' : 'PRO';
-    if (genDays > 0) {
-      const exp = new Date(); exp.setDate(exp.getDate() + genDays);
-      document.getElementById('fExpiry').value = exp.toISOString().split('T')[0];
+    const isDemo = code.startsWith('DEMO-');
+    document.getElementById('fType').value = isDemo ? 'DEMO' : 'PRO';
+    if (isDemo) {
+      // Extraer fecha de vencimiento del propio código (día codificado + 5)
+      const parts = code.split('-');
+      if (parts.length === 4) {
+        let n = 0;
+        for (const c of parts[2]) n = n * 32 + LIC_CHARS.indexOf(c);
+        const exp = new Date((n + 5) * 86400000);
+        document.getElementById('fExpiry').value = exp.toISOString().split('T')[0];
+      }
     } else {
       document.getElementById('fExpiry').value = '';
     }
