@@ -32,6 +32,12 @@ body { font-family: 'Inter', sans-serif; background: #06060a; color: #e2e2e9; mi
 .badge-pro { background: #D4AF37; color: #06060a; }
 .badge-demo { background: rgba(62,106,0,0.3); color: #b9f474; border: 1px solid #3e6a00; }
 .badge-inactiva { background: rgba(186,26,26,0.2); color: #ff8a80; border: 1px solid #ba1a1a; }
+.badge-pausada  { background: rgba(88,49,0,0.35); color: #ffdcbe; border: 1px solid #583100; }
+.badge-bloqueada{ background: rgba(186,26,26,0.25); color: #ff8a80; border: 1px solid #ba1a1a; }
+.badge-activa   { background: rgba(62,106,0,0.3); color: #b9f474; border: 1px solid #3e6a00; }
+.act-btn { padding: 3px 7px; border-radius: 6px; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; border: none; transition: opacity 0.15s; display: flex; align-items: center; gap: 3px; }
+.act-btn:hover { opacity: 0.8; }
+.act-btn:active { transform: scale(0.95); }
 
 .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
 .modal-bg.open { display: flex; }
@@ -150,7 +156,8 @@ body { font-family: 'Inter', sans-serif; background: #06060a; color: #e2e2e9; mi
           style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:#fff">
           <option value="">Todos los estados</option>
           <option value="Activa">Activa</option>
-          <option value="Inactiva">Inactiva</option>
+          <option value="Pausada">Pausada</option>
+          <option value="Bloqueada">Bloqueada</option>
         </select>
       </div>
       <div class="flex gap-3">
@@ -379,6 +386,88 @@ body { font-family: 'Inter', sans-serif; background: #06060a; color: #e2e2e9; mi
   </div>
 </div>
 
+<!-- ═══ MODAL: Cambiar Device ID ═══ -->
+<div id="modalDevice" class="modal-bg">
+  <div class="rounded-2xl w-full max-w-sm mx-4 p-8" style="background:#0f1117;border:1px solid rgba(212,175,55,0.25)">
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined fill-icon" style="color:#D4AF37">devices</span>
+        <h3 class="text-lg font-black text-white">Cambiar Device ID</h3>
+      </div>
+      <button onclick="closeModal('modalDevice')" class="text-gray-500 hover:text-white">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <input type="hidden" id="deviceLicId"/>
+
+    <!-- Info del cliente -->
+    <div class="p-4 rounded-xl mb-5" style="background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.15)">
+      <p class="text-[9px] text-gray-500 uppercase tracking-widest mb-0.5">Cliente / Licencia</p>
+      <p id="deviceClientName" class="font-bold text-white text-sm"></p>
+      <p id="deviceClientCode" class="mono text-[10px] mt-0.5" style="color:#D4AF37"></p>
+    </div>
+
+    <div class="flex flex-col gap-4">
+      <div>
+        <p class="text-[9px] text-gray-500 uppercase tracking-widest mb-1">Device ID Actual</p>
+        <p id="deviceCurrentId" class="mono text-sm font-bold" style="color:#888">—</p>
+      </div>
+      <label class="flex flex-col gap-1">
+        <span class="text-[10px] font-bold uppercase tracking-widest" style="color:#D4AF37">Nuevo Device ID</span>
+        <input id="deviceNewId" type="text" placeholder="ABC-DEF-GHJ  (o vacío = Universal)"
+          class="mono px-4 py-3 rounded-xl text-sm outline-none uppercase"
+          style="background:rgba(255,255,255,0.06);border:1px solid rgba(212,175,55,0.3);color:#fff"
+          onkeydown="if(event.key==='Enter')saveDeviceId()"/>
+      </label>
+      <div class="p-3 rounded-xl text-[10px] text-gray-500 leading-relaxed" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05)">
+        <span class="material-symbols-outlined text-xs align-middle mr-1" style="color:#D4AF37">info</span>
+        El cliente puede ver su Device ID en la pantalla de activación del sistema (<b class="text-gray-400">Hardware Identifier</b>). Dejarlo vacío lo convierte en licencia universal (cualquier PC).
+      </div>
+    </div>
+
+    <div class="flex gap-3 mt-6">
+      <button onclick="saveDeviceId()"
+        class="flex-1 py-3 rounded-xl font-black text-sm uppercase tracking-wider transition-all active:scale-95"
+        style="background:#D4AF37;color:#06060a">
+        <span class="material-symbols-outlined text-base align-middle mr-1">save</span>
+        Actualizar Device
+      </button>
+      <button onclick="closeModal('modalDevice')"
+        class="px-6 py-3 rounded-xl font-bold text-sm text-gray-400 hover:text-white transition-all"
+        style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Confirmar Eliminación ═══ -->
+<div id="modalConfirmDelete" class="modal-bg">
+  <div class="rounded-2xl w-full max-w-xs mx-4 p-8 text-center" style="background:#0f1117;border:1px solid rgba(186,26,26,0.3)">
+    <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+         style="background:rgba(186,26,26,0.1);border:1px solid rgba(186,26,26,0.3)">
+      <span class="material-symbols-outlined fill-icon text-3xl" style="color:#ba1a1a">delete_forever</span>
+    </div>
+    <h3 class="text-lg font-black text-white mb-2">Eliminar Licencia</h3>
+    <p class="text-sm text-gray-400 mb-3">Esta acción es <b class="text-red-400">irreversible</b>. La licencia y todos sus datos serán borrados permanentemente.</p>
+    <div class="mono text-xs font-bold mb-6 px-3 py-2 rounded-lg" style="background:rgba(186,26,26,0.1);color:#ff8a80" id="deleteTargetInfo"></div>
+    <input type="hidden" id="deleteTargetId"/>
+    <div class="flex gap-3">
+      <button onclick="confirmDeleteExec()"
+        class="flex-1 py-3 rounded-xl font-black text-sm uppercase tracking-wider transition-all active:scale-95"
+        style="background:#ba1a1a;color:#fff">
+        <span class="material-symbols-outlined text-base align-middle mr-1">delete_forever</span>
+        Eliminar
+      </button>
+      <button onclick="closeModal('modalConfirmDelete')"
+        class="flex-1 py-3 rounded-xl font-bold text-sm text-gray-400 hover:text-white transition-all"
+        style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08)">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
@@ -506,8 +595,20 @@ function renderLicenses() {
 
   body.innerHTML = filtered.map(l => {
     const expired = l.expiresAt && new Date(l.expiresAt) < new Date();
-    const badgeClass = l.status !== 'Activa' ? 'badge-inactiva' : expired ? 'badge-inactiva' : l.type==='PRO' ? 'badge-pro' : 'badge-demo';
-    const statusLabel = l.status !== 'Activa' ? 'Inactiva' : expired ? 'Expirada' : 'Activa';
+    const st = l.status === 'Pausada' ? 'Pausada' : l.status === 'Bloqueada' ? 'Bloqueada' : expired ? 'Expirada' : 'Activa';
+    const badgeClass = st === 'Activa' ? 'badge-activa' : st === 'Pausada' ? 'badge-pausada' : 'badge-bloqueada';
+
+    // Status action buttons — highlight the current state
+    const isPausada   = l.status === 'Pausada';
+    const isBloqueada = l.status === 'Bloqueada';
+    const isActiva    = !isPausada && !isBloqueada;
+    const btnPausar   = isPausada
+      ? `<button type="button" onclick="setStatus('${l.id}','Activa')"   class="act-btn" style="background:rgba(88,49,0,0.5);color:#ffdcbe"><span class="material-symbols-outlined fill-icon" style="font-size:10px">pause</span>Pausada ✓</button>`
+      : `<button type="button" onclick="setStatus('${l.id}','Pausada')"  class="act-btn" style="background:rgba(255,255,255,0.06);color:#888"><span class="material-symbols-outlined" style="font-size:10px">pause</span>Pausar</button>`;
+    const btnBloquear = isBloqueada
+      ? `<button type="button" onclick="setStatus('${l.id}','Activa')"   class="act-btn" style="background:rgba(186,26,26,0.5);color:#ff8a80"><span class="material-symbols-outlined fill-icon" style="font-size:10px">lock</span>Bloqueada ✓</button>`
+      : `<button type="button" onclick="setStatus('${l.id}','Bloqueada')" class="act-btn" style="background:rgba(255,255,255,0.06);color:#888"><span class="material-symbols-outlined" style="font-size:10px">lock</span>Bloquear</button>`;
+
     return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
       <td class="px-5 py-3 mono font-bold text-[11px]" style="color:#D4AF37">${l.code}</td>
       <td class="px-4 py-3">
@@ -518,28 +619,30 @@ function renderLicenses() {
       <td class="px-4 py-3 text-center">
         <span class="px-2 py-0.5 rounded text-[9px] font-black ${l.type==='PRO'?'badge-pro':'badge-demo'}">${l.type}</span>
       </td>
-      <td class="px-4 py-3 text-center mono text-gray-500 text-[10px]">${l.deviceId || 'Universal'}</td>
-      <td class="px-4 py-3 text-center text-[10px] ${expired?'text-red-400':'text-gray-500'}">${l.expiresAt || 'Sin expiración'}</td>
       <td class="px-4 py-3 text-center">
-        <span class="px-2 py-0.5 rounded text-[9px] font-black ${badgeClass}">${statusLabel}</span>
+        <p class="mono text-[10px] ${l.deviceId ? 'text-gray-300' : 'text-gray-600'}">${l.deviceId || 'Universal'}</p>
       </td>
+      <td class="px-4 py-3 text-center text-[10px] ${expired?'text-red-400':'text-gray-500'}">${l.expiresAt || '—'}</td>
       <td class="px-4 py-3 text-center">
-        <div class="flex gap-1 justify-center">
-          <button onclick="copyCode('${l.code}')" title="Copiar código"
-            class="p-1 rounded hover:bg-white/10 transition-colors">
-            <span class="material-symbols-outlined text-sm text-gray-400">content_copy</span>
+        <span class="px-2 py-0.5 rounded text-[9px] font-black ${badgeClass}">${st}</span>
+      </td>
+      <td class="px-4 py-3">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;min-width:168px">
+          <!-- Row 1: management actions -->
+          <button type="button" onclick="editLicense('${l.id}')" class="act-btn" style="background:rgba(0,56,126,0.25);color:#abc5ff">
+            <span class="material-symbols-outlined" style="font-size:10px">edit</span>Editar
           </button>
-          <button onclick="toggleStatus('${l.id}')" title="${l.status==='Activa'?'Desactivar':'Activar'}"
-            class="p-1 rounded hover:bg-white/10 transition-colors">
-            <span class="material-symbols-outlined text-sm ${l.status==='Activa'?'text-red-400':'text-green-400'}">${l.status==='Activa'?'block':'check_circle'}</span>
+          <button type="button" onclick="openDeviceModal('${l.id}')" class="act-btn" style="background:rgba(212,175,55,0.15);color:#D4AF37">
+            <span class="material-symbols-outlined" style="font-size:10px">devices</span>Device
           </button>
-          <button onclick="editLicense('${l.id}')" title="Editar"
-            class="p-1 rounded hover:bg-white/10 transition-colors">
-            <span class="material-symbols-outlined text-sm text-blue-400">edit</span>
+          <button type="button" onclick="copyCode('${l.code}')" class="act-btn" style="background:rgba(255,255,255,0.06);color:#888">
+            <span class="material-symbols-outlined" style="font-size:10px">content_copy</span>Copiar
           </button>
-          <button onclick="deleteLicense('${l.id}')" title="Eliminar"
-            class="p-1 rounded hover:bg-white/10 transition-colors">
-            <span class="material-symbols-outlined text-sm text-red-400">delete</span>
+          <!-- Row 2: status actions + delete -->
+          ${btnPausar}
+          ${btnBloquear}
+          <button type="button" onclick="confirmDelete('${l.id}')" class="act-btn" style="background:rgba(186,26,26,0.2);color:#ff8a80">
+            <span class="material-symbols-outlined" style="font-size:10px">delete</span>Eliminar
           </button>
         </div>
       </td>
@@ -613,26 +716,75 @@ function saveLicense() {
   showToast(id ? 'Licencia actualizada' : 'Licencia creada', 'success');
 }
 
-function toggleStatus(id) {
+function setStatus(id, newStatus) {
   const lics = DB.get('licenses') || [];
   const idx = lics.findIndex(l => l.id == id);
   if (idx < 0) return;
-  lics[idx].status = lics[idx].status === 'Activa' ? 'Inactiva' : 'Activa';
+  // If already in that state → toggle back to Activa
+  if (lics[idx].status === newStatus) newStatus = 'Activa';
+  lics[idx].status = newStatus;
   DB.set('licenses', lics);
   renderAll();
-  addLog(`Licencia ${lics[idx].code} → ${lics[idx].status}`);
-  showToast(`Licencia ${lics[idx].status.toLowerCase()}`, 'info');
+  addLog(`Licencia ${lics[idx].code} → ${newStatus}`);
+  const color = newStatus === 'Activa' ? 'success' : 'info';
+  showToast(`Licencia → ${newStatus}`, color);
 }
 
-function deleteLicense(id) {
-  if (!confirm('¿Eliminar esta licencia permanentemente?')) return;
-  const lics = (DB.get('licenses')||[]);
+// Legacy alias (kept for safety)
+function toggleStatus(id) { setStatus(id, 'Bloqueada'); }
+
+// ── DEVICE ID ──────────────────────────────────
+function openDeviceModal(id) {
+  const lics = DB.get('licenses') || [];
+  const l = lics.find(x => x.id == id);
+  if (!l) return;
+  document.getElementById('deviceLicId').value = id;
+  document.getElementById('deviceClientName').textContent = l.name;
+  document.getElementById('deviceClientCode').textContent = l.code;
+  document.getElementById('deviceCurrentId').textContent = l.deviceId || 'Universal (sin restricción de dispositivo)';
+  document.getElementById('deviceNewId').value = '';
+  document.getElementById('modalDevice').classList.add('open');
+  setTimeout(() => document.getElementById('deviceNewId').focus(), 100);
+}
+
+function saveDeviceId() {
+  const id = document.getElementById('deviceLicId').value;
+  const newDevice = document.getElementById('deviceNewId').value.trim().toUpperCase();
+  const lics = DB.get('licenses') || [];
+  const idx = lics.findIndex(l => l.id == id);
+  if (idx < 0) return;
+  const oldDevice = lics[idx].deviceId || 'Universal';
+  lics[idx].deviceId = newDevice;
+  DB.set('licenses', lics);
+  closeModal('modalDevice');
+  renderAll();
+  addLog(`Device ID cambiado: ${lics[idx].code} · ${oldDevice} → ${newDevice || 'Universal'}`);
+  showToast(newDevice ? `Device actualizado: ${newDevice}` : 'Licencia convertida a Universal', 'success');
+}
+
+// ── DELETE WITH CONFIRM MODAL ──────────────────
+function confirmDelete(id) {
+  const lics = DB.get('licenses') || [];
+  const l = lics.find(x => x.id == id);
+  if (!l) return;
+  document.getElementById('deleteTargetId').value = id;
+  document.getElementById('deleteTargetInfo').textContent = `${l.code}  ·  ${l.name}`;
+  document.getElementById('modalConfirmDelete').classList.add('open');
+}
+
+function confirmDeleteExec() {
+  const id = document.getElementById('deleteTargetId').value;
+  const lics = DB.get('licenses') || [];
   const l = lics.find(x => x.id == id);
   DB.set('licenses', lics.filter(x => x.id != id));
+  closeModal('modalConfirmDelete');
   renderAll();
-  if (l) addLog(`Licencia eliminada: ${l.code}`);
-  showToast('Licencia eliminada', 'error');
+  if (l) addLog(`Licencia eliminada: ${l.code} (${l.name})`);
+  showToast('Licencia eliminada permanentemente', 'error');
 }
+
+// Legacy alias
+function deleteLicense(id) { confirmDelete(id); }
 
 function copyCode(code) {
   navigator.clipboard.writeText(code).then(() => showToast('Código copiado: ' + code, 'success'));
@@ -743,7 +895,7 @@ function showToast(msg, type='info') {
 // ── KEYBOARD ───────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    ['modalAdd','modalGenerate'].forEach(id => closeModal(id));
+    ['modalAdd','modalGenerate','modalDevice','modalConfirmDelete'].forEach(id => closeModal(id));
   }
   if (e.key === 'Enter' && document.getElementById('adminLogin').style.display !== 'none') {
     adminLogin();

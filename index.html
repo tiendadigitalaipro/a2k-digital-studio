@@ -1666,11 +1666,13 @@ function lockActivate() {
   // 3) localStorage mismo dispositivo (admin que genera en su PC)
   if (!found) {
     const saved = DB.get('licenses') || [];
-    found = saved.find(l => l.code === code && l.status === 'Activa');
+    found = saved.find(l => l.code === code);
   }
 
   if (!found) { lockShowError('Código de activación inválido o no existe'); return; }
-  if (found.status === 'Inactiva') { lockShowError('Esta licencia está suspendida'); return; }
+  if (found.status === 'Pausada')   { lockShowError('Esta licencia está pausada temporalmente. Contacta a tu proveedor.'); return; }
+  if (found.status === 'Bloqueada') { lockShowError('Esta licencia fue bloqueada. Contacta a tu proveedor.'); return; }
+  if (found.status === 'Inactiva')  { lockShowError('Esta licencia está suspendida. Contacta a tu proveedor.'); return; }
   if (found.expiresAt) {
     if (new Date(found.expiresAt) < new Date()) {
       if (found.type === 'DEMO') { lockShowExpiredDemo(found); }
@@ -3025,7 +3027,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let lic = LICENSES.find(l => l.code === sess.code)
            || validateLicCode(sess.code)
            || (DB.get('licenses')||[]).find(l => l.code === sess.code);
-    if (lic && lic.status === 'Activa') {
+    if (lic && (lic.status === 'Activa' || !lic.status)) {
       if (!lic.expiresAt || new Date(lic.expiresAt) >= new Date()) {
         lockEnter(lic); return;
       }
