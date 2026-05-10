@@ -1296,50 +1296,128 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
 
 <!-- Modal: Agregar/Editar Producto -->
 <div id="modalProduct" class="modal-overlay">
-  <div class="modal-box p-8 mx-4 max-w-lg">
-    <div class="flex justify-between items-center mb-5">
+  <div class="modal-box p-0 mx-4 max-w-xl" style="max-height:92vh;overflow-y:auto;display:flex;flex-direction:column;">
+    <!-- Header sticky -->
+    <div class="flex justify-between items-center px-6 py-4 sticky top-0 z-10" style="background:#fff;border-bottom:1px solid rgba(0,0,0,0.08)">
       <h3 id="modalProductTitle" class="text-lg font-black">Agregar Producto</h3>
       <button onclick="closeModal('modalProduct')" class="p-1 rounded-lg hover:bg-surface-low">
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
-    <input type="hidden" id="mpId"/>
-    <div class="grid gap-3">
-      <div class="grid grid-cols-2 gap-3">
-        <label class="flex flex-col gap-1">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-outline">SKU / Código</span>
-          <input id="mpSku" type="text" class="px-3 py-2.5 rounded-xl border border-surface-highest text-sm outline-none"/>
-        </label>
-        <label class="flex flex-col gap-1">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Categoría</span>
-          <input id="mpCat" type="text" placeholder="Electrónica, Gaming..." class="px-3 py-2.5 rounded-xl border border-surface-highest text-sm outline-none"/>
-        </label>
+
+    <div class="p-5 grid gap-4 flex-1">
+      <input type="hidden" id="mpId"/>
+
+      <!-- Fila: Foto + SKU/Cat/Desc -->
+      <div class="flex gap-4 items-start">
+        <!-- Foto upload -->
+        <div class="flex-shrink-0 flex flex-col items-center gap-1">
+          <div id="mpPhotoPreview"
+               onclick="document.getElementById('mpPhotoInput').click()"
+               class="w-[88px] h-[88px] rounded-xl flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all hover:opacity-80"
+               style="background:rgba(0,56,126,0.06);border:2px dashed rgba(0,56,126,0.25)">
+            <span id="mpPhotoIcon" class="material-symbols-outlined text-3xl" style="color:rgba(0,56,126,0.4);font-variation-settings:'FILL' 0">add_photo_alternate</span>
+            <span id="mpPhotoLabel" class="text-[9px] font-bold uppercase tracking-wide mt-0.5" style="color:rgba(0,56,126,0.5)">Foto</span>
+          </div>
+          <button type="button" id="mpPhotoRemoveBtn" onclick="mpRemovePhoto()" class="text-[9px] font-bold uppercase tracking-wide hidden" style="color:#ba1a1a">Quitar</button>
+          <input type="file" id="mpPhotoInput" accept="image/*" class="hidden" onchange="mpHandlePhoto(this)"/>
+        </div>
+
+        <!-- SKU / Cat / Desc -->
+        <div class="flex-1 grid gap-2">
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex flex-col gap-1">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-outline">SKU / Código</span>
+              <input id="mpSku" type="text" class="px-3 py-2 rounded-xl border border-surface-highest text-sm outline-none"/>
+            </label>
+            <label class="flex flex-col gap-1">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Categoría</span>
+              <input id="mpCat" type="text" list="mpCatList" placeholder="Ej: Lácteos..." class="px-3 py-2 rounded-xl border border-surface-highest text-sm outline-none"/>
+              <datalist id="mpCatList"></datalist>
+            </label>
+          </div>
+          <label class="flex flex-col gap-1">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Descripción del Producto</span>
+            <input id="mpDesc" type="text" class="px-3 py-2 rounded-xl border border-surface-highest text-sm outline-none"/>
+          </label>
+        </div>
       </div>
-      <label class="flex flex-col gap-1">
-        <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Descripción</span>
-        <input id="mpDesc" type="text" class="px-3 py-2.5 rounded-xl border border-surface-highest text-sm outline-none"/>
-      </label>
-      <div class="grid grid-cols-3 gap-3">
-        <label class="flex flex-col gap-1">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Costo $</span>
-          <input id="mpCost" type="number" step="0.01" class="px-3 py-2.5 rounded-xl border border-surface-highest text-sm outline-none" oninput="mpCalcPrice()"/>
-        </label>
-        <label class="flex flex-col gap-1">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-outline">% Ganancia</span>
-          <input id="mpMargin" type="number" step="1" placeholder="ej: 30" class="px-3 py-2.5 rounded-xl border border-surface-highest text-sm outline-none" oninput="mpCalcPrice()"/>
-        </label>
-        <label class="flex flex-col gap-1">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Precio $ <span id="mpPriceCalcLabel" class="text-primary text-[9px]">(auto)</span></span>
-          <input id="mpPrice" type="number" step="0.01" class="px-3 py-2.5 rounded-xl border border-surface-highest text-sm outline-none font-black text-secondary"/>
-        </label>
+
+      <!-- Sección de Precios -->
+      <div class="rounded-xl overflow-hidden" style="border:1.5px solid rgba(0,56,126,0.15)">
+        <div class="px-4 py-2.5 flex items-center gap-2" style="background:rgba(0,56,126,0.07)">
+          <span class="material-symbols-outlined text-sm" style="color:#00387e;font-variation-settings:'FILL' 1">price_change</span>
+          <span class="text-[10px] font-black uppercase tracking-widest" style="color:#00387e">Costos y Precio de Venta</span>
+        </div>
+        <div class="p-4 grid gap-3">
+          <!-- Bulto / Caja -->
+          <div class="rounded-xl p-3" style="background:rgba(88,49,0,0.05);border:1px solid rgba(88,49,0,0.18)">
+            <p class="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1" style="color:#583100;">
+              <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">inventory_2</span>
+              Compra por Bulto / Caja (opcional)
+            </p>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="flex flex-col gap-1">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Costo Total del Bulto $</span>
+                <input id="mpBulkCost" type="number" step="0.01" placeholder="Ej: 25.00"
+                  class="px-3 py-2 rounded-xl border border-surface-highest text-sm outline-none"
+                  oninput="mpCalcPrice()"/>
+              </label>
+              <label class="flex flex-col gap-1">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Unidades en el Bulto</span>
+                <input id="mpBulkUnits" type="number" step="1" min="1" placeholder="Ej: 24"
+                  class="px-3 py-2 rounded-xl border border-surface-highest text-sm outline-none"
+                  oninput="mpCalcPrice()"/>
+              </label>
+            </div>
+            <p class="text-[10px] text-outline mt-1.5">Completa ambos campos y el costo por unidad se calcula automáticamente.</p>
+          </div>
+
+          <!-- Costo / Margen / Precio -->
+          <div class="grid grid-cols-3 gap-2">
+            <label class="flex flex-col gap-1">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Costo/Unidad $</span>
+              <input id="mpCost" type="number" step="0.0001" class="px-3 py-2 rounded-xl border border-surface-highest text-sm outline-none" oninput="mpCalcPrice()"/>
+            </label>
+            <label class="flex flex-col gap-1">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-outline">% Ganancia</span>
+              <input id="mpMargin" type="number" step="1" placeholder="ej: 30" class="px-3 py-2 rounded-xl border border-surface-highest text-sm outline-none" oninput="mpCalcPrice()"/>
+            </label>
+            <label class="flex flex-col gap-1">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Precio Venta $ <span class="text-[9px]" style="color:#3e6a00">(auto)</span></span>
+              <input id="mpPrice" type="number" step="0.01" class="px-3 py-2 rounded-xl border border-surface-highest text-sm outline-none font-black" style="color:#3e6a00"/>
+            </label>
+          </div>
+
+          <!-- Panel visual: Costo proveedor vs Precio sugerido -->
+          <div id="mpPriceInfo" style="display:none">
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <!-- Costo proveedor -->
+              <div class="rounded-xl p-3 text-center" style="background:rgba(88,49,0,0.07);border:1px solid rgba(88,49,0,0.2)">
+                <div class="text-[9px] font-black uppercase tracking-[0.12em] mb-1" style="color:#583100">Te costó (proveedor)</div>
+                <div id="mpCostDisplay" class="text-2xl font-black leading-none" style="color:#583100">$0.00</div>
+                <div id="mpBulkDisplay" class="text-[9px] mt-1 leading-tight" style="color:rgba(88,49,0,0.65)"></div>
+              </div>
+              <!-- Precio venta sugerido -->
+              <div class="rounded-xl p-3 text-center" style="background:rgba(62,106,0,0.07);border:1px solid rgba(62,106,0,0.2)">
+                <div class="text-[9px] font-black uppercase tracking-[0.12em] mb-1" style="color:#3e6a00">Precio sugerido venta</div>
+                <div id="mpSaleDisplay" class="text-2xl font-black leading-none" style="color:#3e6a00">$0.00</div>
+                <div id="mpBsDisplay" class="text-[9px] mt-1 leading-tight" style="color:rgba(62,106,0,0.65)"></div>
+              </div>
+            </div>
+            <!-- Línea resumen -->
+            <div class="px-3 py-2 rounded-xl text-[10px]" style="background:rgba(0,56,126,0.05);border:1px solid rgba(0,56,126,0.1)">
+              <span id="mpPriceInfoText">—</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="px-3 py-2 rounded-xl bg-surface-low text-[11px] text-on-surface-variant" id="mpPriceInfo" style="display:none">
-        Precio calculado con <b id="mpMarginShow">0</b>% de ganancia sobre el costo. Precio en Bs: <b id="mpPriceBs">—</b>
-      </div>
+
+      <!-- IVA / Stock -->
       <div class="grid grid-cols-3 gap-3">
         <label class="flex flex-col gap-1">
           <span class="text-[10px] font-bold uppercase tracking-widest text-outline">IVA %</span>
-          <select id="mpIva" class="px-3 py-2.5 rounded-xl border border-surface-highest text-sm outline-none">
+          <select id="mpIva" class="px-3 py-2 rounded-xl border border-surface-highest text-sm outline-none">
             <option value="0">0%</option>
             <option value="8">8%</option>
             <option value="16" selected>16%</option>
@@ -1347,24 +1425,26 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
         </label>
         <label class="flex flex-col gap-1">
           <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Stock Actual</span>
-          <input id="mpStock" type="number" class="px-3 py-2.5 rounded-xl border border-surface-highest text-sm outline-none"/>
+          <input id="mpStock" type="number" class="px-3 py-2 rounded-xl border border-surface-highest text-sm outline-none"/>
         </label>
         <label class="flex flex-col gap-1">
           <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Stock Mínimo</span>
-          <input id="mpMin" type="number" class="px-3 py-2.5 rounded-xl border border-surface-highest text-sm outline-none"/>
+          <input id="mpMin" type="number" class="px-3 py-2 rounded-xl border border-surface-highest text-sm outline-none"/>
         </label>
       </div>
-      <label class="flex items-center gap-2 cursor-pointer mt-1">
+      <label class="flex items-center gap-2 cursor-pointer">
         <input id="mpFraccionable" type="checkbox" class="w-4 h-4 rounded"/>
         <span class="text-sm font-medium">¿Producto fraccionable? (kg / L)</span>
       </label>
     </div>
-    <div class="flex gap-3 mt-5">
+
+    <!-- Footer sticky -->
+    <div class="flex gap-3 px-5 py-4 sticky bottom-0 z-10" style="background:#fff;border-top:1px solid rgba(0,0,0,0.08)">
       <button onclick="invSaveProduct()"
         class="flex-1 py-3 rounded-xl font-black text-sm uppercase tracking-wider transition-all active:scale-95"
-        style="background:#00387e;color:#fff">Guardar</button>
+        style="background:#00387e;color:#fff">Guardar Producto</button>
       <button onclick="closeModal('modalProduct')"
-        class="px-6 py-3 rounded-xl font-bold text-sm bg-surface-high text-on-surface hover:bg-surface-highest transition-all">
+        class="px-6 py-3 rounded-xl font-bold text-sm hover:bg-surface-highest transition-all" style="background:rgba(0,0,0,0.06)">
         Cancelar</button>
     </div>
   </div>
@@ -1980,8 +2060,15 @@ function invRender() {
     return `<tr class="inv-row border-b border-surface-highest text-xs">
       <td class="px-4 py-2.5 font-mono font-bold text-outline">${p.sku}</td>
       <td class="px-4 py-2.5">
-        <p class="font-semibold">${p.desc}</p>
-        ${p.fraccionable ? '<span class="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">FRAC</span>' : ''}
+        <div class="flex items-center gap-2">
+          ${p.photo
+            ? `<img src="${p.photo}" alt="" class="w-8 h-8 rounded-lg object-cover flex-shrink-0" style="border:1px solid rgba(0,0,0,0.08)">`
+            : `<div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center" style="background:rgba(0,56,126,0.06)"><span class="material-symbols-outlined text-xs" style="color:rgba(0,56,126,0.3)">image</span></div>`}
+          <div>
+            <p class="font-semibold">${p.desc}</p>
+            ${p.fraccionable ? '<span class="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">FRAC</span>' : ''}
+          </div>
+        </div>
       </td>
       <td class="px-3 py-2.5 text-center">
         <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-surface-high">${p.cat || '—'}</span>
@@ -2017,10 +2104,12 @@ function invRender() {
 
 function invOpenAdd() {
   document.getElementById('modalProductTitle').textContent = 'Agregar Producto';
-  ['mpId','mpSku','mpCat','mpDesc','mpCost','mpPrice','mpStock','mpMin','mpMargin'].forEach(id => document.getElementById(id).value = '');
+  ['mpId','mpSku','mpCat','mpDesc','mpCost','mpPrice','mpStock','mpMin','mpMargin','mpBulkCost','mpBulkUnits'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('mpIva').value = '16';
   document.getElementById('mpFraccionable').checked = false;
   document.getElementById('mpPriceInfo').style.display = 'none';
+  mpResetPhoto();
+  mpPopulateCatList();
   openModal('modalProduct');
 }
 
@@ -2033,30 +2122,42 @@ function invEdit(id) {
   document.getElementById('mpSku').value = p.sku;
   document.getElementById('mpCat').value = p.cat || '';
   document.getElementById('mpDesc').value = p.desc;
-  document.getElementById('mpCost').value = p.cost;
+  document.getElementById('mpBulkCost').value  = p.bulkCost  || '';
+  document.getElementById('mpBulkUnits').value = p.bulkUnits > 1 ? p.bulkUnits : '';
+  document.getElementById('mpCost').value  = p.cost;
   document.getElementById('mpMargin').value = p.cost > 0 ? (((p.price-p.cost)/p.cost)*100).toFixed(0) : '';
   document.getElementById('mpPrice').value = p.price;
-  document.getElementById('mpPriceInfo').style.display = p.cost > 0 ? '' : 'none';
   document.getElementById('mpIva').value = p.iva;
   document.getElementById('mpStock').value = p.stock;
   document.getElementById('mpMin').value = p.min;
   document.getElementById('mpFraccionable').checked = !!p.fraccionable;
+  if (p.photo) mpLoadPhoto(p.photo); else mpResetPhoto();
+  mpPopulateCatList();
+  document.getElementById('mpPriceInfo').style.display = 'none';
+  if (p.cost > 0) mpCalcPrice();
   openModal('modalProduct');
 }
 
 function invSaveProduct() {
   const id = document.getElementById('mpId').value;
+  const bulkCost  = parseFloat(document.getElementById('mpBulkCost').value)  || 0;
+  const bulkUnits = parseInt(document.getElementById('mpBulkUnits').value)   || 0;
+  const photoPreview = document.getElementById('mpPhotoPreview');
+  const photoData = photoPreview.dataset.photo || '';
   const prod = {
     id: id || Date.now().toString(),
     sku: document.getElementById('mpSku').value.trim().toUpperCase() || 'S/C',
     cat: document.getElementById('mpCat').value.trim(),
     desc: document.getElementById('mpDesc').value.trim(),
+    bulkCost:  bulkCost  > 0 ? bulkCost  : undefined,
+    bulkUnits: bulkUnits > 1 ? bulkUnits : undefined,
     cost: parseFloat(document.getElementById('mpCost').value) || 0,
     price: parseFloat(document.getElementById('mpPrice').value) || 0,
     iva: parseInt(document.getElementById('mpIva').value) || 0,
     stock: parseInt(document.getElementById('mpStock').value) || 0,
     min: parseInt(document.getElementById('mpMin').value) || 0,
     fraccionable: document.getElementById('mpFraccionable').checked,
+    photo: photoData || undefined,
   };
   if (!prod.desc) { toast('La descripción es obligatoria', 'error'); return; }
   const prods = DB.get('products') || [];
@@ -2761,17 +2862,93 @@ function etqPrint() {
 // PROFIT MARGIN CALC
 // ════════════════════════════════════════════
 function mpCalcPrice() {
-  const cost = parseFloat(document.getElementById('mpCost').value) || 0;
-  const margin = parseFloat(document.getElementById('mpMargin').value);
-  const infoEl = document.getElementById('mpPriceInfo');
+  const bulkCost  = parseFloat(document.getElementById('mpBulkCost').value) || 0;
+  const bulkUnits = parseInt(document.getElementById('mpBulkUnits').value)   || 0;
+  const margin    = parseFloat(document.getElementById('mpMargin').value);
+  const infoEl    = document.getElementById('mpPriceInfo');
+
+  let cost;
+  if (bulkCost > 0 && bulkUnits > 1) {
+    cost = bulkCost / bulkUnits;
+    document.getElementById('mpCost').value = cost.toFixed(4);
+  } else {
+    cost = parseFloat(document.getElementById('mpCost').value) || 0;
+  }
+
   if (cost > 0 && !isNaN(margin) && margin >= 0) {
-    const price = cost * (1 + margin/100);
+    const price = cost * (1 + margin / 100);
     document.getElementById('mpPrice').value = price.toFixed(2);
-    document.getElementById('mpMarginShow').textContent = margin;
-    const rate = (DB.get('config')||{}).bcv || (DB.get('config')||{}).paralelo || 0;
-    document.getElementById('mpPriceBs').textContent = rate ? `Bs. ${(price*rate).toFixed(2)}` : 'Configura la tasa BCV';
-    infoEl.style.display='';
-  } else { infoEl.style.display='none'; }
+
+    // Tarjetas visuales: costo proveedor vs precio sugerido
+    document.getElementById('mpCostDisplay').textContent = '$' + cost.toFixed(2);
+    document.getElementById('mpSaleDisplay').textContent = '$' + price.toFixed(2);
+
+    if (bulkCost > 0 && bulkUnits > 1) {
+      document.getElementById('mpBulkDisplay').textContent = `📦 Bulto ${bulkUnits} uds · Total $${bulkCost.toFixed(2)}`;
+    } else {
+      document.getElementById('mpBulkDisplay').textContent = '';
+    }
+
+    const rate = (DB.get('config')||{}).bcv || 0;
+    if (rate) {
+      document.getElementById('mpBsDisplay').textContent = `Bs. ${(price * rate).toFixed(2)}`;
+    } else {
+      document.getElementById('mpBsDisplay').textContent = 'Configura la tasa BCV';
+    }
+
+    // Línea de resumen
+    const profit = price - cost;
+    const bsStr = rate
+      ? `Bs. <b style="color:#3e6a00">${(price*rate).toFixed(2)}</b>`
+      : '<span style="color:#ba1a1a">sin tasa BCV</span>';
+    let txt = `Ganancia: <b style="color:#3e6a00">$${profit.toFixed(2)}</b> por unidad · Margen <b>${margin}%</b> · ${bsStr}`;
+    if (bulkCost > 0 && bulkUnits > 1) {
+      txt = `Costo/ud: <b>$${cost.toFixed(4)}</b> · ` + txt;
+    }
+    document.getElementById('mpPriceInfoText').innerHTML = txt;
+    infoEl.style.display = '';
+  } else {
+    infoEl.style.display = 'none';
+  }
+}
+
+// Foto producto
+function mpHandlePhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => mpLoadPhoto(e.target.result);
+  reader.readAsDataURL(file);
+}
+function mpLoadPhoto(dataUrl) {
+  const preview = document.getElementById('mpPhotoPreview');
+  preview.dataset.photo = dataUrl;
+  preview.style.backgroundImage = `url(${dataUrl})`;
+  preview.style.backgroundSize = 'cover';
+  preview.style.backgroundPosition = 'center';
+  preview.style.border = '2px solid rgba(62,106,0,0.4)';
+  document.getElementById('mpPhotoIcon').style.display = 'none';
+  document.getElementById('mpPhotoLabel').style.display = 'none';
+  document.getElementById('mpPhotoRemoveBtn').classList.remove('hidden');
+}
+function mpResetPhoto() {
+  const preview = document.getElementById('mpPhotoPreview');
+  preview.dataset.photo = '';
+  preview.style.backgroundImage = '';
+  preview.style.border = '2px dashed rgba(0,56,126,0.25)';
+  document.getElementById('mpPhotoIcon').style.display = '';
+  document.getElementById('mpPhotoLabel').style.display = '';
+  document.getElementById('mpPhotoRemoveBtn').classList.add('hidden');
+  document.getElementById('mpPhotoInput').value = '';
+}
+function mpRemovePhoto() { mpResetPhoto(); }
+
+// Datalist de categorías existentes
+function mpPopulateCatList() {
+  const prods = DB.get('products') || [];
+  const cats = [...new Set(prods.map(p => p.cat).filter(Boolean))].sort();
+  const dl = document.getElementById('mpCatList');
+  dl.innerHTML = cats.map(c => `<option value="${c}">`).join('');
 }
 
 // ════════════════════════════════════════════
