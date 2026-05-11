@@ -2060,9 +2060,9 @@ function posRender() {
       </td>
       <td class="px-2 py-2 text-center">
         <div class="flex items-center justify-center gap-1">
-          <button type="button" onclick="posQty(${i},-1)" class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm select-none" style="background:rgba(186,26,26,0.1);color:#ba1a1a">−</button>
-          <span class="font-black text-sm w-7 text-center">${c.qty}</span>
-          <button type="button" onclick="posQty(${i},1)" class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm select-none" style="background:rgba(62,106,0,0.1);color:#3e6a00">+</button>
+          <button type="button" onclick="posQtyById('${esc(c.sourceProductId || c.id)}',-1)" class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm select-none" style="background:rgba(186,26,26,0.1);color:#ba1a1a">−</button>
+          <span class="font-black text-sm w-7 text-center">${stockNum(c.qty)}</span>
+          <button type="button" onclick="posQtyById('${esc(c.sourceProductId || c.id)}',1)" class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm select-none" style="background:rgba(62,106,0,0.1);color:#3e6a00">+</button>
         </div>
       </td>
       <td class="px-2 py-2 text-right font-semibold text-xs">${fmt$(c.price)}</td>
@@ -2115,6 +2115,12 @@ function posQty(i, delta) {
   cart[i].qty = stockNum(cart[i].qty) + delta;
   if (cart[i].qty <= 0) cart.splice(i, 1);
   posRender();
+}
+function posQtyById(productId, delta) {
+  normalizeCart();
+  const idx = cart.findIndex(c => (c.sourceProductId || c.id) == productId);
+  if (idx < 0) return;
+  posQty(idx, delta);
 }
 function posClearClient() {
   document.getElementById('posClientName').value = 'CLIENTE GENÉRICO';
