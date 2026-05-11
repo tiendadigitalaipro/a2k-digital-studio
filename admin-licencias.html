@@ -269,6 +269,7 @@ body { font-family: 'Inter', sans-serif; background: #06060a; color: #e2e2e9; mi
         <label class="flex flex-col gap-1">
           <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Tipo</span>
           <select id="fType" class="px-4 py-3 rounded-xl text-sm outline-none"
+            onchange="syncExpiryByType()"
             style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff">
             <option value="PRO">PRO</option>
             <option value="DEMO">DEMO</option>
@@ -302,10 +303,11 @@ body { font-family: 'Inter', sans-serif; background: #06060a; color: #e2e2e9; mi
           style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff"/>
       </label>
       <label class="flex flex-col gap-1">
-        <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Fecha de Vencimiento (vacío = sin expiración)</span>
+        <span id="fExpiryLabel" class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Licencia PRO permanente</span>
         <input id="fExpiry" type="date"
           class="px-4 py-3 rounded-xl text-sm outline-none"
           style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff"/>
+        <span id="fExpiryHint" class="text-[10px] font-bold uppercase tracking-widest" style="color:#D4AF37">PERMANENTE · DE POR VIDA · SIN CADUCIDAD</span>
       </label>
       <label class="flex flex-col gap-1">
         <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Notas internas</span>
@@ -706,12 +708,34 @@ function renderStats() {
 }
 
 // ── CRUD ───────────────────────────────────────
+function syncExpiryByType() {
+  const type = document.getElementById('fType').value;
+  const expiry = document.getElementById('fExpiry');
+  const label = document.getElementById('fExpiryLabel');
+  const hint = document.getElementById('fExpiryHint');
+  if (type === 'PRO') {
+    expiry.value = '';
+    expiry.disabled = true;
+    expiry.style.opacity = '0.45';
+    label.textContent = 'Licencia PRO permanente';
+    hint.textContent = 'PERMANENTE · DE POR VIDA · SIN CADUCIDAD';
+    hint.style.color = '#D4AF37';
+  } else {
+    expiry.disabled = false;
+    expiry.style.opacity = '1';
+    label.textContent = 'Fecha de vencimiento DEMO';
+    hint.textContent = 'DEMO: debe tener fecha de caducidad';
+    hint.style.color = '#ff8a80';
+  }
+}
+
 function openAddModal() {
   document.getElementById('modalAddTitle').textContent = 'Nueva Licencia';
   document.getElementById('editId').value = '';
   ['fCode','fName','fPhone','fDevice','fExpiry','fNotes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('fType').value = 'PRO';
   document.getElementById('fStatus').value = 'Activa';
+  syncExpiryByType();
   document.getElementById('modalAdd').classList.add('open');
 }
 
@@ -729,6 +753,7 @@ function editLicense(id) {
   document.getElementById('fDevice').value = l.deviceId || '';
   document.getElementById('fExpiry').value = l.expiresAt || '';
   document.getElementById('fNotes').value = l.notes || '';
+  syncExpiryByType();
   document.getElementById('modalAdd').classList.add('open');
 }
 
@@ -745,7 +770,7 @@ function saveLicense() {
     name: document.getElementById('fName').value.trim() || 'Sin nombre',
     phone: document.getElementById('fPhone').value.trim(),
     deviceId: document.getElementById('fDevice').value.trim().toUpperCase(),
-    expiresAt: document.getElementById('fExpiry').value || null,
+    expiresAt: document.getElementById('fType').value === 'PRO' ? null : (document.getElementById('fExpiry').value || null),
     notes: document.getElementById('fNotes').value.trim(),
     createdAt: new Date().toISOString(),
   };
@@ -914,6 +939,7 @@ function copyGenCode() {
     } else {
       document.getElementById('fExpiry').value = '';
     }
+    syncExpiryByType();
     showToast('Código listo. Completa el nombre del cliente y guarda.', 'success');
   });
 }
