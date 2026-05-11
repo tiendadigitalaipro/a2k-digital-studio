@@ -1955,6 +1955,7 @@ function nextTicketNum() {
 let cart = [];
 let searchTimeout = null;
 let isPaying = false;
+let posQtyLock = false;
 
 function stockNum(v) {
   const n = parseFloat(String(v ?? '0').replace(',', '.').replace(/[^0-9.\-]/g, ''));
@@ -1967,6 +1968,12 @@ function cartQtyForProduct(productId, excludeIndex = -1) {
     const itemProductId = item.sourceProductId || item.id;
     return itemProductId == productId ? total + stockNum(item.stockQty || item.qty) : total;
   }, 0);
+}
+
+function normalizeCart() {
+  cart = cart
+    .map(item => ({ ...item, qty: stockNum(item.qty) }))
+    .filter(item => item.qty > 0);
 }
 
 function posSearchProduct(q) {
@@ -2027,6 +2034,7 @@ function posAddProduct(id) {
 }
 
 function posRender() {
+  normalizeCart();
   const body = document.getElementById('cartBody');
   const empty = document.getElementById('cartEmpty');
   if (!cart.length) {
@@ -2085,6 +2093,10 @@ function posRender() {
 }
 
 function posQty(i, delta) {
+  if (posQtyLock) return;
+  posQtyLock = true;
+  setTimeout(() => { posQtyLock = false; }, 120);
+  normalizeCart();
   if (!cart[i]) return;
   if (delta > 0) {
     const prods = DB.get('products') || [];
@@ -2093,14 +2105,14 @@ function posQty(i, delta) {
     if (p) {
       const stock = stockNum(p.stock);
       const min = stockNum(p.min);
-      const nextQty = cart[i].qty + delta;
+      const nextQty = stockNum(cart[i].qty) + delta;
       const nextTotal = cartQtyForProduct(productId, i) + nextQty;
       if (nextTotal > stock) { toast(`Stock insuficiente. Disponible: ${stock} · En carrito: ${cartQtyForProduct(productId)}`, 'error'); return; }
       const remaining = stock - nextTotal;
       if (remaining >= 0 && remaining <= min) toast(`Alerta: ${p.desc} quedará en stock mínimo (${remaining})`, 'info');
     }
   }
-  cart[i].qty += delta;
+  cart[i].qty = stockNum(cart[i].qty) + delta;
   if (cart[i].qty <= 0) cart.splice(i, 1);
   posRender();
 }
