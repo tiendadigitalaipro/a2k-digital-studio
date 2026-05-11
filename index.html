@@ -1804,18 +1804,23 @@ function lockShowForUpgrade() {
   const ls = document.getElementById('lockScreen');
   ls.style.display = 'flex';
   ls.style.opacity = '1';
+  ls.style.pointerEvents = 'auto';
+  ls.style.zIndex = '9999';
   ls.style.transition = 'none';
   document.getElementById('lockInput').value = '';
   document.getElementById('lockInput').focus();
 }
 
 function lockEnter(lic) {
-  document.getElementById('lockScreen').style.opacity = '0';
-  document.getElementById('lockScreen').style.transition = 'opacity 0.4s';
+  const lockScreen = document.getElementById('lockScreen');
+  lockScreen.style.pointerEvents = 'none';
+  lockScreen.style.opacity = '0';
+  lockScreen.style.transition = 'opacity 0.4s';
+  document.getElementById('appShell').classList.add('active');
+  document.getElementById('aiFab').style.display = 'flex';
   setTimeout(() => {
-    document.getElementById('lockScreen').style.display = 'none';
-    document.getElementById('appShell').classList.add('active');
-    document.getElementById('aiFab').style.display = 'flex';
+    lockScreen.style.display = 'none';
+    lockScreen.style.zIndex = '-1';
     // Badge licencia
     const badge = document.getElementById('licBadge');
     badge.textContent = lic.type;
