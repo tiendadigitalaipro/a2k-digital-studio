@@ -429,7 +429,7 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
           <span id="demoDaysLeftText">—</span>
         </p>
       </div>
-      <p class="text-[9px] text-gray-500 mt-1">v2.1.0-godmode · A2K Digital Studio</p>
+      <p class="text-[9px] text-gray-500 mt-1">v2.1.1-venepagos · A2K Digital Studio</p>
     </div>
   </aside>
 
@@ -1405,6 +1405,9 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
           <option value="bolivares">Bolívares</option>
           <option value="transferencia">Transferencia</option>
           <option value="pago-movil">Pago Móvil</option>
+          <option value="biopago">Biopago</option>
+          <option value="punto-debito">Punto de Venta Débito</option>
+          <option value="punto-credito">Punto de Venta Crédito</option>
           <option value="zelle">Zelle</option>
           <option value="credito">Crédito / Fiado</option>
         </select>
@@ -2290,6 +2293,20 @@ function posPaymentGroup(method) {
   if (method === 'credito') return 'credit';
   return 'digital';
 }
+function posPaymentLabel(method) {
+  const labels = {
+    efectivo: 'Efectivo USD',
+    bolivares: 'Bolívares',
+    transferencia: 'Transferencia',
+    'pago-movil': 'Pago Móvil',
+    biopago: 'Biopago',
+    'punto-debito': 'Punto de Venta Débito',
+    'punto-credito': 'Punto de Venta Crédito',
+    zelle: 'Zelle',
+    credito: 'Crédito / Fiado'
+  };
+  return labels[method] || method || '—';
+}
 
 function posValidateStock(items = cart) {
   const prods = DB.get('products') || [];
@@ -2514,7 +2531,7 @@ Subtotal:         ${fmt$(t.subtotal).padStart(10)}
 IVA:              ${fmt$(t.iva).padStart(10)}
 TOTAL:            ${fmt$(t.total).padStart(10)}
 --------------------------------
-Método: ${t.method.toUpperCase()}
+Método: ${posPaymentLabel(t.method).toUpperCase()}
 ${t.received > 0 ? 'Recibido: ' + fmt$(t.received) : ''}
 ${t.received > 0 ? 'Vuelto:   ' + fmt$(Math.max(0, t.received - t.total)) : ''}
 ================================
@@ -3060,7 +3077,7 @@ function rptRender() {
       <td class="px-4 py-2.5 text-outline">${new Date(s.date).toLocaleString('es-VE')}</td>
       <td class="px-4 py-2.5 text-center">${s.items.reduce((a,i)=>a+i.qty,0)}</td>
       <td class="px-4 py-2.5 text-right font-black ${s.voided ? 'text-error' : 'text-secondary'}">${s.voided ? 'ANULADA ' : ''}${fmt$(s.total)}</td>
-      <td class="px-4 py-2.5 text-center capitalize">${esc(s.method)}</td>
+      <td class="px-4 py-2.5 text-center">${esc(posPaymentLabel(s.method))}</td>
       <td class="px-4 py-2.5 text-center">
         ${s.voided ? '<span class="text-[10px] font-black text-error">ANULADA</span>' : `<button onclick="saleVoid('${s.id}')" class="px-2 py-1 rounded text-[10px] font-black uppercase" style="background:rgba(186,26,26,0.12);color:#ba1a1a">Anular</button>`}
       </td>
@@ -3102,7 +3119,7 @@ function rptPrint() {
       ${sales.slice(-50).map(s => `<tr>
         <td>#${s.ticketNum}</td><td>${s.client}</td>
         <td>${new Date(s.date).toLocaleString('es-VE')}</td>
-        <td>$${s.total.toFixed(2)}</td><td>${s.method}</td>
+        <td>$${s.total.toFixed(2)}</td><td>${posPaymentLabel(s.method)}</td>
       </tr>`).join('')}
     </table>
   </body></html>`);
