@@ -421,7 +421,7 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
           <span id="demoDaysLeftText">—</span>
         </p>
       </div>
-      <p class="text-[9px] text-gray-500 mt-1">v2.0.1-posfix · A2K Digital Studio</p>
+      <p class="text-[9px] text-gray-500 mt-1">v2.0.2-posstable · A2K Digital Studio</p>
     </div>
   </aside>
 
@@ -1981,17 +1981,33 @@ function normalizeCart() {
     .filter(item => item.qty > 0);
 }
 
+function posText(v) {
+  return String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+function posFindProducts(q) {
+  const query = posText(q);
+  if (!query) return [];
+  const words = query.split(/\s+/).filter(Boolean);
+  return (DB.get('products') || []).filter(p => {
+    const sku = posText(p.sku);
+    const desc = posText(p.desc);
+    const full = `${sku} ${desc}`;
+    return sku === query || desc === query || desc.includes(query) || words.every(w => full.includes(w));
+  });
+}
+
 function posSearchProduct(q) {
   clearTimeout(searchTimeout);
   const res = document.getElementById('posSearchResults');
   if (!q) { res.classList.add('hidden'); return; }
   searchTimeout = setTimeout(() => {
-    const prods = DB.get('products') || [];
-    const hits = prods.filter(p =>
-      p.desc.toLowerCase().includes(q.toLowerCase()) ||
-      p.sku.toLowerCase().includes(q.toLowerCase())
-    ).slice(0, 8);
-    if (!hits.length) { res.classList.add('hidden'); return; }
+    const hits = posFindProducts(q).slice(0, 8);
+    if (!hits.length) {
+      res.innerHTML = '<div class="px-4 py-3 text-xs font-bold text-outline">Producto no encontrado</div>';
+      res.classList.remove('hidden');
+      return;
+    }
     res.innerHTML = hits.map(p => `
       <div class="px-4 py-2.5 hover:bg-surface-low cursor-pointer border-b border-surface-highest last:border-0 flex justify-between items-center"
            onclick="posAddProduct('${p.id}')">
@@ -2008,11 +2024,9 @@ function posSearchProduct(q) {
 function posAddBySearch() {
   const q = document.getElementById('posSearch').value.trim();
   if (!q) return;
-  const prods = DB.get('products') || [];
-  const p = prods.find(x =>
-    x.sku.toLowerCase() === q.toLowerCase() || x.desc.toLowerCase() === q.toLowerCase()
-  );
-  if (p) posAddProduct(p.id);
+  const hits = posFindProducts(q);
+  if (!hits.length) { toast('Producto no encontrado', 'error'); return; }
+  posAddProduct(hits[0].id);
 }
 
 function posAddProduct(id) {
@@ -2020,19 +2034,13 @@ function posAddProduct(id) {
   const p = prods.find(x => x.id == id);
   if (!p) return;
   const stock = stockNum(p.stock);
-  const min = stockNum(p.min);
   if (stock <= 0) { toast('Sin stock disponible', 'error'); return; }
-  const idx = cart.findIndex(c => c.id == id);
-  const currentInCart = cartQtyForProduct(id);
-  const nextTotal = currentInCart + 1;
-  if (nextTotal > stock) { toast(`Stock insuficiente. Disponible: ${stock} · En carrito: ${currentInCart}`, 'error'); return; }
-  if (idx >= 0) {
-    cart[idx].qty++;
-  } else {
+  const idx = cart.findIndex(c => !c.sourceProductId && c.id == id);
+  if (idx < 0) {
     cart.push({ id: p.id, sku: p.sku, desc: p.desc, price: p.price, iva: p.iva, qty: 1 });
+  } else {
+    if (!posChangeProductQty(id, 1, false)) return;
   }
-  const remaining = stock - nextTotal;
-  if (remaining >= 0 && remaining <= min) toast(`Alerta: ${p.desc} quedará en stock mínimo (${remaining})`, 'info');
   document.getElementById('posSearch').value = '';
   document.getElementById('posSearchResults').classList.add('hidden');
   posRender();
@@ -2105,28 +2113,31 @@ function posRender() {
 }
 
 function posQty(i, delta) {
-  if (posQtyLock) return;
-  posQtyLock = true;
-  setTimeout(() => { posQtyLock = false; }, 120);
   normalizeCart();
   if (!cart[i]) return;
-  if (delta > 0) {
-    const prods = DB.get('products') || [];
-    const productId = cart[i].sourceProductId || cart[i].id;
-    const p = prods.find(x => x.id == productId);
-    if (p) {
-      const stock = stockNum(p.stock);
-      const min = stockNum(p.min);
-      const nextQty = stockNum(cart[i].qty) + delta;
-      const nextTotal = cartQtyForProduct(productId, i) + nextQty;
-      if (nextTotal > stock) { toast(`Stock insuficiente. Disponible: ${stock} · En carrito: ${cartQtyForProduct(productId)}`, 'error'); return; }
-      const remaining = stock - nextTotal;
-      if (remaining >= 0 && remaining <= min) toast(`Alerta: ${p.desc} quedará en stock mínimo (${remaining})`, 'info');
-    }
-  }
-  cart[i].qty = stockNum(cart[i].qty) + delta;
-  if (cart[i].qty <= 0) cart.splice(i, 1);
+  const productId = cart[i].sourceProductId || cart[i].id;
+  if (!posChangeProductQty(productId, delta, false, i)) return;
   posRender();
+}
+function posChangeProductQty(productId, delta, render = true, preferredIndex = -1) {
+  normalizeCart();
+  const idx = preferredIndex >= 0 ? preferredIndex : cart.findIndex(c => (c.sourceProductId || c.id) == productId);
+  if (idx < 0) return false;
+  const prods = DB.get('products') || [];
+  const p = prods.find(x => x.id == productId);
+  if (delta > 0 && p) {
+    const stock = stockNum(p.stock);
+    const min = stockNum(p.min);
+    const currentQty = stockNum(cart[idx].stockQty || cart[idx].qty);
+    const nextQty = +(currentQty + delta).toFixed(3);
+    if (nextQty > stock) { toast(`Stock insuficiente. Disponible: ${stock} · En carrito: ${currentQty}`, 'error'); return false; }
+    const remaining = stock - nextQty;
+    if (remaining >= 0 && remaining <= min) toast(`Alerta: ${p.desc} quedará en stock mínimo (${remaining})`, 'info');
+  }
+  cart[idx].qty = stockNum(cart[idx].qty) + delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  if (render) posRender();
+  return true;
 }
 function posQtyById(productId, delta) {
   normalizeCart();
@@ -2140,6 +2151,11 @@ function posClearClient() {
 }
 function posRemove(i) { cart.splice(i, 1); posRender(); }
 function posClearCart() { cart = []; posRender(); }
+
+function invAddProductToCart(id) {
+  navigateTo('pos');
+  posAddProduct(id);
+}
 
 function posGetClientInfo() {
   return {
@@ -2458,7 +2474,7 @@ function invRender() {
       <td class="px-3 py-2.5 text-center">${p.iva}%</td>
       <td class="px-3 py-2.5 text-center">
         <div class="flex gap-1 justify-center">
-          <button onclick="posAddProduct('${p.id}'); navigateTo('pos')" class="p-1 rounded hover:bg-surface-high" title="Agregar a venta">
+          <button onclick="invAddProductToCart('${p.id}')" class="p-1 rounded hover:bg-surface-high" title="Agregar a venta">
             <span class="material-symbols-outlined text-sm text-secondary">add_shopping_cart</span>
           </button>
           <button onclick="invEdit('${p.id}')" class="p-1 rounded hover:bg-surface-high" title="Editar">
