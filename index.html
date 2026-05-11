@@ -386,6 +386,14 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
         <span class="material-symbols-outlined text-base">account_balance_wallet</span>
         <span>Fiados</span>
       </div>
+      <div class="nav-item" onclick="navigateTo('devoluciones')" data-view="devoluciones">
+        <span class="material-symbols-outlined text-base">assignment_return</span>
+        <span>Devoluciones</span>
+      </div>
+      <div class="nav-item" onclick="navigateTo('cotizaciones')" data-view="cotizaciones">
+        <span class="material-symbols-outlined text-base">request_quote</span>
+        <span>Cotizaciones</span>
+      </div>
       <div class="nav-item" onclick="navigateTo('reportes')" data-view="reportes">
         <span class="material-symbols-outlined text-base">bar_chart</span>
         <span>Reportes</span>
@@ -421,7 +429,7 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
           <span id="demoDaysLeftText">—</span>
         </p>
       </div>
-      <p class="text-[9px] text-gray-500 mt-1">v2.0.3-posrender · A2K Digital Studio</p>
+      <p class="text-[9px] text-gray-500 mt-1">v2.1.0-godmode · A2K Digital Studio</p>
     </div>
   </aside>
 
@@ -801,6 +809,98 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
         </div>
       </div>
 
+      <!-- ── VIEW: DEVOLUCIONES ── -->
+      <div id="view-devoluciones" class="view h-full bg-surface overflow-y-auto p-6">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="text-xl font-black">Devoluciones</h2>
+            <p class="text-xs text-outline mt-0.5">Busca una venta, devuelve productos y restaura stock automáticamente</p>
+          </div>
+          <input id="devSearch" type="text" placeholder="Buscar ticket, cliente o CI/RIF..."
+            class="px-4 py-2 rounded-xl text-sm border border-surface-highest outline-none bg-white focus:ring-2 focus:ring-primary/20 w-72"
+            oninput="devRender()"/>
+        </div>
+        <div class="grid grid-cols-3 gap-4 mb-5">
+          <div class="bg-white rounded-2xl p-5 border border-surface-highest shadow-sm">
+            <p class="text-[9px] font-black uppercase tracking-widest text-outline mb-1">Devuelto Hoy</p>
+            <p id="devTodayTotal" class="text-2xl font-black text-error">$0.00</p>
+          </div>
+          <div class="bg-white rounded-2xl p-5 border border-surface-highest shadow-sm">
+            <p class="text-[9px] font-black uppercase tracking-widest text-outline mb-1">Operaciones Hoy</p>
+            <p id="devTodayCount" class="text-2xl font-black text-on-surface">0</p>
+          </div>
+          <div class="bg-white rounded-2xl p-5 border border-surface-highest shadow-sm">
+            <p class="text-[9px] font-black uppercase tracking-widest text-outline mb-1">Histórico</p>
+            <p id="devAllTotal" class="text-2xl font-black text-primary">$0.00</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl overflow-hidden border border-surface-highest shadow-sm">
+          <table class="w-full text-xs">
+            <thead class="bg-surface-low text-on-surface-variant font-bold uppercase tracking-widest text-[10px]">
+              <tr>
+                <th class="px-4 py-2 text-left">Ticket</th>
+                <th class="px-4 py-2 text-left">Cliente</th>
+                <th class="px-4 py-2 text-left">Fecha</th>
+                <th class="px-4 py-2 text-center">Items</th>
+                <th class="px-4 py-2 text-right">Total</th>
+                <th class="px-4 py-2 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="devBody"></tbody>
+          </table>
+          <div id="devEmpty" class="py-12 text-center text-outline">
+            <p class="text-xs font-bold opacity-40 uppercase">Sin ventas disponibles para devolución</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── VIEW: COTIZACIONES ── -->
+      <div id="view-cotizaciones" class="view h-full bg-surface overflow-y-auto p-6">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="text-xl font-black">Cotizaciones</h2>
+            <p class="text-xs text-outline mt-0.5">Guarda el carrito como presupuesto sin descontar inventario</p>
+          </div>
+          <button onclick="quoteCreateFromCart()" class="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold" style="background:#00387e;color:#fff">
+            <span class="material-symbols-outlined text-base">add_notes</span>
+            Crear desde Carrito
+          </button>
+        </div>
+        <div class="grid grid-cols-3 gap-4 mb-5">
+          <div class="bg-white rounded-2xl p-5 border border-surface-highest shadow-sm">
+            <p class="text-[9px] font-black uppercase tracking-widest text-outline mb-1">Cotizaciones</p>
+            <p id="quoteCount" class="text-2xl font-black text-on-surface">0</p>
+          </div>
+          <div class="bg-white rounded-2xl p-5 border border-surface-highest shadow-sm">
+            <p class="text-[9px] font-black uppercase tracking-widest text-outline mb-1">Pendiente</p>
+            <p id="quotePendingTotal" class="text-2xl font-black text-primary">$0.00</p>
+          </div>
+          <div class="bg-white rounded-2xl p-5 border border-surface-highest shadow-sm">
+            <p class="text-[9px] font-black uppercase tracking-widest text-outline mb-1">Convertidas</p>
+            <p id="quoteConvertedCount" class="text-2xl font-black text-secondary">0</p>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl overflow-hidden border border-surface-highest shadow-sm">
+          <table class="w-full text-xs">
+            <thead class="bg-surface-low text-on-surface-variant font-bold uppercase tracking-widest text-[10px]">
+              <tr>
+                <th class="px-4 py-2 text-left">Cotización</th>
+                <th class="px-4 py-2 text-left">Cliente</th>
+                <th class="px-4 py-2 text-left">Fecha</th>
+                <th class="px-4 py-2 text-center">Items</th>
+                <th class="px-4 py-2 text-right">Total</th>
+                <th class="px-4 py-2 text-center">Estado</th>
+                <th class="px-4 py-2 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="quoteBody"></tbody>
+          </table>
+          <div id="quoteEmpty" class="py-12 text-center text-outline">
+            <p class="text-xs font-bold opacity-40 uppercase">Sin cotizaciones guardadas</p>
+          </div>
+        </div>
+      </div>
+
       <!-- ── VIEW: REPORTES ── -->
       <div id="view-reportes" class="view h-full bg-surface overflow-y-auto p-6">
         <div class="flex items-center justify-between mb-5">
@@ -845,6 +945,7 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
                 <th class="px-4 py-2 text-center">Items</th>
                 <th class="px-4 py-2 text-right">Total $</th>
                 <th class="px-4 py-2 text-center">Método</th>
+                <th class="px-4 py-2 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody id="rptBody"></tbody>
@@ -1856,6 +1957,8 @@ function appInit() {
   posPausedRender();
   invRender();
   fiadoRender();
+  devRender();
+  quoteRender();
   rptRender();
   wPopulateSelect();
   cfgLoad();
@@ -1869,6 +1972,7 @@ function appInit() {
 const viewTitles = {
   pos: 'Punto de Venta', inventario: 'Inventario', pesaje: 'Pesaje gr/L',
   fiados: 'Fiados y Créditos', reportes: 'Reportes', config: 'Configuración',
+  devoluciones: 'Devoluciones', cotizaciones: 'Cotizaciones',
   caja: 'Gestión de Caja', formula: 'Fórmula 50/30/20', etiquetas: 'Impresión de Etiquetas'
 };
 let currentView = 'pos';
@@ -1884,6 +1988,8 @@ function navigateTo(view) {
   document.getElementById('view-'+view)?.classList.add('active');
   document.querySelector(`[data-view="${view}"]`)?.classList.add('active');
   document.getElementById('viewTitle').textContent = viewTitles[view] || view;
+  if (view === 'devoluciones') devRender();
+  if (view === 'cotizaciones') quoteRender();
   if (view === 'caja') cajaRender();
   if (view === 'formula') { fmlHistRender(); fmlCalc(); }
   if (view === 'etiquetas') { etqPopulate(); etqUpdate(); }
@@ -2757,13 +2863,184 @@ function fiadoDelete(id) {
 }
 
 // ════════════════════════════════════════════
+// DEVOLUCIONES MODULE
+// ════════════════════════════════════════════
+function saleReturnedQty(sale, itemIndex) {
+  return (DB.get('returns') || [])
+    .filter(r => r.saleId == sale.id && !r.voided)
+    .reduce((a,r) => a + ((r.items || []).find(i => i.itemIndex === itemIndex)?.qty || 0), 0);
+}
+
+function devStats() {
+  const returns = DB.get('returns') || [];
+  const today = new Date().toDateString();
+  const active = returns.filter(r => !r.voided);
+  const todayReturns = active.filter(r => new Date(r.date).toDateString() === today);
+  return {
+    todayTotal: todayReturns.reduce((a,r) => a + (r.total || 0), 0),
+    todayCount: todayReturns.length,
+    allTotal: active.reduce((a,r) => a + (r.total || 0), 0)
+  };
+}
+
+function devRender() {
+  const body = document.getElementById('devBody');
+  if (!body) return;
+  const empty = document.getElementById('devEmpty');
+  const q = posText(document.getElementById('devSearch')?.value || '');
+  const sales = (DB.get('sales') || []).filter(s => !s.voided);
+  const filtered = sales.filter(s => {
+    const txt = posText(`${s.ticketNum} ${s.client} ${s.clientId}`);
+    return !q || txt.includes(q);
+  }).slice(-80).reverse();
+  const st = devStats();
+  document.getElementById('devTodayTotal').textContent = fmt$(st.todayTotal);
+  document.getElementById('devTodayCount').textContent = st.todayCount;
+  document.getElementById('devAllTotal').textContent = fmt$(st.allTotal);
+  empty.classList.toggle('hidden', filtered.length > 0);
+  body.innerHTML = filtered.map(s => {
+    const returned = (DB.get('returns') || []).filter(r => r.saleId == s.id && !r.voided).reduce((a,r) => a + (r.total || 0), 0);
+    const status = returned > 0 ? `<span class="text-[10px] font-black text-error">Devuelto ${fmt$(returned)}</span>` : '';
+    return `<tr class="inv-row border-b border-surface-highest text-xs">
+      <td class="px-4 py-2.5 font-mono font-bold">#${esc(s.ticketNum)}</td>
+      <td class="px-4 py-2.5">${esc(s.client || 'CLIENTE GENÉRICO')}</td>
+      <td class="px-4 py-2.5 text-outline">${new Date(s.date).toLocaleString('es-VE')}</td>
+      <td class="px-4 py-2.5 text-center">${(s.items || []).reduce((a,i)=>a+stockNum(i.qty),0)}</td>
+      <td class="px-4 py-2.5 text-right font-black text-secondary">${fmt$(s.total || 0)}<br>${status}</td>
+      <td class="px-4 py-2.5 text-center">
+        <button onclick="devOpenSale('${s.id}')" class="px-2 py-1 rounded text-[10px] font-black uppercase" style="background:rgba(186,26,26,0.12);color:#ba1a1a">Devolver</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function devOpenSale(id) {
+  const sale = (DB.get('sales') || []).find(s => s.id == id);
+  if (!sale) { toast('Venta no encontrada', 'error'); return; }
+  const options = (sale.items || []).map((it, idx) => {
+    const sold = stockNum(it.qty);
+    const returned = saleReturnedQty(sale, idx);
+    const available = +(sold - returned).toFixed(3);
+    return `${idx + 1}) ${it.desc} — vendido ${sold}, disponible ${available}, total ${fmt$(it.price * available)}`;
+  }).join('\n');
+  const choice = parseInt(prompt(`Ticket #${sale.ticketNum}\n${options}\n\nNúmero de producto a devolver:`), 10) - 1;
+  if (choice < 0 || !sale.items[choice]) return;
+  const item = sale.items[choice];
+  const available = +(stockNum(item.qty) - saleReturnedQty(sale, choice)).toFixed(3);
+  if (available <= 0) { toast('Ese producto ya fue devuelto completo', 'error'); return; }
+  const qty = stockNum(prompt(`Cantidad a devolver de "${item.desc}" (máx. ${available}):`));
+  if (!qty || qty <= 0 || qty > available) { toast('Cantidad inválida', 'error'); return; }
+  const reason = prompt('Motivo de devolución:');
+  if (!reason || !reason.trim()) { toast('La devolución requiere motivo', 'error'); return; }
+  if (!confirm(`Confirmar devolución de ${qty} x ${item.desc}?`)) return;
+  const amount = +(stockNum(item.price) * qty * (1 + ((item.iva || 0) / 100))).toFixed(2);
+  const returnItem = { ...item, itemIndex: choice, qty, total: amount };
+  posRestoreStock([{ ...returnItem, stockQty: item.stockQty ? +(stockNum(item.stockQty) * qty / stockNum(item.qty)).toFixed(3) : qty }]);
+  const returns = DB.get('returns') || [];
+  const rec = {
+    id: genId('return'), saleId: sale.id, ticketNum: sale.ticketNum,
+    client: sale.client, clientId: sale.clientId, items: [returnItem],
+    total: amount, reason: reason.trim(), method: sale.method,
+    date: new Date().toISOString()
+  };
+  returns.unshift(rec);
+  DB.set('returns', returns);
+  auditLog('return_created', { ticketNum: sale.ticketNum, total: amount, reason: reason.trim() });
+  invRender(); devRender(); rptRender(); cajaRender();
+  toast(`Devolución registrada: ${fmt$(amount)}`, 'success');
+}
+
+// ════════════════════════════════════════════
+// COTIZACIONES MODULE
+// ════════════════════════════════════════════
+function quoteCreateFromCart() {
+  if (!cart.length) { toast('Agrega productos al carrito para cotizar', 'error'); return; }
+  const client = posGetClientInfo();
+  const totals = posCartTotals();
+  const quotes = DB.get('quotes') || [];
+  const quote = {
+    id: genId('quote'), num: (quotes.length + 1).toString().padStart(5,'0'),
+    client, items: cart.map(c => ({ ...c })), totals,
+    status: 'pending', createdAt: new Date().toISOString()
+  };
+  quotes.unshift(quote);
+  DB.set('quotes', quotes);
+  auditLog('quote_created', { num: quote.num, total: totals.total });
+  quoteRender();
+  toast(`Cotización #${quote.num} guardada`, 'success');
+}
+
+function quoteRender() {
+  const body = document.getElementById('quoteBody');
+  if (!body) return;
+  const quotes = DB.get('quotes') || [];
+  const pending = quotes.filter(q => q.status === 'pending');
+  document.getElementById('quoteCount').textContent = quotes.length;
+  document.getElementById('quotePendingTotal').textContent = fmt$(pending.reduce((a,q) => a + (q.totals?.total || 0), 0));
+  document.getElementById('quoteConvertedCount').textContent = quotes.filter(q => q.status === 'converted').length;
+  document.getElementById('quoteEmpty').classList.toggle('hidden', quotes.length > 0);
+  body.innerHTML = quotes.map(q => `<tr class="inv-row border-b border-surface-highest text-xs ${q.status !== 'pending' ? 'opacity-60' : ''}">
+    <td class="px-4 py-2.5 font-mono font-bold">#${esc(q.num)}</td>
+    <td class="px-4 py-2.5">${esc(q.client?.name || 'CLIENTE GENÉRICO')}</td>
+    <td class="px-4 py-2.5 text-outline">${new Date(q.createdAt).toLocaleString('es-VE')}</td>
+    <td class="px-4 py-2.5 text-center">${q.totals?.count || 0}</td>
+    <td class="px-4 py-2.5 text-right font-black text-secondary">${fmt$(q.totals?.total || 0)}</td>
+    <td class="px-4 py-2.5 text-center font-black uppercase">${q.status === 'converted' ? 'Convertida' : 'Pendiente'}</td>
+    <td class="px-4 py-2.5 text-center">
+      <div class="flex gap-1 justify-center">
+        ${q.status === 'pending' ? `<button onclick="quoteToCart('${q.id}')" class="px-2 py-1 rounded text-[10px] font-black uppercase" style="background:#00387e;color:#fff">Pasar a POS</button>` : ''}
+        <button onclick="quotePrint('${q.id}')" class="px-2 py-1 rounded text-[10px] font-black uppercase bg-surface-high">Imprimir</button>
+        ${q.status === 'pending' ? `<button onclick="quoteDelete('${q.id}')" class="px-2 py-1 rounded text-[10px] font-black uppercase" style="background:rgba(186,26,26,0.12);color:#ba1a1a">Eliminar</button>` : ''}
+      </div>
+    </td>
+  </tr>`).join('');
+}
+
+function quoteToCart(id) {
+  const quotes = DB.get('quotes') || [];
+  const idx = quotes.findIndex(q => q.id == id);
+  if (idx < 0) return;
+  if (cart.length && !confirm('Hay productos en el POS. ¿Reemplazar carrito actual por esta cotización?')) return;
+  cart = (quotes[idx].items || []).map(i => ({ ...i }));
+  posSetClientInfo(quotes[idx].client);
+  quotes[idx].status = 'converted';
+  quotes[idx].convertedAt = new Date().toISOString();
+  DB.set('quotes', quotes);
+  navigateTo('pos');
+  posRender();
+  quoteRender();
+  toast(`Cotización #${quotes[idx].num} cargada al POS`, 'success');
+}
+
+function quoteDelete(id) {
+  if (!confirm('¿Eliminar esta cotización?')) return;
+  DB.set('quotes', (DB.get('quotes') || []).filter(q => q.id != id));
+  quoteRender();
+}
+
+function quotePrint(id) {
+  const q = (DB.get('quotes') || []).find(x => x.id == id);
+  if (!q) return;
+  const cfg = DB.get('config') || {};
+  const w = window.open('','_blank');
+  w.document.write(`<html><head><title>Cotización #${q.num}</title></head><body style="font-family:monospace;font-size:13px;max-width:420px;margin:auto;padding:20px">
+    <h2 style="text-align:center">${esc(cfg.name || 'ZYNC ELECTRONICS')}</h2><h3 style="text-align:center">COTIZACIÓN #${esc(q.num)}</h3><hr/>
+    <p>Cliente: ${esc(q.client?.name || 'CLIENTE GENÉRICO')}</p><p>Fecha: ${new Date(q.createdAt).toLocaleString('es-VE')}</p><hr/>
+    ${(q.items || []).map(i => `<p>${esc(i.desc)}<br>${i.qty} x ${fmt$(i.price)} = <b>${fmt$(i.price*i.qty)}</b></p>`).join('')}
+    <hr/><h3>Total: ${fmt$(q.totals?.total || 0)}</h3><p style="text-align:center">Cotización no descuenta inventario hasta facturar.</p></body></html>`);
+  w.print();
+}
+
+// ════════════════════════════════════════════
 // REPORTS MODULE
 // ════════════════════════════════════════════
 function rptRender() {
   const sales = DB.get('sales') || [];
   const today = new Date().toDateString();
+  const returns = DB.get('returns') || [];
   const todaySales = sales.filter(s => !s.voided && new Date(s.date).toDateString() === today);
-  const todayTotal = todaySales.reduce((a,s) => a+s.total, 0);
+  const todayReturns = returns.filter(r => !r.voided && new Date(r.date).toDateString() === today);
+  const todayTotal = todaySales.reduce((a,s) => a+s.total, 0) - todayReturns.reduce((a,r) => a+(r.total||0), 0);
   const prods = DB.get('products') || [];
   const lowStock = prods.filter(p => p.stock <= p.min).length;
 
@@ -2908,6 +3185,8 @@ function cfgExport() {
     cajaMovimientos: DB.get('cajaMovimientos') || [],
     pausedSales: DB.get('pausedSales') || [],
     fmlHistory: DB.get('fmlHistory') || [],
+    returns: DB.get('returns') || [],
+    quotes: DB.get('quotes') || [],
     config: DB.get('config') || {},
     exportedAt: new Date().toISOString()
   };
@@ -2928,7 +3207,7 @@ function cfgDoImport(e) {
     try {
       const data = JSON.parse(ev.target.result);
       if (!data || typeof data !== 'object') throw new Error('Formato inválido');
-      const validKeys = ['products','sales','fiados','config','cajaTurnoActivo','cajaTurnos','cajaMovimientos','pausedSales','fmlHistory'];
+          const validKeys = ['products','sales','fiados','config','cajaTurnoActivo','cajaTurnos','cajaMovimientos','pausedSales','fmlHistory','returns','quotes'];
       if (!validKeys.some(k => Object.prototype.hasOwnProperty.call(data, k))) throw new Error('Backup sin datos reconocibles');
       if (!confirm('Antes de importar se guardará un respaldo interno de emergencia. ¿Continuar con la restauración?')) return;
       DB.set('preImportBackup', {
@@ -2940,6 +3219,8 @@ function cfgDoImport(e) {
         cajaMovimientos: DB.get('cajaMovimientos') || [],
         pausedSales: DB.get('pausedSales') || [],
         fmlHistory: DB.get('fmlHistory') || [],
+        returns: DB.get('returns') || [],
+        quotes: DB.get('quotes') || [],
         config: DB.get('config') || {},
         createdAt: new Date().toISOString()
       });
@@ -2952,8 +3233,10 @@ function cfgDoImport(e) {
       if (data.cajaMovimientos) DB.set('cajaMovimientos', data.cajaMovimientos);
       if (data.pausedSales) DB.set('pausedSales', data.pausedSales);
       if (data.fmlHistory) DB.set('fmlHistory', data.fmlHistory);
+      if (data.returns) DB.set('returns', data.returns);
+      if (data.quotes) DB.set('quotes', data.quotes);
       auditLog('backup_imported', { file: file.name, importedAt: new Date().toISOString() });
-      invRender(); fiadoRender(); rptRender(); cfgLoad(); cajaRender(); posPausedRender(); fmlHistRender();
+      invRender(); fiadoRender(); devRender(); quoteRender(); rptRender(); cfgLoad(); cajaRender(); posPausedRender(); fmlHistRender();
       toast('Datos importados correctamente', 'success');
     } catch { toast('Archivo inválido', 'error'); }
   };
@@ -2984,7 +3267,7 @@ function systemHealthCheck(repair = false) {
   const products = ensureArray('products');
   const sales = ensureArray('sales');
   const fiados = ensureArray('fiados');
-  ['cajaTurnos','cajaMovimientos','pausedSales'].forEach(ensureArray);
+  ['cajaTurnos','cajaMovimientos','pausedSales','returns','quotes'].forEach(ensureArray);
   products.forEach(p => {
     if (!p.id) { issues.push(`Producto sin ID: ${p.desc || 'sin descripción'}`); if (repair) p.id = genId('prod'); }
     if ((parseFloat(p.stock) || 0) < 0) { issues.push(`Stock negativo: ${p.desc}`); if (repair) p.stock = 0; }
@@ -3004,7 +3287,7 @@ function systemHealthCheck(repair = false) {
     DB.set('sales', sales);
     DB.set('fiados', fiados);
     auditLog('system_repair', { issues });
-    invRender(); rptRender(); fiadoRender(); cajaRender();
+    invRender(); rptRender(); fiadoRender(); devRender(); quoteRender(); cajaRender();
   }
   return { ok: issues.length === 0, issues };
 }
@@ -3139,7 +3422,7 @@ function aiRespond(q) {
 // EMPLOYEE MODE MODULE
 // ════════════════════════════════════════════
 let empMode = false;
-const EMP_HIDDEN_VIEWS = ['inventario','caja','fiados','reportes','config','formula','etiquetas'];
+const EMP_HIDDEN_VIEWS = ['inventario','caja','fiados','devoluciones','cotizaciones','reportes','config','formula','etiquetas'];
 
 function empToggle() {
   if (!empMode) {
@@ -3186,6 +3469,7 @@ function empVerifyPin() {
 function cajaSalesSummary(turno) {
   const sales = (DB.get('sales') || []).filter(s => !s.voided && s.date >= turno.openAt);
   const voided = (DB.get('sales') || []).filter(s => s.voided && s.date >= turno.openAt);
+  const returns = (DB.get('returns') || []).filter(r => !r.voided && r.date >= turno.openAt);
   const movimientos = (DB.get('cajaMovimientos') || []).filter(m => m.openAt === turno.openAt);
   const total = sales.reduce((a,s) => a+s.total, 0);
   const cash = sales.filter(s => (s.paymentGroup || posPaymentGroup(s.method)) === 'cash').reduce((a,s) => a+s.total, 0);
@@ -3193,7 +3477,8 @@ function cajaSalesSummary(turno) {
   const credit = sales.filter(s => (s.paymentGroup || posPaymentGroup(s.method)) === 'credit').reduce((a,s) => a+s.total, 0);
   const entradas = movimientos.filter(m => m.type === 'entrada').reduce((a,m) => a+m.amount, 0);
   const salidas = movimientos.filter(m => m.type === 'salida').reduce((a,m) => a+m.amount, 0);
-  return { total, cash, digital, credit, entradas, salidas, movimientos, voidedTotal: voided.reduce((a,s)=>a+s.total,0), voidedCount: voided.length, count: sales.length };
+  const returnedTotal = returns.reduce((a,r) => a + (r.total || 0), 0);
+  return { total, cash, digital, credit, entradas, salidas, returns, returnedTotal, movimientos, voidedTotal: voided.reduce((a,s)=>a+s.total,0), voidedCount: voided.length, count: sales.length };
 }
 
 function cajaRender() {
@@ -3206,8 +3491,8 @@ function cajaRender() {
     aperturaP.classList.add('hidden'); activaP.classList.remove('hidden');
     const summary = cajaSalesSummary(turno);
     document.getElementById('cajaResInicial').textContent = fmt$(turno.inicial);
-    document.getElementById('cajaResVentas').textContent = `${fmt$(summary.total)} · Efectivo ${fmt$(summary.cash)} · Digital ${fmt$(summary.digital)} · Crédito ${fmt$(summary.credit)} · Mov. ${fmt$(summary.entradas-summary.salidas)}`;
-    document.getElementById('cajaResEsperado').textContent = fmt$(turno.inicial + summary.cash + summary.entradas - summary.salidas);
+    document.getElementById('cajaResVentas').textContent = `${fmt$(summary.total)} · Efectivo ${fmt$(summary.cash)} · Digital ${fmt$(summary.digital)} · Crédito ${fmt$(summary.credit)} · Dev. ${fmt$(summary.returnedTotal)} · Mov. ${fmt$(summary.entradas-summary.salidas)}`;
+    document.getElementById('cajaResEsperado').textContent = fmt$(turno.inicial + summary.cash + summary.entradas - summary.salidas - summary.returnedTotal);
     document.getElementById('cajaResponsable').value = turno.responsable;
   } else {
     badge.textContent = 'Caja Cerrada'; badge.style.background='#e8e7ef'; badge.style.color='#434751';
@@ -3263,12 +3548,12 @@ function cajaCerrar() {
   const turno = DB.get('cajaTurnoActivo');
   if (!turno) return;
   const summary = cajaSalesSummary(turno);
-  const esperado = turno.inicial + summary.cash + summary.entradas - summary.salidas;
+  const esperado = turno.inicial + summary.cash + summary.entradas - summary.salidas - summary.returnedTotal;
   const contado = parseFloat(document.getElementById('cajaContado').value) || 0;
   const turnos = DB.get('cajaTurnos') || [];
   turnos.push({ id: Date.now(), responsable: turno.responsable, openAt: turno.openAt,
     closeAt: new Date().toISOString(), inicial: turno.inicial, ventas: summary.total, efectivo: summary.cash,
-    digital: summary.digital, credito: summary.credit, entradas: summary.entradas, salidas: summary.salidas,
+    digital: summary.digital, credito: summary.credit, entradas: summary.entradas, salidas: summary.salidas, devoluciones: summary.returnedTotal,
     anuladas: summary.voidedTotal, esperado, contado, diff: contado - esperado });
   DB.set('cajaTurnos', turnos);
   DB.remove('cajaTurnoActivo');
@@ -3313,10 +3598,11 @@ function cajaImprimir() {
   <p>Crédito/fiado:     ${fmt$(summary.credit)}</p>
   <p>Entradas caja:      ${fmt$(summary.entradas)}</p>
   <p>Salidas caja:       ${fmt$(summary.salidas)}</p>
+  <p>Devoluciones:       ${fmt$(summary.returnedTotal)}</p>
   <p>Ventas anuladas:    ${fmt$(summary.voidedTotal)}</p>
-  <p>Total esperado:    ${fmt$(turno.inicial+summary.cash+summary.entradas-summary.salidas)}</p>
+  <p>Total esperado:    ${fmt$(turno.inicial+summary.cash+summary.entradas-summary.salidas-summary.returnedTotal)}</p>
   <p>Efectivo contado:  ${fmt$(contado)}</p>
-  <p><b>Diferencia:       ${fmt$(contado-(turno.inicial+summary.cash+summary.entradas-summary.salidas))}</b></p>
+  <p><b>Diferencia:       ${fmt$(contado-(turno.inicial+summary.cash+summary.entradas-summary.salidas-summary.returnedTotal))}</b></p>
   <hr/><p style="text-align:center">A2K Digital Studio · ZYNC Electronics</p></body></html>`);
   w.print();
 }
