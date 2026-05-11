@@ -277,7 +277,7 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
       <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2 block">Clave de Activación</label>
       <input id="lockInput" type="text"
         placeholder="XXXX-XXXX-XXXX-XXXX"
-        class="w-full mono font-bold text-center rounded-xl px-2 py-3 uppercase outline-none transition-all"
+        class="w-full mono font-bold text-center rounded-xl px-2 py-3 outline-none transition-all"
         style="background:rgba(255,255,255,0.05); color:#fff; border:1px solid rgba(212,175,55,0.2); font-size:11px; letter-spacing:0.04em;"
         oninput="lockFormatInput(this)"
         onkeydown="if(event.key==='Enter')lockActivate()"/>
@@ -1608,6 +1608,7 @@ const LIC_PUBLIC_PEM = `-----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEMJXO3br9svtF34637hKPCl9sQL8O
 CZwqSVE+JztI23Yi5kHqUulHJgHVRymDV1fepkeXy4javc16HhLkdWbkrQ==
 -----END PUBLIC KEY-----`;
+let lastLicenseError = '';
 
 function licHash(str) {
   let h = 5381 >>> 0;
@@ -1617,6 +1618,14 @@ function licHash(str) {
 function licCheck(parts) {
   const h = licHash(parts.join('|') + LIC_KEY);
   return [h>>>24, (h>>>16)&0xff, (h>>>8)&0xff, h&0xff].map(b => LIC_CHARS[b % 32]).join('');
+}
+function licLegacySignedCheck(payload) {
+  const priv = 'ZYNC-PRIVATE-2026-A2K-DIGITAL-STUDIO-KEEP-SECRET';
+  const pub = 'ZYNC-PUBLIC-2026-A2K-DIGITAL-STUDIO';
+  const h1 = licHash(payload + '|' + priv);
+  const h2 = licHash(priv + '|' + payload + '|' + pub);
+  const n = ((h1 ^ ((h2 << 7) >>> 0)) >>> 0).toString(36).toUpperCase().replace(/[^A-Z0-9]/g,'');
+  return (n + '00000000').slice(0, 8);
 }
 function normalizeDeviceId(deviceId) {
   const raw = (deviceId || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -1659,7 +1668,8 @@ function decodeDay(s) {
 
 async function validateSignedLicCode(code) {
   const p = code.split('-');
-  if (p.length !== 7 || p[0].toUpperCase() !== 'ZSG') return null;
+  lastLicenseError = '';
+  if (p.length !== 7 || p[0].toUpperCase() !== 'ZSG') { lastLicenseError = 'Formato de licencia firmada incompleto.'; return null; }
   const type = p[1].toUpperCase();
   if (!['PRO','DEMO'].includes(type)) return null;
   const deviceCompact = p[2].toUpperCase();
@@ -1668,9 +1678,12 @@ async function validateSignedLicCode(code) {
   const serial = p[5].toUpperCase();
   const sig = p[6];
   const device = normalizeDeviceId(DEVICE_ID);
-  if (deviceCompact !== device.replace(/-/g,'')) return null;
+  if (deviceCompact !== device.replace(/-/g,'')) { lastLicenseError = 'Esta licencia pertenece a otro Hardware ID.'; return null; }
   const payload = ['ZSG', type, device, created, expiry, serial].join('|');
-  if (!(await verifyLicenseSignature(payload, sig))) return null;
+  let sigOk = false;
+  if (sig.length <= 16) sigOk = sig.toUpperCase() === licLegacySignedCheck(payload);
+  else sigOk = await verifyLicenseSignature(payload, sig);
+  if (!sigOk) { lastLicenseError = 'La firma de esta licencia no coincide. Genera una nueva licencia desde el panel actualizado.'; return null; }
   const expiresAt = expiry === 'LIFE' ? null : new Date(decodeDay(expiry) * 86400000).toISOString().split('T')[0];
   if (expiry !== 'LIFE' && daysEpoch() > decodeDay(expiry)) return { code, type, name:'Licencia Firmada ' + type, deviceId:DEVICE_ID, expiresAt, status:'Expirada' };
   return { code, type, name:'Licencia Firmada ' + type, deviceId:DEVICE_ID, expiresAt, status:'Activa', signed:true };
@@ -1748,7 +1761,7 @@ async function lockActivate() {
     found = saved.find(l => l.code === code);
   }
 
-  if (!found) { lockShowError('Código de activación inválido o no existe'); return; }
+  if (!found) { lockShowError(lastLicenseError || 'Código de activación inválido o no existe'); return; }
   if (found.status === 'Pausada')   { lockShowError('Esta licencia está pausada temporalmente. Contacta a tu proveedor.'); return; }
   if (found.status === 'Bloqueada') { lockShowError('Esta licencia fue bloqueada. Contacta a tu proveedor.'); return; }
   if (found.status === 'Inactiva')  { lockShowError('Esta licencia está suspendida. Contacta a tu proveedor.'); return; }
