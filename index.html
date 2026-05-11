@@ -1994,14 +1994,19 @@ function posAddProduct(id) {
   const prods = DB.get('products') || [];
   const p = prods.find(x => x.id == id);
   if (!p) return;
-  if (p.stock <= 0) { toast('Sin stock disponible', 'error'); return; }
+  const stock = parseFloat(p.stock) || 0;
+  const min = parseFloat(p.min) || 0;
+  if (stock <= 0) { toast('Sin stock disponible', 'error'); return; }
   const idx = cart.findIndex(c => c.id == id);
   if (idx >= 0) {
-    if (cart[idx].qty >= p.stock) { toast('Stock máximo alcanzado', 'error'); return; }
+    if ((cart[idx].qty + 1) > stock) { toast(`Stock insuficiente. Disponible: ${stock}`, 'error'); return; }
     cart[idx].qty++;
   } else {
     cart.push({ id: p.id, sku: p.sku, desc: p.desc, price: p.price, iva: p.iva, qty: 1 });
   }
+  const nextQty = idx >= 0 ? cart[idx].qty : 1;
+  const remaining = stock - nextQty;
+  if (remaining >= 0 && remaining <= min) toast(`Alerta: ${p.desc} quedará en stock mínimo (${remaining})`, 'info');
   document.getElementById('posSearch').value = '';
   document.getElementById('posSearchResults').classList.add('hidden');
   posRender();
@@ -2069,7 +2074,14 @@ function posQty(i, delta) {
   if (delta > 0) {
     const prods = DB.get('products') || [];
     const p = prods.find(x => x.id == cart[i].id);
-    if (p && cart[i].qty >= p.stock) { toast('Stock máximo alcanzado', 'error'); return; }
+    if (p) {
+      const stock = parseFloat(p.stock) || 0;
+      const min = parseFloat(p.min) || 0;
+      const nextQty = cart[i].qty + delta;
+      if (nextQty > stock) { toast(`Stock insuficiente. Disponible: ${stock}`, 'error'); return; }
+      const remaining = stock - nextQty;
+      if (remaining >= 0 && remaining <= min) toast(`Alerta: ${p.desc} quedará en stock mínimo (${remaining})`, 'info');
+    }
   }
   cart[i].qty += delta;
   if (cart[i].qty <= 0) cart.splice(i, 1);
