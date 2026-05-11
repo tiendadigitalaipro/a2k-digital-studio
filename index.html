@@ -421,7 +421,7 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
           <span id="demoDaysLeftText">—</span>
         </p>
       </div>
-      <p class="text-[9px] text-gray-500 mt-1">v2.0.2-posstable · A2K Digital Studio</p>
+      <p class="text-[9px] text-gray-500 mt-1">v2.0.3-posrender · A2K Digital Studio</p>
     </div>
   </aside>
 
@@ -2049,9 +2049,14 @@ function posAddProduct(id) {
 function posRender() {
   normalizeCart();
   const body = document.getElementById('cartBody');
-  const empty = document.getElementById('cartEmpty');
   if (!cart.length) {
-    body.innerHTML = ''; body.appendChild(empty); empty.style.display='';
+    body.innerHTML = `
+      <tr id="cartEmpty">
+        <td colspan="5" class="py-16 text-center text-outline">
+          <span class="material-symbols-outlined text-5xl block mb-2 opacity-20">shopping_cart</span>
+          <span class="text-xs font-bold uppercase opacity-40">Carrito vacío</span>
+        </td>
+      </tr>`;
     ['posSubtotal','posTotal','posIva','posLastPrice'].forEach(id => {
       document.getElementById(id).textContent = '$0.00';
     });
@@ -2061,7 +2066,6 @@ function posRender() {
     document.getElementById('posIvaLabel').textContent = 'IVA';
     return;
   }
-  empty.style.display = 'none';
   let subtotal = 0;
   body.innerHTML = '';
   cart.forEach((c,i) => {
