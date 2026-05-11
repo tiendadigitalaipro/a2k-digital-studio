@@ -421,7 +421,7 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
           <span id="demoDaysLeftText">—</span>
         </p>
       </div>
-      <p class="text-[9px] text-gray-500 mt-1">v2.0.0 · A2K Digital Studio</p>
+      <p class="text-[9px] text-gray-500 mt-1">v2.0.1-posfix · A2K Digital Studio</p>
     </div>
   </aside>
 
@@ -2050,30 +2050,37 @@ function posRender() {
   }
   empty.style.display = 'none';
   let subtotal = 0;
-  body.innerHTML = cart.map((c,i) => {
+  body.innerHTML = '';
+  cart.forEach((c,i) => {
     const line = c.price * c.qty;
     subtotal += line;
-    return `<tr class="cart-row border-b border-surface-highest">
+    const productId = c.sourceProductId || c.id;
+    const tr = document.createElement('tr');
+    tr.className = 'cart-row border-b border-surface-highest';
+    tr.innerHTML = `
       <td class="px-4 py-2">
         <p class="font-semibold text-xs">${esc(c.desc)}</p>
         <p class="text-[10px] text-outline">${esc(c.sku)}</p>
       </td>
       <td class="px-2 py-2 text-center">
         <div class="flex items-center justify-center gap-1">
-          <button type="button" onclick="posQtyById('${esc(c.sourceProductId || c.id)}',-1)" class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm select-none" style="background:rgba(186,26,26,0.1);color:#ba1a1a">−</button>
+          <button type="button" data-pos-action="dec" class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm select-none" style="background:rgba(186,26,26,0.1);color:#ba1a1a">−</button>
           <span class="font-black text-sm w-7 text-center">${stockNum(c.qty)}</span>
-          <button type="button" onclick="posQtyById('${esc(c.sourceProductId || c.id)}',1)" class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm select-none" style="background:rgba(62,106,0,0.1);color:#3e6a00">+</button>
+          <button type="button" data-pos-action="inc" class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm select-none" style="background:rgba(62,106,0,0.1);color:#3e6a00">+</button>
         </div>
       </td>
       <td class="px-2 py-2 text-right font-semibold text-xs">${fmt$(c.price)}</td>
       <td class="px-2 py-2 text-right font-black text-xs text-secondary">${fmt$(line)}</td>
       <td class="px-2 py-2 text-center">
-        <button onclick="posRemove(${i})" class="text-error hover:text-red-700">
+        <button type="button" data-pos-action="remove" class="text-error hover:text-red-700">
           <span class="material-symbols-outlined text-sm">delete</span>
         </button>
-      </td>
-    </tr>`;
-  }).join('');
+      </td>`;
+    tr.querySelector('[data-pos-action="dec"]').addEventListener('click', () => posQtyById(productId, -1));
+    tr.querySelector('[data-pos-action="inc"]').addEventListener('click', () => posQtyById(productId, 1));
+    tr.querySelector('[data-pos-action="remove"]').addEventListener('click', () => posRemove(i));
+    body.appendChild(tr);
+  });
 
   const ivaTotal = cart.reduce((a,c) => a + c.price * c.qty * ((c.iva||0) / 100), 0);
   const total = subtotal + ivaTotal;
