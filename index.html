@@ -429,7 +429,7 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
           <span id="demoDaysLeftText">—</span>
         </p>
       </div>
-      <p class="text-[9px] text-gray-500 mt-1">v2.1.2-wallets · A2K Digital Studio</p>
+      <p class="text-[9px] text-gray-500 mt-1">v2.1.3-multimoneda · A2K Digital Studio</p>
     </div>
   </aside>
 
@@ -584,6 +584,12 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
                 style="background:linear-gradient(135deg,#583100,#8a4d00);color:#fff">
                 <span class="material-symbols-outlined">pause_circle</span>
                 Pausar
+              </button>
+              <button onclick="posOpenReturns()"
+                class="py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all hover:opacity-90 active:scale-95 flex items-center justify-center gap-2"
+                style="background:rgba(186,26,26,0.12);color:#ba1a1a">
+                <span class="material-symbols-outlined">assignment_return</span>
+                Devolver
               </button>
               <button onclick="posClearCart()"
                 class="py-4 rounded-xl font-black text-sm uppercase tracking-wider bg-surface-high text-on-surface-variant hover:bg-surface-highest transition-all active:scale-95 flex items-center justify-center gap-2">
@@ -1386,22 +1392,14 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
     <div class="mb-4 px-4 py-3 rounded-xl bg-surface-low">
       <p class="text-[10px] text-outline font-bold uppercase">Total a Cobrar</p>
       <p id="payTotal" class="text-4xl font-black text-secondary">$0.00</p>
+      <p id="payTotalBs" class="text-xs font-black text-outline mt-1">Bs. 0.00</p>
     </div>
     <div class="grid gap-3 mb-5">
       <label class="flex flex-col gap-1">
-        <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Monto Recibido $</span>
-        <input id="payReceived" type="number" step="0.01" placeholder="0.00"
-          class="px-4 py-3 rounded-xl border border-surface-highest text-xl font-bold outline-none focus:ring-2 focus:ring-primary/20"
-          oninput="payCalcChange()"/>
-      </label>
-      <div class="flex justify-between px-1">
-        <span class="text-sm font-bold text-outline">Vuelto</span>
-        <span id="payChange" class="text-sm font-black text-secondary">$0.00</span>
-      </div>
-      <label class="flex flex-col gap-1">
         <span class="text-[10px] font-bold uppercase tracking-widest text-outline">Método de Pago</span>
-        <select id="payMethod" class="px-4 py-2.5 rounded-xl border border-surface-highest text-sm outline-none">
+        <select id="payMethod" class="px-4 py-2.5 rounded-xl border border-surface-highest text-sm outline-none" onchange="payCalcChange()">
           <option value="efectivo">Efectivo USD</option>
+          <option value="efectivo-bs">Efectivo Bolívares</option>
           <option value="bolivares">Bolívares</option>
           <option value="transferencia">Transferencia</option>
           <option value="pago-movil">Pago Móvil</option>
@@ -1414,6 +1412,17 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
           <option value="credito">Crédito / Fiado</option>
         </select>
       </label>
+      <label class="flex flex-col gap-1">
+        <span id="payReceivedLabel" class="text-[10px] font-bold uppercase tracking-widest text-outline">Monto Recibido $</span>
+        <input id="payReceived" type="number" step="0.01" placeholder="0.00"
+          class="px-4 py-3 rounded-xl border border-surface-highest text-xl font-bold outline-none focus:ring-2 focus:ring-primary/20"
+          oninput="payCalcChange()"/>
+      </label>
+      <p id="payReceivedHint" class="text-[10px] font-bold text-outline -mt-2"></p>
+      <div class="flex justify-between px-1">
+        <span class="text-sm font-bold text-outline">Vuelto multimoneda</span>
+        <span id="payChange" class="text-sm font-black text-secondary text-right">$0.00<br><small class="text-outline">Bs. 0.00</small></span>
+      </div>
     </div>
     <button onclick="payConfirm()"
       class="w-full py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all active:scale-95"
@@ -2291,13 +2300,14 @@ function posCartTotals(items = cart) {
 }
 
 function posPaymentGroup(method) {
-  if (method === 'efectivo' || method === 'bolivares') return 'cash';
+  if (method === 'efectivo' || method === 'efectivo-bs') return 'cash';
   if (method === 'credito') return 'credit';
   return 'digital';
 }
 function posPaymentLabel(method) {
   const labels = {
     efectivo: 'Efectivo USD',
+    'efectivo-bs': 'Efectivo Bolívares',
     bolivares: 'Bolívares',
     transferencia: 'Transferencia',
     'pago-movil': 'Pago Móvil',
@@ -2434,17 +2444,53 @@ function posOpenPayment() {
   const ivaTotal = cart.reduce((a,c) => a + c.price*c.qty*((c.iva||0)/100), 0);
   const total = subtotal + ivaTotal;
   document.getElementById('payTotal').textContent = fmt$(total);
+  document.getElementById('payTotalBs').textContent = fmtBs(total);
   document.getElementById('payReceived').value = '';
-  document.getElementById('payChange').textContent = '$0.00';
+  document.getElementById('payMethod').value = 'efectivo';
+  payCalcChange();
   openModal('modalPayment');
+}
+
+function posOpenReturns() {
+  const client = posGetClientInfo();
+  navigateTo('devoluciones');
+  setTimeout(() => {
+    const search = document.getElementById('devSearch');
+    if (search) {
+      search.value = client.id || (client.name !== 'CLIENTE GENÉRICO' ? client.name : '');
+      search.focus();
+      devRender();
+    }
+  }, 0);
+  toast('Busca el ticket y presiona Devolver', 'info');
+}
+
+function payRate() {
+  const cfg = DB.get('config') || {};
+  return parseFloat(cfg.bcv || cfg.paralelo || 0) || 0;
+}
+
+function payIsBolivarMethod(method) {
+  return method === 'efectivo-bs' || method === 'bolivares' || method === 'pago-movil' || method === 'biopago' || method === 'punto-debito' || method === 'punto-credito' || method === 'transferencia';
 }
 
 function payCalcChange() {
   const total = parseFloat(document.getElementById('payTotal').textContent.replace('$','')) || 0;
-  const recv = parseFloat(document.getElementById('payReceived').value) || 0;
-  const change = recv - total;
-  document.getElementById('payChange').textContent = fmt$(Math.max(0, change));
-  document.getElementById('payChange').style.color = change < 0 ? '#ba1a1a' : '#3e6a00';
+  const method = document.getElementById('payMethod').value;
+  const rate = payRate();
+  const recvInput = parseFloat(document.getElementById('payReceived').value) || 0;
+  const receivedUsd = payIsBolivarMethod(method) ? (rate ? recvInput / rate : 0) : recvInput;
+  const changeUsd = receivedUsd - total;
+  const changeBs = Math.max(0, changeUsd) * rate;
+  const label = document.getElementById('payReceivedLabel');
+  const hint = document.getElementById('payReceivedHint');
+  label.textContent = payIsBolivarMethod(method) ? 'Monto Recibido Bs.' : 'Monto Recibido $';
+  hint.textContent = payIsBolivarMethod(method)
+    ? (rate ? `Equivalente recibido: ${fmt$(receivedUsd)} · Tasa: Bs. ${rate.toFixed(2)}` : 'Configura la tasa BCV/paralelo para calcular bolívares')
+    : (rate ? `Equivalente recibido: Bs. ${(recvInput * rate).toFixed(2)}` : '');
+  const el = document.getElementById('payChange');
+  el.innerHTML = `${fmt$(Math.max(0, changeUsd))}<br><small class="text-outline">Bs. ${changeBs.toFixed(2)}</small>`;
+  el.style.color = changeUsd < 0 ? '#ba1a1a' : '#3e6a00';
 }
 
 function payConfirm() {
@@ -2452,11 +2498,16 @@ function payConfirm() {
   isPaying = true;
   const totalStr = document.getElementById('payTotal').textContent.replace('$','');
   const total = parseFloat(totalStr) || 0;
-  const recv = parseFloat(document.getElementById('payReceived').value) || 0;
   const method = document.getElementById('payMethod').value;
   const group = posPaymentGroup(method);
+  const rate = payRate();
+  const recvInput = parseFloat(document.getElementById('payReceived').value) || 0;
+  const recv = payIsBolivarMethod(method) ? (rate ? recvInput / rate : 0) : recvInput;
   const client = posGetClientInfo();
 
+  if (payIsBolivarMethod(method) && !rate) {
+    toast('Configura la tasa BCV/paralelo para cobrar en bolívares', 'error'); isPaying = false; return;
+  }
   if (group === 'cash' && recv < total) {
     toast('Monto insuficiente', 'error'); isPaying = false; return;
   }
