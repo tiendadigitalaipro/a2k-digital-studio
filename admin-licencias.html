@@ -478,9 +478,14 @@ const DB = {
   set: (k,v) => localStorage.setItem('zync_'+k, JSON.stringify(v)),
 };
 
-// ── MOTOR DE LICENCIAS (mismo algoritmo que el sistema) ──
+// ── MOTOR DE LICENCIAS FIRMADAS ──
 const LIC_KEY   = 'ZY2026A2K';
 const LIC_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const LIC_PRIVATE_PEM = `-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgRS5d0y5BfVjuYt/2
+H8bvf7oM/+wWlQIzXz+uhkwlwfChRANCAAQwlc7duv2y+0XfjrfuEo8KX2xAvw4J
+nCpJUT4nO0jbdiLmQepS6UcmAdVHKYNXV96mR5fLiNq9zXoeEuR1ZuSt
+-----END PRIVATE KEY-----`;
 
 function licHash(str) {
   let h = 5381 >>> 0;
@@ -491,32 +496,72 @@ function licCheck(parts) {
   const h = licHash(parts.join('|') + LIC_KEY);
   return [h>>>24, (h>>>16)&0xff, (h>>>8)&0xff, h&0xff].map(b => LIC_CHARS[b % 32]).join('');
 }
+function normalizeDeviceId(deviceId) {
+  const raw = (deviceId || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (raw.length === 9) return raw.slice(0,3) + '-' + raw.slice(3,6) + '-' + raw.slice(6);
+  return (deviceId || '').trim().toUpperCase();
+}
+function pemToArrayBuffer(pem) {
+  const b64 = pem.replace(/-----[^-]+-----/g, '').replace(/\s+/g, '');
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
+}
+function bufToB64Url(buf) {
+  const bytes = new Uint8Array(buf);
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g, '_').replace(/\//g, '~').replace(/=+$/,'');
+}
+async function importPrivateKey() {
+  return crypto.subtle.importKey('pkcs8', pemToArrayBuffer(LIC_PRIVATE_PEM), { name:'ECDSA', namedCurve:'P-256' }, false, ['sign']);
+}
+async function licSignature(payload) {
+  const key = await importPrivateKey();
+  const data = new TextEncoder().encode(payload);
+  const sig = await crypto.subtle.sign({ name:'ECDSA', hash:'SHA-256' }, key, data);
+  return bufToB64Url(sig);
+}
 function daysEpoch() { return Math.floor(Date.now() / 86400000); }
 function encodeDay(d) {
   let r = '';
   for (let i = 0; i < 4; i++) { r = LIC_CHARS[d % 32] + r; d = Math.floor(d / 32); }
   return r;
 }
-
-function genProCode() {
-  const seg = () => Array.from({length:4}, () => LIC_CHARS[Math.floor(Math.random()*32)]).join('');
-  const s1 = seg(), s2 = seg();
-  return `ZYNC-${s1}-${s2}-${licCheck(['PRO', s1, s2])}`;
+function decodeDay(s) {
+  let n = 0;
+  for (const c of s) n = n * 32 + LIC_CHARS.indexOf(c);
+  return n;
 }
 
-function genDemoCode() {
-  const seg = () => Array.from({length:4}, () => LIC_CHARS[Math.floor(Math.random()*32)]).join('');
-  const s1 = seg();
-  const dateEnc = encodeDay(daysEpoch());
-  return `DEMO-${s1}-${dateEnc}-${licCheck(['DEMO', s1, dateEnc])}`;
+function getTargetDeviceId() {
+  const did = prompt('Pega el DEVICE ID exacto del cliente:');
+  return normalizeDeviceId(did);
+}
+
+async function genSignedCode(type, deviceId) {
+  deviceId = normalizeDeviceId(deviceId);
+  if (!deviceId) return '';
+  const rand = () => Array.from({length:4}, () => LIC_CHARS[Math.floor(Math.random()*32)]).join('');
+  const serial = rand() + rand();
+  const created = encodeDay(daysEpoch());
+  const expiry = type === 'DEMO' ? encodeDay(daysEpoch() + 5) : 'LIFE';
+  const payload = ['ZSG', type, deviceId, created, expiry, serial].join('|');
+  const sig = await licSignature(payload);
+  return ['ZSG', type, deviceId.replace(/-/g,''), created, expiry, serial, sig].join('-');
+}
+
+async function genProCode(deviceId) {
+  return genSignedCode('PRO', deviceId);
+}
+
+async function genDemoCode(deviceId) {
+  return genSignedCode('DEMO', deviceId);
 }
 
 // ── LICENCIAS EMBEBIDAS (mirror del sistema) ──
 const EMBEDDED = [
-  { code:'ZYNC-DEMO-2026-FREE', type:'DEMO', name:'Demo Pública', deviceId:'', expiresAt:'2026-12-31', status:'Activa' },
-  { code:'ZYNC-CWCJ-JH77-KTXX', type:'DEMO', name:'Demo Alternativa', deviceId:'', expiresAt:'2026-12-31', status:'Activa' },
-  { code:'ZYNC-PRO1-A2K0-2026', type:'PRO', name:'Licencia PRO Estándar', deviceId:'', expiresAt:null, status:'Activa' },
-  { code:'ZYNC-PRO2-ELEC-2026', type:'PRO', name:'Licencia PRO Electronics', deviceId:'', expiresAt:null, status:'Activa' },
 ];
 
 // ── ADMIN AUTH ─────────────────────────────────
@@ -747,19 +792,30 @@ function openDeviceModal(id) {
   setTimeout(() => document.getElementById('deviceNewId').focus(), 100);
 }
 
-function saveDeviceId() {
+async function saveDeviceId() {
   const id = document.getElementById('deviceLicId').value;
-  const newDevice = document.getElementById('deviceNewId').value.trim().toUpperCase();
+  const newDevice = normalizeDeviceId(document.getElementById('deviceNewId').value);
   const lics = DB.get('licenses') || [];
   const idx = lics.findIndex(l => l.id == id);
   if (idx < 0) return;
+  if (!newDevice) { showToast('El nuevo DEVICE ID es obligatorio', 'error'); return; }
   const oldDevice = lics[idx].deviceId || 'Universal';
+  if (lics[idx].code && lics[idx].code.startsWith('ZSG-')) {
+    lics[idx].code = lics[idx].type === 'DEMO' ? await genDemoCode(newDevice) : await genProCode(newDevice);
+    if (lics[idx].type === 'DEMO') {
+      const parts = lics[idx].code.split('-');
+      const expDay = decodeDay(parts[4]);
+      lics[idx].expiresAt = new Date(expDay * 86400000).toISOString().split('T')[0];
+    }
+  }
   lics[idx].deviceId = newDevice;
+  lics[idx].migratedAt = new Date().toISOString();
+  lics[idx].migrationFrom = oldDevice;
   DB.set('licenses', lics);
   closeModal('modalDevice');
   renderAll();
-  addLog(`Device ID cambiado: ${lics[idx].code} · ${oldDevice} → ${newDevice || 'Universal'}`);
-  showToast(newDevice ? `Device actualizado: ${newDevice}` : 'Licencia convertida a Universal', 'success');
+  addLog(`Device ID migrado: ${lics[idx].code} · ${oldDevice} → ${newDevice}`);
+  showToast(`Device migrado y licencia regenerada: ${newDevice}`, 'success');
 }
 
 // ── DELETE WITH CONFIRM MODAL ──────────────────
@@ -793,6 +849,7 @@ function copyCode(code) {
 // ── CODE GENERATOR ─────────────────────────────
 let genPrefix = 'ZYNC';
 let genDays = 0; // 0 = sin expiración (PRO), 5 = DEMO 5 días
+let genDeviceId = '';
 
 const GEN_BTN_ACTIVE_GOLD = 'background:#D4AF37;color:#06060a;flex:1;padding:12px 8px;border-radius:12px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;transition:all 0.15s';
 const GEN_BTN_ACTIVE_RED  = 'background:#ba1a1a;color:#fff;flex:1;padding:12px 8px;border-radius:12px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;transition:all 0.15s';
@@ -815,13 +872,19 @@ function setGenPrefix(p) {
   doGenerate();
 }
 
-function doGenerate() {
-  const code = genPrefix === 'DEMO' ? genDemoCode() : genProCode();
+async function doGenerate() {
+  if (!genDeviceId) {
+    genDeviceId = getTargetDeviceId();
+    if (!genDeviceId) { showToast('DEVICE ID obligatorio para generar licencias', 'error'); return; }
+  }
+  document.getElementById('genCode').textContent = 'Generando firma segura...';
+  const code = genPrefix === 'DEMO' ? await genDemoCode(genDeviceId) : await genProCode(genDeviceId);
   document.getElementById('genCode').textContent = code;
 }
 
 function openGenerateModal() {
-  genPrefix = 'ZYNC'; genDays = 0;
+  genPrefix = 'ZYNC'; genDays = 0; genDeviceId = getTargetDeviceId();
+  if (!genDeviceId) { showToast('DEVICE ID obligatorio para generar licencias', 'error'); return; }
   document.getElementById('gPro').style.cssText  = GEN_BTN_ACTIVE_GOLD;
   document.getElementById('gDemo').style.cssText = GEN_BTN_INACTIVE;
   document.getElementById('genDemoInfo').style.display = 'none';
@@ -831,20 +894,21 @@ function openGenerateModal() {
 
 function copyGenCode() {
   const code = document.getElementById('genCode').textContent;
-  if (!code || code === '—') return;
+  if (!code || code === '—' || code.includes('Generando')) { showToast('Espera a que termine la firma segura', 'info'); return; }
   navigator.clipboard.writeText(code).then(() => {
     closeModal('modalGenerate');
     openAddModal();
     document.getElementById('fCode').value = code;
-    const isDemo = code.startsWith('DEMO-');
+    document.getElementById('fDevice').value = genDeviceId;
+    const isDemo = code.startsWith('DEMO-') || code.startsWith('ZSG-DEMO-');
     document.getElementById('fType').value = isDemo ? 'DEMO' : 'PRO';
     if (isDemo) {
-      // Extraer fecha de vencimiento del propio código (día codificado + 5)
       const parts = code.split('-');
-      if (parts.length === 4) {
+      const datePart = code.startsWith('ZSG-DEMO-') ? parts[4] : parts[2];
+      if (datePart && datePart !== 'LIFE') {
         let n = 0;
-        for (const c of parts[2]) n = n * 32 + LIC_CHARS.indexOf(c);
-        const exp = new Date((n + 5) * 86400000);
+        for (const c of datePart) n = n * 32 + LIC_CHARS.indexOf(c);
+        const exp = new Date(n * 86400000);
         document.getElementById('fExpiry').value = exp.toISOString().split('T')[0];
       }
     } else {

@@ -553,6 +553,16 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
               </div>
             </div>
 
+            <div class="bg-white rounded-2xl p-4 border border-surface-highest">
+              <div class="flex items-center justify-between mb-3">
+                <p class="text-[9px] font-black uppercase tracking-widest text-outline">Ventas Pausadas</p>
+                <span id="pausedSalesCount" class="text-[10px] font-black px-2 py-0.5 rounded-full" style="background:#ffdcbe;color:#583100">0</span>
+              </div>
+              <div id="pausedSalesList" class="space-y-2 max-h-36 overflow-y-auto">
+                <p class="text-[10px] text-outline font-bold uppercase opacity-50 text-center py-3">Sin ventas pausadas</p>
+              </div>
+            </div>
+
             <!-- Acciones -->
             <div class="grid grid-cols-2 gap-2 mt-auto">
               <button onclick="posOpenPayment()"
@@ -560,6 +570,12 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
                 style="background:linear-gradient(135deg,#3e6a00,#2a4a00);color:#fff">
                 <span class="material-symbols-outlined fill-icon">payments</span>
                 Cobrar (F12)
+              </button>
+              <button onclick="posPauseSale()"
+                class="py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all hover:opacity-90 active:scale-95 flex items-center justify-center gap-2"
+                style="background:linear-gradient(135deg,#583100,#8a4d00);color:#fff">
+                <span class="material-symbols-outlined">pause_circle</span>
+                Pausar
               </button>
               <button onclick="posClearCart()"
                 class="py-4 rounded-xl font-black text-sm uppercase tracking-wider bg-surface-high text-on-surface-variant hover:bg-surface-highest transition-all active:scale-95 flex items-center justify-center gap-2">
@@ -1571,10 +1587,6 @@ const DB = {
 
 // ── LICENCIAS EMBEBIDAS ───────────────────────
 const LICENSES = [
-  { code:'ZYNC-DEMO-2026-FREE', type:'DEMO', name:'Demo Pública', deviceId:'', expiresAt:'2026-12-31', status:'Activa' },
-  { code:'ZYNC-CWCJ-JH77-KTXX', type:'DEMO', name:'Demo Alternativa', deviceId:'', expiresAt:'2026-12-31', status:'Activa' },
-  { code:'ZYNC-PRO1-A2K0-2026', type:'PRO', name:'Licencia PRO Estándar', deviceId:'', expiresAt:null, status:'Activa' },
-  { code:'ZYNC-PRO2-ELEC-2026', type:'PRO', name:'Licencia PRO Electronics', deviceId:'', expiresAt:null, status:'Activa' },
 ];
 
 // ── DEVICE ID ─────────────────────────────────
@@ -1589,9 +1601,13 @@ function getDeviceId() {
 }
 const DEVICE_ID = getDeviceId();
 
-// ── MOTOR DE LICENCIAS (valida en cualquier PC) ───
+// ── MOTOR DE LICENCIAS ───
 const LIC_KEY   = 'ZY2026A2K';
 const LIC_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const LIC_PUBLIC_PEM = `-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEMJXO3br9svtF34637hKPCl9sQL8O
+CZwqSVE+JztI23Yi5kHqUulHJgHVRymDV1fepkeXy4javc16HhLkdWbkrQ==
+-----END PUBLIC KEY-----`;
 
 function licHash(str) {
   let h = 5381 >>> 0;
@@ -1601,6 +1617,33 @@ function licHash(str) {
 function licCheck(parts) {
   const h = licHash(parts.join('|') + LIC_KEY);
   return [h>>>24, (h>>>16)&0xff, (h>>>8)&0xff, h&0xff].map(b => LIC_CHARS[b % 32]).join('');
+}
+function normalizeDeviceId(deviceId) {
+  const raw = (deviceId || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (raw.length === 9) return raw.slice(0,3) + '-' + raw.slice(3,6) + '-' + raw.slice(6);
+  return (deviceId || '').trim().toUpperCase();
+}
+function pemToArrayBuffer(pem) {
+  const b64 = pem.replace(/-----[^-]+-----/g, '').replace(/\s+/g, '');
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
+}
+function b64UrlToArrayBuffer(s) {
+  const b64 = s.replace(/_/g, '+').replace(/~/g, '/') + '==='.slice((s.length + 3) % 4);
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
+}
+async function importPublicKey() {
+  return crypto.subtle.importKey('spki', pemToArrayBuffer(LIC_PUBLIC_PEM), { name:'ECDSA', namedCurve:'P-256' }, false, ['verify']);
+}
+async function verifyLicenseSignature(payload, signature) {
+  const key = await importPublicKey();
+  const data = new TextEncoder().encode(payload);
+  return crypto.subtle.verify({ name:'ECDSA', hash:'SHA-256' }, key, b64UrlToArrayBuffer(signature), data);
 }
 function daysEpoch() { return Math.floor(Date.now() / 86400000); }
 function encodeDay(d) {
@@ -1614,28 +1657,54 @@ function decodeDay(s) {
   return n;
 }
 
-// Valida código algorítmico — funciona en cualquier PC sin servidor
+async function validateSignedLicCode(code) {
+  const p = code.split('-');
+  if (p.length !== 7 || p[0] !== 'ZSG') return null;
+  const type = p[1];
+  if (!['PRO','DEMO'].includes(type)) return null;
+  const deviceCompact = p[2];
+  const created = p[3];
+  const expiry = p[4];
+  const serial = p[5];
+  const sig = p[6];
+  const device = normalizeDeviceId(DEVICE_ID);
+  if (deviceCompact !== device.replace(/-/g,'')) return null;
+  const payload = ['ZSG', type, device, created, expiry, serial].join('|');
+  if (!(await verifyLicenseSignature(payload, sig))) return null;
+  const expiresAt = expiry === 'LIFE' ? null : new Date(decodeDay(expiry) * 86400000).toISOString().split('T')[0];
+  if (expiry !== 'LIFE' && daysEpoch() > decodeDay(expiry)) return { code, type, name:'Licencia Firmada ' + type, deviceId:DEVICE_ID, expiresAt, status:'Expirada' };
+  return { code, type, name:'Licencia Firmada ' + type, deviceId:DEVICE_ID, expiresAt, status:'Activa', signed:true };
+}
+
+async function validateLicCodeAsync(code) {
+  const signed = await validateSignedLicCode(code);
+  if (signed) return signed;
+  return validateLicCode(code);
+}
+
 function validateLicCode(code) {
   const p = code.split('-');
   if (p.length !== 4) return null;
   if (p[0] === 'ZYNC') {
-    if (p[3] !== licCheck(['PRO', p[1], p[2]])) return null;
-    return { code, type:'PRO', name:'Licencia PRO', deviceId:'', expiresAt:null, status:'Activa' };
+    if (p[3] !== licCheck(['PRO', p[1], p[2], DEVICE_ID])) return null;
+    return { code, type:'PRO', name:'Licencia PRO', deviceId:DEVICE_ID, expiresAt:null, status:'Activa' };
   }
   if (p[0] === 'DEMO') {
-    if (p[3] !== licCheck(['DEMO', p[1], p[2]])) return null;
+    if (p[3] !== licCheck(['DEMO', p[1], p[2], DEVICE_ID])) return null;
     const createdDay = decodeDay(p[2]);
     const expiresDay = createdDay + 5;
     const expiresAt  = new Date(expiresDay * 86400000).toISOString().split('T')[0];
-    if (daysEpoch() > expiresDay) return { code, type:'DEMO', name:'Demo 5 Días', expiresAt, status:'Expirada' };
-    return { code, type:'DEMO', name:'Demo 5 Días', deviceId:'', expiresAt, status:'Activa' };
+    if (daysEpoch() > expiresDay) return { code, type:'DEMO', name:'Demo 5 Días', deviceId:DEVICE_ID, expiresAt, status:'Expirada' };
+    return { code, type:'DEMO', name:'Demo 5 Días', deviceId:DEVICE_ID, expiresAt, status:'Activa' };
   }
   return null;
 }
 
 // ── LOCK SCREEN ───────────────────────────────
 function lockFormatInput(el) {
-  let v = el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  let raw = el.value.toUpperCase().replace(/[^A-Z0-9\-_~]/g,'');
+  if (raw.startsWith('ZSG-') || raw.length > 24) { el.value = raw; return; }
+  let v = raw.replace(/[^A-Z0-9]/g,'');
   let out = '';
   for (let i = 0; i < v.length && i < 16; i++) {
     if (i > 0 && i % 4 === 0) out += '-';
@@ -1644,7 +1713,7 @@ function lockFormatInput(el) {
   el.value = out;
 }
 
-function lockActivate() {
+async function lockActivate() {
   const code = document.getElementById('lockInput').value.trim().toUpperCase();
   const status = document.getElementById('lockStatus');
   const msg = document.getElementById('lockStatusMsg');
@@ -1654,9 +1723,9 @@ function lockActivate() {
   // 1) Licencias embebidas (hardcoded)
   let found = LICENSES.find(l => l.code === code);
 
-  // 2) Validación algorítmica — funciona en CUALQUIER PC
+  // 2) Validación firmada / algorítmica
   if (!found) {
-    const alg = validateLicCode(code);
+    const alg = await validateLicCodeAsync(code);
     if (alg) {
       if (alg.status === 'Expirada') { lockShowExpiredDemo(alg); return; }
       found = alg;
@@ -1756,6 +1825,7 @@ function appInit() {
   document.getElementById('sidebarUser').textContent = cfg.vendedor || 'Administrador';
   document.getElementById('sidebarRole').textContent = cfg.name || 'ZYNC Electronics';
   startClock();
+  posPausedRender();
   invRender();
   fiadoRender();
   rptRender();
@@ -1775,6 +1845,11 @@ const viewTitles = {
 };
 let currentView = 'pos';
 function navigateTo(view) {
+  if (empMode && EMP_HIDDEN_VIEWS.includes(view)) {
+    toast('Acceso bloqueado en Modo Empleado', 'error');
+    auditLog('employee_blocked_view', { view });
+    return;
+  }
   currentView = view;
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -1830,12 +1905,33 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 // ── FORMAT ────────────────────────────────────
 const fmt$ = n => '$' + (parseFloat(n)||0).toFixed(2);
 const fmtBs = n => 'Bs. ' + ((parseFloat(n)||0) * (DB.get('config')?.bcv || 36)).toFixed(2);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+
+function auditLog(action, detail = {}) {
+  const logs = DB.get('auditLogs') || [];
+  logs.unshift({ action, detail, at: new Date().toISOString() });
+  DB.set('auditLogs', logs.slice(0, 300));
+}
+
+function genId(prefix = 'id') {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+}
+
+function nextTicketNum() {
+  const current = parseInt(DB.get('ticketCounter') || '0', 10);
+  const sales = DB.get('sales') || [];
+  const maxExisting = sales.reduce((max, s) => Math.max(max, parseInt(s.ticketNum || '0', 10) || 0), 0);
+  const next = Math.max(current, maxExisting) + 1;
+  DB.set('ticketCounter', next);
+  return next.toString().padStart(6,'0');
+}
 
 // ════════════════════════════════════════════
 // POS MODULE
 // ════════════════════════════════════════════
 let cart = [];
 let searchTimeout = null;
+let isPaying = false;
 
 function posSearchProduct(q) {
   clearTimeout(searchTimeout);
@@ -1852,8 +1948,8 @@ function posSearchProduct(q) {
       <div class="px-4 py-2.5 hover:bg-surface-low cursor-pointer border-b border-surface-highest last:border-0 flex justify-between items-center"
            onclick="posAddProduct('${p.id}')">
         <div>
-          <p class="font-bold text-xs">${p.desc}</p>
-          <p class="text-[10px] text-outline">${p.sku} · Stock: ${p.stock}</p>
+          <p class="font-bold text-xs">${esc(p.desc)}</p>
+          <p class="text-[10px] text-outline">${esc(p.sku)} · Stock: ${p.stock}</p>
         </div>
         <span class="text-xs font-black text-secondary">${fmt$(p.price)}</span>
       </div>`).join('');
@@ -1909,8 +2005,8 @@ function posRender() {
     subtotal += line;
     return `<tr class="cart-row border-b border-surface-highest">
       <td class="px-4 py-2">
-        <p class="font-semibold text-xs">${c.desc}</p>
-        <p class="text-[10px] text-outline">${c.sku}</p>
+        <p class="font-semibold text-xs">${esc(c.desc)}</p>
+        <p class="text-[10px] text-outline">${esc(c.sku)}</p>
       </td>
       <td class="px-2 py-2 text-center">
         <div class="flex items-center justify-center gap-1">
@@ -1963,6 +2059,142 @@ function posClearClient() {
 function posRemove(i) { cart.splice(i, 1); posRender(); }
 function posClearCart() { cart = []; posRender(); }
 
+function posGetClientInfo() {
+  return {
+    name: document.getElementById('posClientName').value.trim() || 'CLIENTE GENÉRICO',
+    id: document.getElementById('posClientId').value.trim() || ''
+  };
+}
+
+function posSetClientInfo(client) {
+  document.getElementById('posClientName').value = client?.name || 'CLIENTE GENÉRICO';
+  document.getElementById('posClientId').value = client?.id || '';
+}
+
+function posCartTotals(items = cart) {
+  const subtotal = items.reduce((a,c) => a + c.price*c.qty, 0);
+  const ivaTotal = items.reduce((a,c) => a + c.price*c.qty*((c.iva||0)/100), 0);
+  return { subtotal, iva: ivaTotal, total: subtotal + ivaTotal, count: items.reduce((a,c) => a + c.qty, 0) };
+}
+
+function posPaymentGroup(method) {
+  if (method === 'efectivo' || method === 'bolivares') return 'cash';
+  if (method === 'credito') return 'credit';
+  return 'digital';
+}
+
+function posValidateStock(items = cart) {
+  const prods = DB.get('products') || [];
+  for (const c of items) {
+    const productId = c.sourceProductId || c.id;
+    const idx = prods.findIndex(p => p.id == productId);
+    if (idx < 0) continue;
+    const deductQty = c.stockQty || c.qty;
+    if ((parseFloat(prods[idx].stock) || 0) < deductQty) {
+      return { ok:false, product: prods[idx], needed: deductQty };
+    }
+  }
+  return { ok:true };
+}
+
+function posApplyStock(items = cart) {
+  const prods = DB.get('products') || [];
+  items.forEach(c => {
+    const productId = c.sourceProductId || c.id;
+    const idx = prods.findIndex(p => p.id == productId);
+    if (idx >= 0) {
+      const deductQty = c.stockQty || c.qty;
+      prods[idx].stock = +(parseFloat(prods[idx].stock) - deductQty).toFixed(3);
+    }
+  });
+  DB.set('products', prods);
+}
+
+function posRestoreStock(items = []) {
+  const prods = DB.get('products') || [];
+  items.forEach(c => {
+    const productId = c.sourceProductId || c.id;
+    const idx = prods.findIndex(p => p.id == productId);
+    if (idx >= 0) {
+      const restoreQty = c.stockQty || c.qty;
+      prods[idx].stock = +(parseFloat(prods[idx].stock || 0) + restoreQty).toFixed(3);
+    }
+  });
+  DB.set('products', prods);
+}
+
+function posPauseSale() {
+  if (!cart.length) { toast('No hay productos para pausar', 'error'); return; }
+  const paused = DB.get('pausedSales') || [];
+  const client = posGetClientInfo();
+  const totals = posCartTotals();
+  paused.unshift({
+    id: Date.now().toString(),
+    client,
+    items: cart.map(c => ({ ...c })),
+    totals,
+    createdAt: new Date().toISOString()
+  });
+  DB.set('pausedSales', paused.slice(0, 30));
+  cart = [];
+  posSetClientInfo({ name: 'CLIENTE GENÉRICO', id: '' });
+  posRender();
+  posPausedRender();
+  toast(`Venta pausada: ${client.name} · ${fmt$(totals.total)}`, 'success');
+}
+
+function posResumeSale(id) {
+  const paused = DB.get('pausedSales') || [];
+  const sale = paused.find(s => s.id == id);
+  if (!sale) { toast('Venta pausada no encontrada', 'error'); return; }
+  if (cart.length && !confirm('Hay una venta activa en el carrito. ¿Pausarla antes de retomar esta venta?')) return;
+  if (cart.length) posPauseSale();
+  const latest = DB.get('pausedSales') || [];
+  DB.set('pausedSales', latest.filter(s => s.id != id));
+  cart = (sale.items || []).map(c => ({ ...c }));
+  posSetClientInfo(sale.client);
+  posRender();
+  posPausedRender();
+  toast(`Venta retomada: ${sale.client?.name || 'Cliente'} · ${fmt$(sale.totals?.total || 0)}`, 'success');
+}
+
+function posDeletePausedSale(id) {
+  if (!confirm('¿Eliminar esta venta pausada?')) return;
+  DB.set('pausedSales', (DB.get('pausedSales') || []).filter(s => s.id != id));
+  posPausedRender();
+  toast('Venta pausada eliminada', 'info');
+}
+
+function posPausedRender() {
+  const list = document.getElementById('pausedSalesList');
+  const count = document.getElementById('pausedSalesCount');
+  if (!list || !count) return;
+  const paused = DB.get('pausedSales') || [];
+  count.textContent = paused.length;
+  if (!paused.length) {
+    list.innerHTML = '<p class="text-[10px] text-outline font-bold uppercase opacity-50 text-center py-3">Sin ventas pausadas</p>';
+    return;
+  }
+  list.innerHTML = paused.map(s => {
+    const totals = s.totals || posCartTotals(s.items || []);
+    const client = s.client?.name || 'CLIENTE GENÉRICO';
+    const when = new Date(s.createdAt).toLocaleTimeString('es-VE', { hour:'2-digit', minute:'2-digit' });
+    return `<div class="rounded-xl border border-surface-highest p-2.5 bg-surface-low">
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0">
+          <p class="text-xs font-black truncate">${esc(client)}</p>
+          <p class="text-[10px] text-outline font-bold">${totals.count || 0} item(s) · ${when}</p>
+        </div>
+        <p class="text-xs font-black text-secondary">${fmt$(totals.total || 0)}</p>
+      </div>
+      <div class="grid grid-cols-2 gap-1.5 mt-2">
+        <button onclick="posResumeSale('${s.id}')" class="py-1.5 rounded-lg text-[10px] font-black uppercase" style="background:#00387e;color:#fff">Retomar</button>
+        <button onclick="posDeletePausedSale('${s.id}')" class="py-1.5 rounded-lg text-[10px] font-black uppercase" style="background:rgba(186,26,26,0.12);color:#ba1a1a">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function posOpenPayment() {
   if (!cart.length) { toast('El carrito está vacío', 'error'); return; }
   const subtotal = cart.reduce((a,c) => a + c.price*c.qty, 0);
@@ -1983,46 +2215,71 @@ function payCalcChange() {
 }
 
 function payConfirm() {
+  if (isPaying) return;
+  isPaying = true;
   const totalStr = document.getElementById('payTotal').textContent.replace('$','');
   const total = parseFloat(totalStr) || 0;
   const recv = parseFloat(document.getElementById('payReceived').value) || 0;
   const method = document.getElementById('payMethod').value;
+  const group = posPaymentGroup(method);
+  const client = posGetClientInfo();
 
-  if (method !== 'credito' && recv < total && recv > 0) {
-    toast('Monto insuficiente', 'error'); return;
+  if (group === 'cash' && recv < total) {
+    toast('Monto insuficiente', 'error'); isPaying = false; return;
   }
-
-  // Descontar stock
-  const prods = DB.get('products') || [];
-  cart.forEach(c => {
-    const idx = prods.findIndex(p => p.id == c.id);
-    if (idx >= 0) prods[idx].stock = Math.max(0, prods[idx].stock - c.qty);
-  });
-  DB.set('products', prods);
+  if (group === 'digital' && !confirm('Confirma que el pago digital fue recibido/verificado antes de registrar la venta.')) { isPaying = false; return; }
+  if (group === 'credit' && client.name === 'CLIENTE GENÉRICO') {
+    toast('Para fiado/crédito debes colocar el nombre del cliente', 'error'); isPaying = false; return;
+  }
+  const stockCheck = posValidateStock();
+  if (!stockCheck.ok) {
+    toast(`Stock insuficiente: ${stockCheck.product.desc}`, 'error'); isPaying = false; return;
+  }
+  posApplyStock();
 
   // Guardar venta
   const sales = DB.get('sales') || [];
   const subtotal = cart.reduce((a,c) => a + c.price*c.qty, 0);
   const ivaTotal = cart.reduce((a,c) => a + c.price*c.qty*((c.iva||0)/100), 0);
   const ticket = {
-    id: Date.now(),
-    ticketNum: (sales.length + 1).toString().padStart(6,'0'),
-    client: document.getElementById('posClientName').value || 'Cliente Genérico',
-    clientId: document.getElementById('posClientId').value.trim() || '',
+    id: genId('sale'),
+    ticketNum: nextTicketNum(),
+    client: client.name,
+    clientId: client.id,
     items: [...cart],
     subtotal, iva: ivaTotal, total,
-    method, received: recv,
+    method, paymentGroup: group, received: group === 'cash' ? recv : total,
+    paymentStatus: group === 'credit' ? 'pending' : 'paid',
     date: new Date().toISOString()
   };
   sales.push(ticket);
   DB.set('sales', sales);
+  auditLog('sale_created', { ticketNum: ticket.ticketNum, total, method, paymentGroup: group, paymentStatus: ticket.paymentStatus });
+  if (group === 'credit') {
+    const fiados = DB.get('fiados') || [];
+    fiados.push({
+      id: 'sale_'+ticket.id,
+      saleId: ticket.id,
+      ticketNum: ticket.ticketNum,
+      nombre: client.name,
+      ci: client.id,
+      monto: total,
+      desc: `Venta a crédito ticket #${ticket.ticketNum}`,
+      abonado: 0,
+      fecha: Date.now()
+    });
+    DB.set('fiados', fiados);
+    fiadoRender();
+  }
 
   // Mostrar ticket
   showTicket(ticket);
   closeModal('modalPayment');
   cart = []; posRender();
+  posPausedRender();
   invRender(); rptRender();
   toast('Venta registrada exitosamente', 'success');
+  isPaying = false;
 }
 
 function showTicket(t) {
@@ -2087,20 +2344,20 @@ function invRender() {
     const lowStock = p.stock <= p.min;
     const margin = p.cost > 0 ? (((p.price - p.cost) / p.cost) * 100).toFixed(0) : '—';
     return `<tr class="inv-row border-b border-surface-highest text-xs">
-      <td class="px-4 py-2.5 font-mono font-bold text-outline">${p.sku}</td>
+      <td class="px-4 py-2.5 font-mono font-bold text-outline">${esc(p.sku)}</td>
       <td class="px-4 py-2.5">
         <div class="flex items-center gap-2">
           ${p.photo
             ? `<img src="${p.photo}" alt="" class="w-8 h-8 rounded-lg object-cover flex-shrink-0" style="border:1px solid rgba(0,0,0,0.08)">`
             : `<div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center" style="background:rgba(0,56,126,0.06)"><span class="material-symbols-outlined text-xs" style="color:rgba(0,56,126,0.3)">image</span></div>`}
           <div>
-            <p class="font-semibold">${p.desc}</p>
+            <p class="font-semibold">${esc(p.desc)}</p>
             ${p.fraccionable ? '<span class="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">FRAC</span>' : ''}
           </div>
         </div>
       </td>
       <td class="px-3 py-2.5 text-center">
-        <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-surface-high">${p.cat || '—'}</span>
+        <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-surface-high">${esc(p.cat || '—')}</span>
       </td>
       <td class="px-3 py-2.5 text-center">
         <span class="font-black text-base ${lowStock ? 'text-error' : 'text-on-surface'}">${p.stock}</span>
@@ -2132,6 +2389,7 @@ function invRender() {
 }
 
 function invOpenAdd() {
+  if (empMode) { toast('Inventario bloqueado en Modo Empleado', 'error'); auditLog('employee_blocked_action', { action:'invOpenAdd' }); return; }
   document.getElementById('modalProductTitle').textContent = 'Agregar Producto';
   ['mpId','mpSku','mpCat','mpDesc','mpCost','mpPrice','mpStock','mpMin','mpMargin','mpBulkCost','mpBulkUnits'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('mpIva').value = '16';
@@ -2143,6 +2401,7 @@ function invOpenAdd() {
 }
 
 function invEdit(id) {
+  if (empMode) { toast('Inventario bloqueado en Modo Empleado', 'error'); auditLog('employee_blocked_action', { action:'invEdit', id }); return; }
   const prods = DB.get('products') || [];
   const p = prods.find(x => x.id == id);
   if (!p) return;
@@ -2168,6 +2427,7 @@ function invEdit(id) {
 }
 
 function invSaveProduct() {
+  if (empMode) { toast('Inventario bloqueado en Modo Empleado', 'error'); auditLog('employee_blocked_action', { action:'invSaveProduct' }); return; }
   const id = document.getElementById('mpId').value;
   const bulkCost  = parseFloat(document.getElementById('mpBulkCost').value)  || 0;
   const bulkUnits = parseInt(document.getElementById('mpBulkUnits').value)   || 0;
@@ -2193,15 +2453,18 @@ function invSaveProduct() {
   const idx = prods.findIndex(p => p.id == prod.id);
   if (idx >= 0) prods[idx] = prod; else prods.push(prod);
   DB.set('products', prods);
+  auditLog(id ? 'product_updated' : 'product_created', { id: prod.id, sku: prod.sku, desc: prod.desc });
   closeModal('modalProduct');
   invRender(); wPopulateSelect();
   toast(id ? 'Producto actualizado' : 'Producto agregado', 'success');
 }
 
 function invDelete(id) {
+  if (empMode) { toast('Inventario bloqueado en Modo Empleado', 'error'); auditLog('employee_blocked_action', { action:'invDelete', id }); return; }
   if (!confirm('¿Eliminar este producto?')) return;
   const prods = (DB.get('products') || []).filter(p => p.id != id);
   DB.set('products', prods);
+  auditLog('product_deleted', { id });
   invRender();
   toast('Producto eliminado', 'info');
 }
@@ -2283,8 +2546,23 @@ function wAddToCart() {
   const qty = parseFloat(wQtyStr) || 0;
   const price = parseFloat(document.getElementById('wResult').textContent) || 0;
   if (!qty || !price) { toast('Ingrese cantidad y precio', 'error'); return; }
-  const label = `Pesaje ${qty}${wUnit==='kg'?'g':'ml'}`;
-  cart.push({ id: 'w_'+Date.now(), sku:'PESAJE', desc: label, price, iva:16, qty:1 });
+  const productId = document.getElementById('wProdSelect').value;
+  const product = productId ? (DB.get('products')||[]).find(x => x.id == productId) : null;
+  const stockQty = +(qty / 1000).toFixed(3);
+  if (product && (parseFloat(product.stock) || 0) < stockQty) {
+    toast(`Stock insuficiente para ${product.desc}`, 'error'); return;
+  }
+  const label = product ? `${product.desc} · ${qty}${wUnit==='kg'?'g':'ml'}` : `Pesaje ${qty}${wUnit==='kg'?'g':'ml'}`;
+  cart.push({
+    id: 'w_'+Date.now(),
+    sourceProductId: product ? product.id : null,
+    stockQty: product ? stockQty : 0,
+    sku: product ? product.sku : 'PESAJE',
+    desc: label,
+    price,
+    iva: product ? product.iva : 16,
+    qty: 1
+  });
   navigateTo('pos');
   posRender();
   toast('Pesaje agregado al carrito', 'success');
@@ -2312,8 +2590,8 @@ function fiadoRender() {
   body.innerHTML = fiados.map(f => {
     const deuda = f.monto - (f.abonado||0);
     return `<tr class="inv-row border-b border-surface-highest text-xs">
-      <td class="px-4 py-3 font-bold">${f.nombre}</td>
-      <td class="px-4 py-3 text-outline font-mono">${f.ci || '—'}</td>
+      <td class="px-4 py-3 font-bold">${esc(f.nombre)}</td>
+      <td class="px-4 py-3 text-outline font-mono">${esc(f.ci || '—')}</td>
       <td class="px-4 py-3 text-right font-black text-error">${fmt$(deuda)}</td>
       <td class="px-4 py-3 text-center text-outline">${new Date(f.fecha).toLocaleDateString('es-VE')}</td>
       <td class="px-4 py-3 text-center">
@@ -2348,21 +2626,27 @@ function fiadoSave() {
 }
 
 function fiadoAbono(id) {
-  const amt = parseFloat(prompt('Monto de abono $:'));
+  const amt = parseFloat(prompt('Monto a abonar:'));
   if (!amt || amt <= 0) return;
   const fiados = DB.get('fiados') || [];
   const idx = fiados.findIndex(f => f.id == id);
   if (idx < 0) return;
   fiados[idx].abonado = (fiados[idx].abonado||0) + amt;
   if (fiados[idx].abonado >= fiados[idx].monto) fiados[idx].abonado = fiados[idx].monto;
+  fiados[idx].abonos = fiados[idx].abonos || [];
+  fiados[idx].abonos.unshift({ id: genId('abono'), monto: amt, fecha: Date.now() });
+  fiados[idx].estado = fiados[idx].abonado >= fiados[idx].monto ? 'pagado' : 'pendiente';
   DB.set('fiados', fiados);
+  auditLog('credit_payment', { id, amount: amt, balance: fiados[idx].monto - fiados[idx].abonado });
   fiadoRender();
   toast(`Abono de ${fmt$(amt)} registrado`, 'success');
 }
 
 function fiadoDelete(id) {
+  if (empMode) { toast('Fiados bloqueados en Modo Empleado', 'error'); auditLog('employee_blocked_action', { action:'fiadoDelete', id }); return; }
   if (!confirm('¿Eliminar este fiado?')) return;
   DB.set('fiados', (DB.get('fiados')||[]).filter(f => f.id != id));
+  auditLog('credit_deleted', { id });
   fiadoRender();
 }
 
@@ -2372,7 +2656,7 @@ function fiadoDelete(id) {
 function rptRender() {
   const sales = DB.get('sales') || [];
   const today = new Date().toDateString();
-  const todaySales = sales.filter(s => new Date(s.date).toDateString() === today);
+  const todaySales = sales.filter(s => !s.voided && new Date(s.date).toDateString() === today);
   const todayTotal = todaySales.reduce((a,s) => a+s.total, 0);
   const prods = DB.get('products') || [];
   const lowStock = prods.filter(p => p.stock <= p.min).length;
@@ -2387,14 +2671,40 @@ function rptRender() {
   if (!sales.length) { body.innerHTML = ''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
   body.innerHTML = [...sales].reverse().slice(0,50).map(s => `
-    <tr class="inv-row border-b border-surface-highest text-xs">
+    <tr class="inv-row border-b border-surface-highest text-xs ${s.voided ? 'opacity-50' : ''}">
       <td class="px-4 py-2.5 font-mono font-bold">#${s.ticketNum}</td>
-      <td class="px-4 py-2.5">${s.client}</td>
+      <td class="px-4 py-2.5">${esc(s.client)}</td>
       <td class="px-4 py-2.5 text-outline">${new Date(s.date).toLocaleString('es-VE')}</td>
       <td class="px-4 py-2.5 text-center">${s.items.reduce((a,i)=>a+i.qty,0)}</td>
-      <td class="px-4 py-2.5 text-right font-black text-secondary">${fmt$(s.total)}</td>
-      <td class="px-4 py-2.5 text-center capitalize">${s.method}</td>
+      <td class="px-4 py-2.5 text-right font-black ${s.voided ? 'text-error' : 'text-secondary'}">${s.voided ? 'ANULADA ' : ''}${fmt$(s.total)}</td>
+      <td class="px-4 py-2.5 text-center capitalize">${esc(s.method)}</td>
+      <td class="px-4 py-2.5 text-center">
+        ${s.voided ? '<span class="text-[10px] font-black text-error">ANULADA</span>' : `<button onclick="saleVoid('${s.id}')" class="px-2 py-1 rounded text-[10px] font-black uppercase" style="background:rgba(186,26,26,0.12);color:#ba1a1a">Anular</button>`}
+      </td>
     </tr>`).join('');
+}
+
+function saleVoid(id) {
+  if (empMode) { toast('Anulación bloqueada en Modo Empleado', 'error'); auditLog('employee_blocked_action', { action:'saleVoid', id }); return; }
+  const sales = DB.get('sales') || [];
+  const idx = sales.findIndex(s => s.id == id);
+  if (idx < 0) { toast('Venta no encontrada', 'error'); return; }
+  const sale = sales[idx];
+  if (sale.voided) { toast('La venta ya está anulada', 'info'); return; }
+  const reason = prompt(`Motivo de anulación del ticket #${sale.ticketNum}:`);
+  if (!reason || !reason.trim()) { toast('La anulación requiere motivo', 'error'); return; }
+  if (!confirm(`¿Anular ticket #${sale.ticketNum} y restaurar stock?`)) return;
+  posRestoreStock(sale.items || []);
+  sales[idx] = { ...sale, voided:true, voidReason: reason.trim(), voidedAt: new Date().toISOString() };
+  DB.set('sales', sales);
+  if ((sale.paymentGroup || posPaymentGroup(sale.method)) === 'credit') {
+    const fiados = (DB.get('fiados') || []).filter(f => f.saleId != sale.id);
+    DB.set('fiados', fiados);
+    fiadoRender();
+  }
+  auditLog('sale_voided', { id: sale.id, ticketNum: sale.ticketNum, total: sale.total, reason: reason.trim() });
+  invRender(); rptRender(); cajaRender();
+  toast(`Ticket #${sale.ticketNum} anulado`, 'success');
 }
 
 function rptPrint() {
@@ -2480,10 +2790,18 @@ function cfgSave() {
 }
 
 function cfgExport() {
+  auditLog('backup_exported', { at: new Date().toISOString() });
   const data = {
+    app: 'ZYNC Electronics',
+    version: 'god-mode-local',
     products: DB.get('products') || [],
     sales: DB.get('sales') || [],
     fiados: DB.get('fiados') || [],
+    cajaTurnoActivo: DB.get('cajaTurnoActivo') || null,
+    cajaTurnos: DB.get('cajaTurnos') || [],
+    cajaMovimientos: DB.get('cajaMovimientos') || [],
+    pausedSales: DB.get('pausedSales') || [],
+    fmlHistory: DB.get('fmlHistory') || [],
     config: DB.get('config') || {},
     exportedAt: new Date().toISOString()
   };
@@ -2503,15 +2821,95 @@ function cfgDoImport(e) {
   reader.onload = ev => {
     try {
       const data = JSON.parse(ev.target.result);
+      if (!data || typeof data !== 'object') throw new Error('Formato inválido');
+      const validKeys = ['products','sales','fiados','config','cajaTurnoActivo','cajaTurnos','cajaMovimientos','pausedSales','fmlHistory'];
+      if (!validKeys.some(k => Object.prototype.hasOwnProperty.call(data, k))) throw new Error('Backup sin datos reconocibles');
+      if (!confirm('Antes de importar se guardará un respaldo interno de emergencia. ¿Continuar con la restauración?')) return;
+      DB.set('preImportBackup', {
+        products: DB.get('products') || [],
+        sales: DB.get('sales') || [],
+        fiados: DB.get('fiados') || [],
+        cajaTurnoActivo: DB.get('cajaTurnoActivo') || null,
+        cajaTurnos: DB.get('cajaTurnos') || [],
+        cajaMovimientos: DB.get('cajaMovimientos') || [],
+        pausedSales: DB.get('pausedSales') || [],
+        fmlHistory: DB.get('fmlHistory') || [],
+        config: DB.get('config') || {},
+        createdAt: new Date().toISOString()
+      });
       if (data.products) DB.set('products', data.products);
       if (data.sales) DB.set('sales', data.sales);
       if (data.fiados) DB.set('fiados', data.fiados);
       if (data.config) DB.set('config', data.config);
-      invRender(); fiadoRender(); rptRender(); cfgLoad();
+      if ('cajaTurnoActivo' in data) DB.set('cajaTurnoActivo', data.cajaTurnoActivo);
+      if (data.cajaTurnos) DB.set('cajaTurnos', data.cajaTurnos);
+      if (data.cajaMovimientos) DB.set('cajaMovimientos', data.cajaMovimientos);
+      if (data.pausedSales) DB.set('pausedSales', data.pausedSales);
+      if (data.fmlHistory) DB.set('fmlHistory', data.fmlHistory);
+      auditLog('backup_imported', { file: file.name, importedAt: new Date().toISOString() });
+      invRender(); fiadoRender(); rptRender(); cfgLoad(); cajaRender(); posPausedRender(); fmlHistRender();
       toast('Datos importados correctamente', 'success');
     } catch { toast('Archivo inválido', 'error'); }
   };
   reader.readAsText(file);
+}
+
+function systemHealthCheck(repair = false) {
+  const issues = [];
+  const backup = {
+    products: DB.get('products'),
+    sales: DB.get('sales'),
+    fiados: DB.get('fiados'),
+    cajaTurnoActivo: DB.get('cajaTurnoActivo'),
+    cajaTurnos: DB.get('cajaTurnos'),
+    cajaMovimientos: DB.get('cajaMovimientos'),
+    pausedSales: DB.get('pausedSales'),
+    createdAt: new Date().toISOString()
+  };
+  const ensureArray = key => {
+    const value = DB.get(key);
+    if (!Array.isArray(value)) {
+      issues.push(`${key} no es una lista válida`);
+      if (repair) DB.set(key, []);
+      return [];
+    }
+    return value;
+  };
+  const products = ensureArray('products');
+  const sales = ensureArray('sales');
+  const fiados = ensureArray('fiados');
+  ['cajaTurnos','cajaMovimientos','pausedSales'].forEach(ensureArray);
+  products.forEach(p => {
+    if (!p.id) { issues.push(`Producto sin ID: ${p.desc || 'sin descripción'}`); if (repair) p.id = genId('prod'); }
+    if ((parseFloat(p.stock) || 0) < 0) { issues.push(`Stock negativo: ${p.desc}`); if (repair) p.stock = 0; }
+  });
+  sales.forEach(s => {
+    if (!s.id) { issues.push(`Venta sin ID: ${s.ticketNum || 'sin ticket'}`); if (repair) s.id = genId('sale'); }
+    if (!Array.isArray(s.items) || !s.items.length) issues.push(`Venta sin items: ${s.ticketNum || s.id}`);
+  });
+  fiados.forEach(f => {
+    if (!f.id) { issues.push(`Fiado sin ID: ${f.nombre || 'sin nombre'}`); if (repair) f.id = genId('credit'); }
+    const deuda = (parseFloat(f.monto)||0) - (parseFloat(f.abonado)||0);
+    if (deuda <= 0 && f.estado !== 'pagado') { issues.push(`Fiado pagado sin estado: ${f.nombre}`); if (repair) f.estado = 'pagado'; }
+  });
+  if (repair) {
+    DB.set('preRepairBackup', backup);
+    DB.set('products', products);
+    DB.set('sales', sales);
+    DB.set('fiados', fiados);
+    auditLog('system_repair', { issues });
+    invRender(); rptRender(); fiadoRender(); cajaRender();
+  }
+  return { ok: issues.length === 0, issues };
+}
+
+function systemHealthReport() {
+  const result = systemHealthCheck(false);
+  if (result.ok) { toast('Salud del sistema OK', 'success'); return; }
+  if (confirm(`Se detectaron ${result.issues.length} problema(s). ¿Crear respaldo y reparar automáticamente?`)) {
+    systemHealthCheck(true);
+    toast('Reparación de datos completada', 'success');
+  }
 }
 
 // ════════════════════════════════════════════
@@ -2679,6 +3077,19 @@ function empVerifyPin() {
 // ════════════════════════════════════════════
 // CAJA MODULE
 // ════════════════════════════════════════════
+function cajaSalesSummary(turno) {
+  const sales = (DB.get('sales') || []).filter(s => !s.voided && s.date >= turno.openAt);
+  const voided = (DB.get('sales') || []).filter(s => s.voided && s.date >= turno.openAt);
+  const movimientos = (DB.get('cajaMovimientos') || []).filter(m => m.openAt === turno.openAt);
+  const total = sales.reduce((a,s) => a+s.total, 0);
+  const cash = sales.filter(s => (s.paymentGroup || posPaymentGroup(s.method)) === 'cash').reduce((a,s) => a+s.total, 0);
+  const digital = sales.filter(s => (s.paymentGroup || posPaymentGroup(s.method)) === 'digital').reduce((a,s) => a+s.total, 0);
+  const credit = sales.filter(s => (s.paymentGroup || posPaymentGroup(s.method)) === 'credit').reduce((a,s) => a+s.total, 0);
+  const entradas = movimientos.filter(m => m.type === 'entrada').reduce((a,m) => a+m.amount, 0);
+  const salidas = movimientos.filter(m => m.type === 'salida').reduce((a,m) => a+m.amount, 0);
+  return { total, cash, digital, credit, entradas, salidas, movimientos, voidedTotal: voided.reduce((a,s)=>a+s.total,0), voidedCount: voided.length, count: sales.length };
+}
+
 function cajaRender() {
   const turno = DB.get('cajaTurnoActivo');
   const badge = document.getElementById('cajaStatusBadge');
@@ -2687,11 +3098,10 @@ function cajaRender() {
   if (turno) {
     badge.textContent = 'Caja Abierta'; badge.style.background='#b9f474'; badge.style.color='#0f2000';
     aperturaP.classList.add('hidden'); activaP.classList.remove('hidden');
-    const sales = DB.get('sales') || [];
-    const ventas = sales.filter(s => s.date >= turno.openAt).reduce((a,s) => a+s.total, 0);
+    const summary = cajaSalesSummary(turno);
     document.getElementById('cajaResInicial').textContent = fmt$(turno.inicial);
-    document.getElementById('cajaResVentas').textContent = fmt$(ventas);
-    document.getElementById('cajaResEsperado').textContent = fmt$(turno.inicial + ventas);
+    document.getElementById('cajaResVentas').textContent = `${fmt$(summary.total)} · Efectivo ${fmt$(summary.cash)} · Digital ${fmt$(summary.digital)} · Crédito ${fmt$(summary.credit)} · Mov. ${fmt$(summary.entradas-summary.salidas)}`;
+    document.getElementById('cajaResEsperado').textContent = fmt$(turno.inicial + summary.cash + summary.entradas - summary.salidas);
     document.getElementById('cajaResponsable').value = turno.responsable;
   } else {
     badge.textContent = 'Caja Cerrada'; badge.style.background='#e8e7ef'; badge.style.color='#434751';
@@ -2703,9 +3113,11 @@ function cajaRender() {
 }
 
 function cajaAbrir() {
+  if (empMode) { toast('Caja bloqueada en Modo Empleado', 'error'); auditLog('employee_blocked_action', { action:'cajaAbrir' }); return; }
   const inicial = parseFloat(document.getElementById('cajaMontoInicial').value) || 0;
   const responsable = document.getElementById('cajaResponsable').value.trim() || 'Admin';
   DB.set('cajaTurnoActivo', { inicial, responsable, openAt: new Date().toISOString() });
+  auditLog('cash_opened', { inicial, responsable });
   cajaRender();
   toast(`Caja abierta con ${fmt$(inicial)}`, 'success');
 }
@@ -2713,9 +3125,8 @@ function cajaAbrir() {
 function cajaCalcDiff() {
   const turno = DB.get('cajaTurnoActivo');
   if (!turno) return;
-  const sales = DB.get('sales') || [];
-  const ventas = sales.filter(s => s.date >= turno.openAt).reduce((a,s) => a+s.total, 0);
-  const esperado = turno.inicial + ventas;
+  const summary = cajaSalesSummary(turno);
+  const esperado = turno.inicial + summary.cash + summary.entradas - summary.salidas;
   const contado = parseFloat(document.getElementById('cajaContado').value) || 0;
   const diff = contado - esperado;
   const el = document.getElementById('cajaDiff');
@@ -2723,18 +3134,39 @@ function cajaCalcDiff() {
   el.style.color = diff >= 0 ? '#3e6a00' : '#ba1a1a';
 }
 
+function cajaMovimiento(type) {
+  if (empMode) { toast('Caja bloqueada en Modo Empleado', 'error'); auditLog('employee_blocked_action', { action:'cajaMovimiento', type }); return; }
+  const turno = DB.get('cajaTurnoActivo');
+  if (!turno) { toast('Debes abrir caja primero', 'error'); return; }
+  if (!['entrada','salida'].includes(type)) return;
+  const amount = parseFloat(prompt(`Monto de ${type} de caja:`) || '0');
+  if (!amount || amount <= 0) { toast('Monto inválido', 'error'); return; }
+  const reason = prompt('Motivo del movimiento:');
+  if (!reason || !reason.trim()) { toast('El motivo es obligatorio', 'error'); return; }
+  const movimientos = DB.get('cajaMovimientos') || [];
+  const mov = { id: genId('cashmov'), openAt: turno.openAt, type, amount, reason: reason.trim(), at: new Date().toISOString(), responsable: turno.responsable };
+  movimientos.unshift(mov);
+  DB.set('cajaMovimientos', movimientos);
+  auditLog('cash_movement', mov);
+  cajaRender(); cajaCalcDiff();
+  toast(`${type === 'entrada' ? 'Entrada' : 'Salida'} registrada: ${fmt$(amount)}`, 'success');
+}
+
 function cajaCerrar() {
+  if (empMode) { toast('Caja bloqueada en Modo Empleado', 'error'); auditLog('employee_blocked_action', { action:'cajaCerrar' }); return; }
   const turno = DB.get('cajaTurnoActivo');
   if (!turno) return;
-  const sales = DB.get('sales') || [];
-  const ventas = sales.filter(s => s.date >= turno.openAt).reduce((a,s) => a+s.total, 0);
-  const esperado = turno.inicial + ventas;
+  const summary = cajaSalesSummary(turno);
+  const esperado = turno.inicial + summary.cash + summary.entradas - summary.salidas;
   const contado = parseFloat(document.getElementById('cajaContado').value) || 0;
   const turnos = DB.get('cajaTurnos') || [];
   turnos.push({ id: Date.now(), responsable: turno.responsable, openAt: turno.openAt,
-    closeAt: new Date().toISOString(), inicial: turno.inicial, ventas, esperado, contado, diff: contado - esperado });
+    closeAt: new Date().toISOString(), inicial: turno.inicial, ventas: summary.total, efectivo: summary.cash,
+    digital: summary.digital, credito: summary.credit, entradas: summary.entradas, salidas: summary.salidas,
+    anuladas: summary.voidedTotal, esperado, contado, diff: contado - esperado });
   DB.set('cajaTurnos', turnos);
   DB.remove('cajaTurnoActivo');
+  auditLog('cash_closed', { responsable: turno.responsable, esperado, contado, diff: contado - esperado });
   cajaRender();
   toast('Caja cerrada correctamente', 'success');
 }
@@ -2757,8 +3189,7 @@ function cajaTurnosRender() {
 function cajaImprimir() {
   const turno = DB.get('cajaTurnoActivo');
   if (!turno) return;
-  const sales = DB.get('sales') || [];
-  const ventas = sales.filter(s => s.date >= turno.openAt).reduce((a,s) => a+s.total, 0);
+  const summary = cajaSalesSummary(turno);
   const contado = parseFloat(document.getElementById('cajaContado').value) || 0;
   const cfg = DB.get('config') || {};
   const w = window.open('','_blank');
@@ -2770,10 +3201,16 @@ function cajaImprimir() {
   <p>Apertura: ${new Date(turno.openAt).toLocaleString('es-VE')}</p>
   <p>Cierre: ${new Date().toLocaleString('es-VE')}</p><hr/>
   <p>Efectivo inicial:  ${fmt$(turno.inicial)}</p>
-  <p>Total en ventas:   ${fmt$(ventas)}</p>
-  <p>Total esperado:    ${fmt$(turno.inicial+ventas)}</p>
+  <p>Total en ventas:   ${fmt$(summary.total)}</p>
+  <p>Efectivo ventas:   ${fmt$(summary.cash)}</p>
+  <p>Pagos digitales:   ${fmt$(summary.digital)}</p>
+  <p>Crédito/fiado:     ${fmt$(summary.credit)}</p>
+  <p>Entradas caja:      ${fmt$(summary.entradas)}</p>
+  <p>Salidas caja:       ${fmt$(summary.salidas)}</p>
+  <p>Ventas anuladas:    ${fmt$(summary.voidedTotal)}</p>
+  <p>Total esperado:    ${fmt$(turno.inicial+summary.cash+summary.entradas-summary.salidas)}</p>
   <p>Efectivo contado:  ${fmt$(contado)}</p>
-  <p><b>Diferencia:       ${fmt$(contado-(turno.inicial+ventas))}</b></p>
+  <p><b>Diferencia:       ${fmt$(contado-(turno.inicial+summary.cash+summary.entradas-summary.salidas))}</b></p>
   <hr/><p style="text-align:center">A2K Digital Studio · ZYNC Electronics</p></body></html>`);
   w.print();
 }
@@ -2991,11 +3428,13 @@ function startBackupScheduler() {
     const cfg = DB.get('config') || {};
     if (!cfg.backupTime) return;
     const now = new Date();
+    const todayKey = now.toISOString().slice(0,10);
     const hhmm = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
     if (hhmm === cfg.backupTime) {
       const last = DB.get('lastAutoBackup');
-      if (last !== hhmm) {
-        DB.set('lastAutoBackup', hhmm);
+      const backupKey = `${todayKey} ${hhmm}`;
+      if (last !== backupKey) {
+        DB.set('lastAutoBackup', backupKey);
         cfgExport();
         toast(`Respaldo automático ejecutado a las ${hhmm}`, 'success');
       }
@@ -3018,14 +3457,14 @@ document.addEventListener('keydown', e => {
 });
 
 // ── INICIALIZACIÓN ────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('lockDeviceId').textContent = DEVICE_ID;
   // Auto-login si hay sesión válida
   const sess = DB.get('session');
   if (sess && sess.type === 'PRO') {
     // Solo las licencias PRO hacen auto-login
     let lic = LICENSES.find(l => l.code === sess.code)
-           || validateLicCode(sess.code)
+           || await validateLicCodeAsync(sess.code)
            || (DB.get('licenses')||[]).find(l => l.code === sess.code);
     if (lic && (lic.status === 'Activa' || !lic.status)) {
       if (!lic.expiresAt || new Date(lic.expiresAt) >= new Date()) {
