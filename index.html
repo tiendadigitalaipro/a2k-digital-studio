@@ -1659,13 +1659,13 @@ function decodeDay(s) {
 
 async function validateSignedLicCode(code) {
   const p = code.split('-');
-  if (p.length !== 7 || p[0] !== 'ZSG') return null;
-  const type = p[1];
+  if (p.length !== 7 || p[0].toUpperCase() !== 'ZSG') return null;
+  const type = p[1].toUpperCase();
   if (!['PRO','DEMO'].includes(type)) return null;
-  const deviceCompact = p[2];
-  const created = p[3];
-  const expiry = p[4];
-  const serial = p[5];
+  const deviceCompact = p[2].toUpperCase();
+  const created = p[3].toUpperCase();
+  const expiry = p[4].toUpperCase();
+  const serial = p[5].toUpperCase();
   const sig = p[6];
   const device = normalizeDeviceId(DEVICE_ID);
   if (deviceCompact !== device.replace(/-/g,'')) return null;
@@ -1702,8 +1702,17 @@ function validateLicCode(code) {
 
 // ── LOCK SCREEN ───────────────────────────────
 function lockFormatInput(el) {
-  let raw = el.value.toUpperCase().replace(/[^A-Z0-9\-_~]/g,'');
-  if (raw.startsWith('ZSG-') || raw.length > 24) { el.value = raw; return; }
+  let rawInput = el.value.trim();
+  if (rawInput.toUpperCase().startsWith('ZSG-') || rawInput.length > 24) {
+    const parts = rawInput.replace(/[^A-Za-z0-9\-_~]/g,'').split('-');
+    if (parts.length >= 6) {
+      el.value = parts.slice(0,6).map(x => x.toUpperCase()).join('-') + (parts[6] ? '-' + parts.slice(6).join('-') : '');
+      return;
+    }
+    el.value = rawInput.replace(/[^A-Za-z0-9\-_~]/g,'');
+    return;
+  }
+  let raw = rawInput.toUpperCase().replace(/[^A-Z0-9\-_~]/g,'');
   let v = raw.replace(/[^A-Z0-9]/g,'');
   let out = '';
   for (let i = 0; i < v.length && i < 16; i++) {
@@ -1714,7 +1723,8 @@ function lockFormatInput(el) {
 }
 
 async function lockActivate() {
-  const code = document.getElementById('lockInput').value.trim().toUpperCase();
+  const rawCode = document.getElementById('lockInput').value.trim();
+  const code = rawCode.toUpperCase().startsWith('ZSG-') ? rawCode : rawCode.toUpperCase();
   const status = document.getElementById('lockStatus');
   const msg = document.getElementById('lockStatusMsg');
 
