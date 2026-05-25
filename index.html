@@ -265,7 +265,29 @@ footer{background:rgba(5,5,16,0.95);border-top:1px solid var(--border);padding:6
 .stab{padding:9px 22px;border-radius:50px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);color:var(--text3);background:transparent;transition:all 0.3s}
 .stab.active{background:linear-gradient(135deg,var(--purple),var(--purpleL));color:#fff;border-color:transparent;box-shadow:var(--glow-p)}
 
-/* ─── CSS MOCKUP SCREENSHOTS (NexoPOS, Jarvis) ─── */
+/* ─── CSS MOCKUP SCREENSHOTS (NexoPOS, Jarvis, ZYNC Electronics) ─── */
+.mockup-zync-elec{width:100%;height:100%;background:#06060a;display:flex;overflow:hidden;font-family:sans-serif}
+.mockup-zync-elec .ze-sidebar{width:46px;background:#00387e;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:10px;flex-shrink:0}
+.mockup-zync-elec .ze-icon{width:30px;height:30px;background:rgba(255,255,255,0.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.mockup-zync-elec .ze-icon.active{background:rgba(212,175,55,0.25);border:1px solid rgba(212,175,55,0.5)}
+.mockup-zync-elec .ze-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.mockup-zync-elec .ze-topbar{height:30px;background:#0d0d1a;border-bottom:1px solid rgba(212,175,55,0.2);display:flex;align-items:center;padding:0 10px;gap:8px;flex-shrink:0}
+.mockup-zync-elec .ze-brand{font-size:8.5px;font-weight:800;color:#D4AF37;letter-spacing:0.8px}
+.mockup-zync-elec .ze-body{flex:1;display:flex;overflow:hidden}
+.mockup-zync-elec .ze-products{flex:1;padding:6px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;overflow:hidden;align-content:start;background:#0a0a14}
+.mockup-zync-elec .ze-prod{background:#111128;border:1px solid rgba(0,56,126,0.4);border-radius:5px;padding:5px 4px;text-align:center}
+.mockup-zync-elec .ze-prod-icon{font-size:14px}
+.mockup-zync-elec .ze-prod-name{font-size:6.5px;color:#999;margin-top:2px;line-height:1.2}
+.mockup-zync-elec .ze-prod-price{font-size:7px;color:#D4AF37;font-weight:700}
+.mockup-zync-elec .ze-cart{width:108px;background:#0d0d1a;border-left:1px solid rgba(0,56,126,0.4);display:flex;flex-direction:column;flex-shrink:0}
+.mockup-zync-elec .ze-cart-title{font-size:7.5px;font-weight:800;color:#D4AF37;padding:5px 7px;border-bottom:1px solid rgba(212,175,55,0.2)}
+.mockup-zync-elec .ze-cart-item{padding:3px 7px;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;justify-content:space-between}
+.mockup-zync-elec .ze-cart-item span{font-size:6.5px;color:#888}
+.mockup-zync-elec .ze-cart-item strong{font-size:6.5px;color:#00b4ff}
+.mockup-zync-elec .ze-total{padding:5px 7px;background:rgba(0,56,126,0.45);margin:auto 5px 5px;border-radius:4px;text-align:center;border:1px solid rgba(212,175,55,0.3)}
+.mockup-zync-elec .ze-total-val{font-size:11px;font-weight:800;color:#D4AF37}
+.mockup-zync-elec .ze-total-label{font-size:6.5px;color:rgba(255,255,255,0.4)}
+.mockup-zync-elec .ze-btn{margin:0 5px 5px;background:#00387e;border-radius:4px;padding:5px;text-align:center;font-size:7.5px;font-weight:700;color:#fff}
 .mockup-nexo{width:100%;height:100%;background:#f0f4ff;display:flex;overflow:hidden}
 .mockup-nexo .nx-sidebar{width:52px;background:#00458f;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:14px;flex-shrink:0}
 .mockup-nexo .nx-icon{width:28px;height:28px;background:rgba(255,255,255,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
@@ -430,7 +452,7 @@ footer{background:rgba(5,5,16,0.95);border-top:1px solid var(--border);padding:6
 <section id="apps" class="layer">
   <div class="container">
     <div class="section-tag fade-up">Apps Locales & Empresariales</div>
-    <h2 class="section-title fade-up">10 Soluciones POS <span>profesionales</span></h2>
+    <h2 class="section-title fade-up">11 Soluciones POS <span>profesionales</span></h2>
     <p class="section-sub fade-up">Una sola compra. Licencia de por vida. Sin mensualidades sorpresa. Con IRON LOCK v2 para máxima seguridad.</p>
 
     <!-- SUB-GRUPO: BODEGAS & SUPERMERCADOS -->
@@ -559,6 +581,63 @@ footer{background:rgba(5,5,16,0.95);border-top:1px solid var(--border);padding:6
           <div class="app-footer">
             <div><div class="app-price">$35</div><div class="app-price-label">Licencia de por vida</div></div>
             <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20Nexo%20POS" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZYNC ELECTRONICS -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap" style="background:#06060a">
+          <div class="app-screenshot-glow" style="background:radial-gradient(circle at 50% 55%,rgba(212,175,55,0.25) 0%,transparent 65%);opacity:1"></div>
+          <div style="position:absolute;top:32px;left:0;right:0;bottom:0;overflow:hidden">
+            <div class="mockup-zync-elec">
+              <div class="ze-sidebar">
+                <div class="ze-icon active">🖥️</div>
+                <div class="ze-icon">📦</div>
+                <div class="ze-icon">⚖️</div>
+                <div class="ze-icon">💳</div>
+                <div class="ze-icon">📊</div>
+                <div class="ze-icon">⚙️</div>
+              </div>
+              <div class="ze-main">
+                <div class="ze-topbar">
+                  <span class="ze-brand">⚡ ZYNC ELECTRONICS</span>
+                  <span style="font-size:7px;color:#555;margin-left:auto">Terminal Pro v2.0</span>
+                </div>
+                <div class="ze-body">
+                  <div class="ze-products">
+                    <div class="ze-prod"><div class="ze-prod-icon">📱</div><div class="ze-prod-name">iPhone 15</div><div class="ze-prod-price">$850</div></div>
+                    <div class="ze-prod"><div class="ze-prod-icon">💻</div><div class="ze-prod-name">Laptop HP</div><div class="ze-prod-price">$620</div></div>
+                    <div class="ze-prod"><div class="ze-prod-icon">📺</div><div class="ze-prod-name">Smart TV</div><div class="ze-prod-price">$380</div></div>
+                    <div class="ze-prod"><div class="ze-prod-icon">🎧</div><div class="ze-prod-name">AirPods</div><div class="ze-prod-price">$120</div></div>
+                    <div class="ze-prod"><div class="ze-prod-icon">⌚</div><div class="ze-prod-name">Smartwatch</div><div class="ze-prod-price">$290</div></div>
+                    <div class="ze-prod"><div class="ze-prod-icon">🖨️</div><div class="ze-prod-name">Impresora</div><div class="ze-prod-price">$95</div></div>
+                  </div>
+                  <div class="ze-cart">
+                    <div class="ze-cart-title">🛒 Carrito (2)</div>
+                    <div class="ze-cart-item"><span>iPhone 15</span><strong>$850</strong></div>
+                    <div class="ze-cart-item"><span>AirPods</span><strong>$120</strong></div>
+                    <div style="flex:1"></div>
+                    <div class="ze-total"><div class="ze-total-label">TOTAL</div><div class="ze-total-val">$970</div></div>
+                    <div class="ze-btn">✅ COBRAR</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">⚡</div>
+            <div><div class="app-name">ZYNC Electronics</div><div class="app-type">Sistema POS · Electrónica & Tecnología</div></div>
+          </div>
+          <p class="app-desc">POS especializado para tiendas tech: pesaje, garantías, cuotas, fórmula 50/30/20 financiera y etiquetas de precio.</p>
+          <div class="app-features"><span class="app-feature">Multi-moneda</span><span class="app-feature">Garantías</span><span class="app-feature">Pesaje</span><span class="app-feature">Cuotas</span><span class="app-feature">Etiquetas</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20ZYNC%20Electronics%20Terminal" target="_blank" class="app-btn">Comprar PRO →</a>
           </div>
         </div>
       </div>
