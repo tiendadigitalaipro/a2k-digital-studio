@@ -260,6 +260,49 @@ footer{background:rgba(5,5,16,0.95);border-top:1px solid var(--border);padding:6
 /* ─── DIVIDER ─── */
 .divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(123,47,255,0.3),rgba(0,212,255,0.2),transparent);margin:0}
 
+/* ─── SECTION TABS (bodega, otros) ─── */
+.section-tabs{display:flex;gap:10px;margin-bottom:40px;flex-wrap:wrap}
+.stab{padding:9px 22px;border-radius:50px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);color:var(--text3);background:transparent;transition:all 0.3s}
+.stab.active{background:linear-gradient(135deg,var(--purple),var(--purpleL));color:#fff;border-color:transparent;box-shadow:var(--glow-p)}
+
+/* ─── CSS MOCKUP SCREENSHOTS (NexoPOS, Jarvis) ─── */
+.mockup-nexo{width:100%;height:100%;background:#f0f4ff;display:flex;overflow:hidden}
+.mockup-nexo .nx-sidebar{width:52px;background:#00458f;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:14px;flex-shrink:0}
+.mockup-nexo .nx-icon{width:28px;height:28px;background:rgba(255,255,255,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.mockup-nexo .nx-icon.active{background:rgba(255,255,255,0.3)}
+.mockup-nexo .nx-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.mockup-nexo .nx-topbar{height:36px;background:#fff;border-bottom:1px solid #e0e6f0;display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0}
+.mockup-nexo .nx-search{flex:1;height:22px;background:#f0f4ff;border-radius:4px;border:1px solid #c8d4e8;font-size:9px;color:#888;display:flex;align-items:center;padding:0 8px}
+.mockup-nexo .nx-body{flex:1;display:flex;overflow:hidden}
+.mockup-nexo .nx-products{flex:1;padding:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;overflow:hidden;align-content:start}
+.mockup-nexo .nx-prod{background:#fff;border-radius:6px;padding:6px 4px;text-align:center;border:1px solid #e8eef8;cursor:pointer}
+.mockup-nexo .nx-prod-icon{font-size:14px}
+.mockup-nexo .nx-prod-name{font-size:7px;color:#444;margin-top:2px;font-weight:600;line-height:1.2}
+.mockup-nexo .nx-prod-price{font-size:7px;color:#00458f;font-weight:700}
+.mockup-nexo .nx-cart{width:110px;background:#fff;border-left:1px solid #e0e6f0;display:flex;flex-direction:column;flex-shrink:0}
+.mockup-nexo .nx-cart-title{font-size:8px;font-weight:800;color:#0d1c2e;padding:6px 8px;border-bottom:1px solid #e0e6f0}
+.mockup-nexo .nx-cart-item{padding:4px 8px;border-bottom:1px solid #f0f4ff;display:flex;justify-content:space-between}
+.mockup-nexo .nx-cart-item span{font-size:7px;color:#555}
+.mockup-nexo .nx-cart-item strong{font-size:7px;color:#00458f}
+.mockup-nexo .nx-total{padding:6px 8px;background:#00458f;margin:auto 6px 6px;border-radius:5px;text-align:center}
+.mockup-nexo .nx-total-val{font-size:11px;font-weight:800;color:#fff}
+.mockup-nexo .nx-total-label{font-size:7px;color:rgba(255,255,255,0.7)}
+.mockup-nexo .nx-btn{margin:0 6px 6px;background:#006c47;border-radius:4px;padding:5px;text-align:center;font-size:8px;font-weight:700;color:#fff}
+.mockup-jarvis{width:100%;height:100%;background:#0d0d1a;display:flex;flex-direction:column;font-family:monospace;overflow:hidden;padding:10px}
+.mockup-jarvis .jv-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(123,47,255,0.3)}
+.mockup-jarvis .jv-logo{font-size:16px}
+.mockup-jarvis .jv-title{font-size:10px;font-weight:700;color:#7B2FFF;letter-spacing:1px}
+.mockup-jarvis .jv-version{font-size:8px;color:#555;margin-left:auto}
+.mockup-jarvis .jv-line{font-size:8px;margin-bottom:3px;line-height:1.5}
+.mockup-jarvis .jv-system{color:#00d4ff}
+.mockup-jarvis .jv-ok{color:#00ff9d}
+.mockup-jarvis .jv-warn{color:#ffd700}
+.mockup-jarvis .jv-user{color:#ff6b9d}
+.mockup-jarvis .jv-response{color:#b0b0d0}
+.mockup-jarvis .jv-input{display:flex;align-items:center;gap:6px;margin-top:8px;padding:5px 8px;background:rgba(123,47,255,0.1);border-radius:5px;border:1px solid rgba(123,47,255,0.3)}
+.mockup-jarvis .jv-prompt{font-size:9px;color:#7B2FFF;font-weight:700}
+.mockup-jarvis .jv-cursor{width:6px;height:11px;background:#7B2FFF;animation:blink 1s infinite;margin-left:2px}
+
 /* ─── SCROLL ANIMATIONS (initial state) ─── */
 .fade-up{opacity:0;transform:translateY(40px)}
 .fade-left{opacity:0;transform:translateX(-40px)}
@@ -386,9 +429,146 @@ footer{background:rgba(5,5,16,0.95);border-top:1px solid var(--border);padding:6
 <!-- ════ APPS LOCALES ════ -->
 <section id="apps" class="layer">
   <div class="container">
-    <div class="section-tag fade-up">Apps Locales</div>
-    <h2 class="section-title fade-up">7 Soluciones POS <span>profesionales</span></h2>
+    <div class="section-tag fade-up">Apps Locales & Empresariales</div>
+    <h2 class="section-title fade-up">10 Soluciones POS <span>profesionales</span></h2>
     <p class="section-sub fade-up">Una sola compra. Licencia de por vida. Sin mensualidades sorpresa. Con IRON LOCK v2 para máxima seguridad.</p>
+
+    <!-- SUB-GRUPO: BODEGAS & SUPERMERCADOS -->
+    <div style="margin-bottom:16px">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.25);border-radius:8px;padding:6px 16px;font-size:12px;font-weight:700;color:var(--neon);margin-bottom:20px">🏪 Bodega, Supermercado & Abastos</div>
+    </div>
+    <div class="apps-grid" style="margin-bottom:56px">
+
+      <!-- BODEGA PRO -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow"></div>
+          <img class="app-screenshot" src="img/app-bodega-pro.png" alt="Bodega Pro — Sistema POS" loading="lazy">
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">🏪</div>
+            <div><div class="app-name">Bodega Pro</div><div class="app-type">Sistema POS · Bodega / Minimarket</div></div>
+          </div>
+          <p class="app-desc">Inventario, fiados, proveedores, pesaje y todos los métodos de pago venezolanos.</p>
+          <div class="app-features"><span class="app-feature">Inventario</span><span class="app-feature">Fiados</span><span class="app-feature">Pesaje</span><span class="app-feature">Proveedores</span><span class="app-feature">Caja</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Bodega%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- MERCADO LOGIC -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow"></div>
+          <img class="app-screenshot" src="img/app-mercado-logic-pro.png" alt="Mercado Logic Pro — Sistema POS" loading="lazy">
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">🛒</div>
+            <div><div class="app-name">Mercado Logic Pro</div><div class="app-type">Sistema POS · Supermercado</div></div>
+          </div>
+          <p class="app-desc">Múltiples cajas, inventario masivo, códigos de barra y reportes avanzados.</p>
+          <div class="app-features"><span class="app-feature">Multi-caja</span><span class="app-feature">Barcode</span><span class="app-feature">Reportes</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Mercado%20Logic%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- FRUTERÍA PRO -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow"></div>
+          <img class="app-screenshot" src="img/app-fruteria-pro.png" alt="Frutería Pro — Sistema POS" loading="lazy">
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">🍎</div>
+            <div><div class="app-name">Frutería Pro</div><div class="app-type">Sistema POS · Frutería</div></div>
+          </div>
+          <p class="app-desc">Pesaje integrado, productos por kg, control de pérdidas y precios del día.</p>
+          <div class="app-features"><span class="app-feature">Pesaje</span><span class="app-feature">Precio/kg</span><span class="app-feature">Pérdidas</span><span class="app-feature">Caja</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Frutería%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEXO POS (NexoPOS) -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow" style="background:radial-gradient(circle at 50% 60%,rgba(0,69,143,0.4) 0%,transparent 65%);opacity:1"></div>
+          <div style="position:absolute;top:32px;left:0;right:0;bottom:0;overflow:hidden">
+            <div class="mockup-nexo">
+              <div class="nx-sidebar">
+                <div class="nx-icon active">🏪</div>
+                <div class="nx-icon">📦</div>
+                <div class="nx-icon">📊</div>
+                <div class="nx-icon">👥</div>
+                <div class="nx-icon">⚙️</div>
+              </div>
+              <div class="nx-main">
+                <div class="nx-topbar">
+                  <div style="width:20px;height:20px;background:#00458f;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">🔷</div>
+                  <div class="nx-search">🔍 Buscar producto...</div>
+                  <div style="font-size:8px;color:#00458f;font-weight:700;white-space:nowrap">📅 HOY</div>
+                </div>
+                <div class="nx-body">
+                  <div class="nx-products">
+                    <div class="nx-prod"><div class="nx-prod-icon">🍫</div><div class="nx-prod-name">Chocolate</div><div class="nx-prod-price">$2.50</div></div>
+                    <div class="nx-prod"><div class="nx-prod-icon">🥤</div><div class="nx-prod-name">Refresco</div><div class="nx-prod-price">$1.80</div></div>
+                    <div class="nx-prod"><div class="nx-prod-icon">🍞</div><div class="nx-prod-name">Pan</div><div class="nx-prod-price">$0.80</div></div>
+                    <div class="nx-prod"><div class="nx-prod-icon">🧴</div><div class="nx-prod-name">Shampoo</div><div class="nx-prod-price">$4.20</div></div>
+                    <div class="nx-prod"><div class="nx-prod-icon">🫙</div><div class="nx-prod-name">Atún</div><div class="nx-prod-price">$3.50</div></div>
+                    <div class="nx-prod"><div class="nx-prod-icon">🍚</div><div class="nx-prod-name">Arroz 1kg</div><div class="nx-prod-price">$1.20</div></div>
+                  </div>
+                  <div class="nx-cart">
+                    <div class="nx-cart-title">🛒 Carrito (3)</div>
+                    <div class="nx-cart-item"><span>Chocolate</span><strong>$2.50</strong></div>
+                    <div class="nx-cart-item"><span>Refresco x2</span><strong>$3.60</strong></div>
+                    <div class="nx-cart-item"><span>Pan</span><strong>$0.80</strong></div>
+                    <div style="flex:1"></div>
+                    <div class="nx-total"><div class="nx-total-label">TOTAL</div><div class="nx-total-val">$6.90</div></div>
+                    <div class="nx-btn">✅ COBRAR</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">🔷</div>
+            <div><div class="app-name">Nexo POS</div><div class="app-type">Sistema POS · Bodega Enterprise</div></div>
+          </div>
+          <p class="app-desc">POS profesional con Next.js, multi-moneda, IVA/IGTF venezolano, inventario masivo y reportes avanzados.</p>
+          <div class="app-features"><span class="app-feature">Multi-moneda</span><span class="app-feature">IVA/IGTF</span><span class="app-feature">Inventario</span><span class="app-feature">Reportes</span><span class="app-feature">Enterprise</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$35</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20Nexo%20POS" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SUB-GRUPO: OTROS NEGOCIOS -->
+    <div style="margin-bottom:16px;margin-top:8px">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(123,47,255,0.08);border:1px solid rgba(123,47,255,0.25);border-radius:8px;padding:6px 16px;font-size:12px;font-weight:700;color:var(--purpleL);margin-bottom:20px">✂️ Servicios, Repuestos & Otros Negocios</div>
+    </div>
     <div class="apps-grid">
 
       <!-- BARBERÍA PRO -->
@@ -435,28 +615,6 @@ footer{background:rgba(5,5,16,0.95);border-top:1px solid var(--border);padding:6
         </div>
       </div>
 
-      <!-- BODEGA PRO -->
-      <div class="app-card fade-up">
-        <div class="app-screenshot-wrap">
-          <div class="app-screenshot-glow"></div>
-          <img class="app-screenshot" src="img/app-bodega-pro.png" alt="Bodega Pro — Sistema POS" loading="lazy">
-          <div class="app-screenshot-overlay"></div>
-          <div class="demo-ribbon">Demo 5 días</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-top">
-            <div class="app-emoji">🏪</div>
-            <div><div class="app-name">Bodega Pro</div><div class="app-type">Sistema POS · Bodega / Minimarket</div></div>
-          </div>
-          <p class="app-desc">Inventario, fiados, proveedores, pesaje y todos los métodos de pago venezolanos.</p>
-          <div class="app-features"><span class="app-feature">Inventario</span><span class="app-feature">Fiados</span><span class="app-feature">Pesaje</span><span class="app-feature">Proveedores</span><span class="app-feature">Caja</span></div>
-          <div class="app-footer">
-            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
-            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Bodega%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
-          </div>
-        </div>
-      </div>
-
       <!-- FERRETERÍA -->
       <div class="app-card fade-up">
         <div class="app-screenshot-wrap">
@@ -497,50 +655,6 @@ footer{background:rgba(5,5,16,0.95);border-top:1px solid var(--border);padding:6
           <div class="app-footer">
             <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
             <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Repuestos%20Motos%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- MERCADO LOGIC -->
-      <div class="app-card fade-up">
-        <div class="app-screenshot-wrap">
-          <div class="app-screenshot-glow"></div>
-          <img class="app-screenshot" src="img/app-mercado-logic-pro.png" alt="Mercado Logic Pro — Sistema POS" loading="lazy">
-          <div class="app-screenshot-overlay"></div>
-          <div class="demo-ribbon">Demo 5 días</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-top">
-            <div class="app-emoji">🛒</div>
-            <div><div class="app-name">Mercado Logic Pro</div><div class="app-type">Sistema POS · Supermercado</div></div>
-          </div>
-          <p class="app-desc">Múltiples cajas, inventario masivo, códigos de barra y reportes avanzados.</p>
-          <div class="app-features"><span class="app-feature">Multi-caja</span><span class="app-feature">Barcode</span><span class="app-feature">Reportes</span></div>
-          <div class="app-footer">
-            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
-            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Mercado%20Logic%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- FRUTERÍA PRO -->
-      <div class="app-card fade-up">
-        <div class="app-screenshot-wrap">
-          <div class="app-screenshot-glow"></div>
-          <img class="app-screenshot" src="img/app-fruteria-pro.png" alt="Frutería Pro — Sistema POS" loading="lazy">
-          <div class="app-screenshot-overlay"></div>
-          <div class="demo-ribbon">Demo 5 días</div>
-        </div>
-        <div class="app-card-body">
-          <div class="app-card-top">
-            <div class="app-emoji">🍎</div>
-            <div><div class="app-name">Frutería Pro</div><div class="app-type">Sistema POS · Frutería</div></div>
-          </div>
-          <p class="app-desc">Pesaje integrado, productos por kg, control de pérdidas y precios del día.</p>
-          <div class="app-features"><span class="app-feature">Pesaje</span><span class="app-feature">Precio/kg</span><span class="app-feature">Pérdidas</span><span class="app-feature">Caja</span></div>
-          <div class="app-footer">
-            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
-            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Frutería%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
           </div>
         </div>
       </div>
@@ -647,6 +761,36 @@ footer{background:rgba(5,5,16,0.95);border-top:1px solid var(--border);padding:6
           <div class="bot-price-box"><div class="bot-price-box-label">Setup</div><div class="bot-price-box-val">Incluido</div></div>
         </div>
         <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20Zync%20Pay" target="_blank" class="btn-bot">💸 Cotizar Zync Pay</a>
+      </div>
+
+      <!-- NEXO JARVIS -->
+      <div class="bot-card fade-up">
+        <div class="mockup-jarvis" style="height:164px;border-radius:10px;margin-bottom:16px;box-shadow:0 4px 24px rgba(123,47,255,0.3)">
+          <div class="jv-header">
+            <span class="jv-logo">🤖</span>
+            <span class="jv-title">JARVIS MENTE MAESTRA</span>
+            <span class="jv-version">v4.0</span>
+          </div>
+          <div class="jv-line jv-system">[ SISTEMA ] Cargando módulos de IA...</div>
+          <div class="jv-line jv-ok">[ OK ] Motor conversacional activo</div>
+          <div class="jv-line jv-ok">[ OK ] Sintetizador de voz TTS listo</div>
+          <div class="jv-line jv-warn">[ INFO ] Verificador Zelle / Binance ON</div>
+          <div class="jv-line jv-user">Usuario: ¿Cuánto vendimos hoy?</div>
+          <div class="jv-line jv-response">Jarvis: 47 ventas · $1,283.40 en caja 🎯</div>
+          <div class="jv-input">
+            <span class="jv-prompt">&gt;</span>
+            <span style="font-size:8px;color:#aaa;flex:1">Escribe tu consulta...</span>
+            <span class="jv-cursor"></span>
+          </div>
+        </div>
+        <div class="bot-icon">🧠</div>
+        <div class="bot-name">Nexo Jarvis</div>
+        <div class="bot-desc">Asistente de escritorio con IA y voz: gestiona tu negocio por comandos, verifica pagos automáticamente, consulta inventario y reportes en tiempo real.</div>
+        <div class="bot-price-row">
+          <div class="bot-price-box"><div class="bot-price-box-label">Licencia</div><div class="bot-price-box-val">$35</div></div>
+          <div class="bot-price-box"><div class="bot-price-box-label">Plan</div><div class="bot-price-box-val">De por vida</div></div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20Nexo%20Jarvis" target="_blank" class="btn-bot">🧠 Cotizar Nexo Jarvis</a>
       </div>
 
     </div>
