@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html lang="es" class="light">
 <head>
 <meta charset="UTF-8"/>
@@ -3947,6 +3948,1334 @@ window.addEventListener('DOMContentLoaded', async () => {
     DB.remove('session');
   }
 });
+=======
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A2K Digital Studio — Apps POS profesionales para barberías, bodegas, ferreterías, nail studios, farmacias y más. Licencias desde $25.">
+<meta name="keywords" content="sistema punto de venta, app POS, barbería pro, nail studio, bodega pro, ferretería, A2K Digital Studio">
+<meta property="og:title" content="A2K Digital Studio — Tecnología que mueve negocios">
+<meta property="og:description" content="Apps POS profesionales desde $25. Licencia de por vida. IRON LOCK v2. Soporte 24/7.">
+<meta property="og:type" content="website">
+<title>A2K Digital Studio — Tecnología que mueve negocios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;800;900&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+:root {
+  --bg:       #050510;
+  --bg2:      #0a0a1f;
+  --bg3:      #0f0f2a;
+  --card:     rgba(255,255,255,0.04);
+  --border:   rgba(255,255,255,0.08);
+  --purple:   #7B2FFF;
+  --purpleL:  #9d5fff;
+  --neon:     #00ff9d;
+  --cyan:     #00d4ff;
+  --gold:     #ffd700;
+  --pink:     #ff6b9d;
+  --text1:    #ffffff;
+  --text2:    #b0b0d0;
+  --text3:    #6a6a8a;
+  --glow-p:   0 0 40px rgba(123,47,255,0.4);
+  --glow-n:   0 0 40px rgba(0,255,157,0.3);
+  --glow-c:   0 0 40px rgba(0,212,255,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text1);overflow-x:hidden;line-height:1.6}
+
+/* ─── CANVAS 3D ─── */
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* ─── LAYER WRAPPER ─── */
+.layer{position:relative;z-index:1}
+
+/* ─── NAVBAR ─── */
+nav{position:fixed;top:0;width:100%;z-index:1000;padding:18px 0;transition:all 0.4s}
+nav.scrolled{background:rgba(5,5,16,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:12px 0}
+.nav-inner{max-width:1280px;margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:'Orbitron',monospace;font-weight:900;font-size:17px;color:var(--text1);text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--purple),var(--cyan));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:var(--glow-p)}
+.logo span{background:linear-gradient(90deg,var(--purpleL),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.3s}
+.nav-links a:hover{color:var(--neon)}
+.nav-cta{background:linear-gradient(135deg,var(--purple),var(--purpleL));color:#fff !important;padding:9px 20px;border-radius:8px;font-weight:700 !important;box-shadow:var(--glow-p);transition:transform 0.2s,box-shadow 0.2s !important}
+.nav-cta:hover{transform:translateY(-2px) !important;box-shadow:0 0 60px rgba(123,47,255,0.6) !important}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px}
+.hamburger span{width:24px;height:2px;background:var(--text1);border-radius:2px;transition:all 0.3s}
+.mobile-menu{display:none;position:fixed;inset:0;background:rgba(5,5,16,0.98);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:30px}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-size:22px;color:var(--text1);text-decoration:none;font-weight:700;font-family:'Syne',sans-serif}
+
+/* ─── HERO ─── */
+.hero{min-height:100vh;display:flex;align-items:center;padding:100px 28px 60px;position:relative;overflow:hidden}
+.hero-inner{max-width:1280px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(123,47,255,0.15);border:1px solid rgba(123,47,255,0.4);border-radius:50px;padding:6px 16px;font-size:12px;font-weight:600;color:var(--purpleL);margin-bottom:24px;letter-spacing:1px}
+.hero-tag::before{content:'';width:8px;height:8px;background:var(--neon);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 8px var(--neon)}50%{opacity:0.3;box-shadow:none}}
+.hero h1{font-family:'Orbitron',monospace;font-size:clamp(32px,4.5vw,62px);font-weight:900;line-height:1.05;margin-bottom:24px}
+.hero h1 .line1{color:var(--text1)}
+.hero h1 .line2{background:linear-gradient(90deg,var(--purple),var(--cyan),var(--neon));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
+.hero h1 .line3{color:var(--text1)}
+.hero p{font-size:17px;color:var(--text2);max-width:480px;margin-bottom:36px;line-height:1.7}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn-hero-primary{background:linear-gradient(135deg,var(--purple),var(--purpleL));color:#fff;padding:14px 32px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;border:none;cursor:pointer;box-shadow:var(--glow-p);transition:all 0.3s;display:inline-flex;align-items:center;gap:8px}
+.btn-hero-primary:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 0 60px rgba(123,47,255,0.6)}
+.btn-hero-ghost{background:transparent;color:var(--text1);padding:14px 32px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;border:1px solid var(--border);cursor:pointer;transition:all 0.3s;display:inline-flex;align-items:center;gap:8px}
+.btn-hero-ghost:hover{border-color:var(--neon);color:var(--neon);box-shadow:var(--glow-n)}
+.hero-stats{display:flex;gap:32px;margin-top:44px;padding-top:36px;border-top:1px solid var(--border)}
+.stat-item{}
+.stat-num{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--neon)}
+.stat-label{font-size:12px;color:var(--text3);margin-top:2px}
+
+/* Hero Visual */
+.hero-visual{position:relative;display:flex;align-items:center;justify-content:center;height:480px}
+.hero-orb{position:absolute;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(123,47,255,0.2) 0%,rgba(0,212,255,0.1) 50%,transparent 70%);animation:orb-pulse 4s ease-in-out infinite}
+@keyframes orb-pulse{0%,100%{transform:scale(1);opacity:0.6}50%{transform:scale(1.1);opacity:1}}
+.hero-screen{width:260px;height:420px;background:linear-gradient(145deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));border:1px solid rgba(123,47,255,0.3);border-radius:28px;backdrop-filter:blur(20px);box-shadow:0 30px 80px rgba(0,0,0,0.5),0 0 60px rgba(123,47,255,0.2),inset 0 1px 0 rgba(255,255,255,0.1);position:relative;overflow:hidden;transform:perspective(800px) rotateY(-8deg) rotateX(3deg);animation:float 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:perspective(800px) rotateY(-8deg) rotateX(3deg) translateY(0)}50%{transform:perspective(800px) rotateY(-8deg) rotateX(3deg) translateY(-16px)}}
+.hero-screen::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(123,47,255,0.8),transparent)}
+.screen-header{padding:18px 16px 12px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.screen-title{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:var(--purpleL);letter-spacing:1px}
+.screen-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.screen-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.screen-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.04)}
+.screen-row-name{font-size:10px;color:var(--text2)}
+.screen-row-val{font-family:'Orbitron',monospace;font-size:10px;color:var(--neon)}
+.screen-total{margin-top:4px;padding:10px;background:linear-gradient(135deg,rgba(123,47,255,0.3),rgba(0,212,255,0.1));border-radius:10px;text-align:center}
+.screen-total-label{font-size:9px;color:var(--text3)}
+.screen-total-val{font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:var(--neon)}
+.screen-btn{margin-top:8px;background:linear-gradient(135deg,var(--purple),var(--purpleL));border-radius:8px;padding:10px;text-align:center;font-size:10px;font-weight:700;color:#fff;box-shadow:0 0 20px rgba(123,47,255,0.4)}
+.screen-status{font-size:9px;color:var(--text3);text-align:center;margin-top:6px}
+.floating-badge{position:absolute;background:rgba(0,255,157,0.15);border:1px solid rgba(0,255,157,0.4);border-radius:12px;padding:10px 14px;backdrop-filter:blur(10px);font-size:12px;font-weight:600;white-space:nowrap}
+.badge-1{top:30px;right:-20px;color:var(--neon);animation:badge-float 4s ease-in-out infinite}
+.badge-2{bottom:80px;left:-30px;color:var(--cyan);border-color:rgba(0,212,255,0.4);background:rgba(0,212,255,0.1);animation:badge-float 4s ease-in-out infinite 1.5s}
+.badge-3{top:50%;right:-40px;color:var(--gold);border-color:rgba(255,215,0,0.4);background:rgba(255,215,0,0.1);animation:badge-float 4s ease-in-out infinite 3s}
+@keyframes badge-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* ─── SECTION SHARED ─── */
+section{padding:100px 28px;position:relative}
+.container{max-width:1280px;margin:0 auto}
+.section-tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--purpleL);margin-bottom:16px}
+.section-tag::before{content:'';width:24px;height:2px;background:linear-gradient(90deg,var(--purple),var(--cyan))}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,48px);font-weight:800;margin-bottom:16px;line-height:1.15}
+.section-title span{background:linear-gradient(90deg,var(--purple),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.section-sub{font-size:17px;color:var(--text2);max-width:600px;margin-bottom:60px}
+
+/* ─── APPS GRID ─── */
+.apps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:28px}
+.app-card{background:var(--card);border:1px solid var(--border);border-radius:24px;cursor:pointer;transition:all 0.4s;position:relative;overflow:hidden;transform-style:preserve-3d}
+.app-card::before{content:'';position:absolute;inset:0;border-radius:24px;background:linear-gradient(135deg,rgba(123,47,255,0.1),rgba(0,212,255,0.05));opacity:0;transition:opacity 0.4s;pointer-events:none;z-index:1}
+.app-card:hover{border-color:rgba(123,47,255,0.5);box-shadow:0 30px 80px rgba(0,0,0,0.5),0 0 60px rgba(123,47,255,0.15);transform:translateY(-8px)}
+.app-card:hover::before{opacity:1}
+
+/* Screenshot 3D mockup */
+.app-screenshot-wrap{position:relative;width:100%;padding-top:62%;overflow:hidden;background:linear-gradient(145deg,#0a0820,#070715)}
+.app-screenshot-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:32px;background:linear-gradient(135deg,rgba(123,47,255,0.3),rgba(0,212,255,0.15));z-index:2;display:flex;align-items:center;padding:0 14px}
+.app-screenshot-wrap::after{content:'● ● ●';position:absolute;top:8px;left:14px;font-size:9px;color:rgba(255,255,255,0.4);z-index:3;letter-spacing:4px}
+.app-screenshot{position:absolute;top:32px;left:0;right:0;bottom:0;width:100%;height:calc(100% - 32px);object-fit:cover;object-position:top;transition:transform 0.6s ease;transform:scale(1.02)}
+.app-card:hover .app-screenshot{transform:scale(1.06) translateY(-4px)}
+.app-screenshot-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(5,5,16,0.95) 100%);z-index:4;pointer-events:none}
+.app-screenshot-glow{position:absolute;inset:0;background:linear-gradient(135deg,rgba(123,47,255,0.08),transparent 60%);z-index:3;pointer-events:none;opacity:0;transition:opacity 0.4s}
+.app-card:hover .app-screenshot-glow{opacity:1}
+
+/* Card body below screenshot */
+.app-card-body{padding:20px 22px 22px;position:relative;z-index:5}
+.app-card-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.app-emoji{width:38px;height:38px;background:linear-gradient(135deg,rgba(123,47,255,0.25),rgba(0,212,255,0.12));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid rgba(123,47,255,0.25);flex-shrink:0}
+.app-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text1)}
+.app-type{font-size:11px;color:var(--purpleL);font-weight:600;margin-top:1px}
+.app-desc{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6}
+.app-features{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px}
+.app-feature{font-size:10px;padding:3px 9px;background:rgba(255,255,255,0.05);border-radius:50px;color:var(--text3);border:1px solid var(--border)}
+.app-footer{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border)}
+.app-price{font-family:'Orbitron',monospace;font-size:17px;font-weight:800;color:var(--neon)}
+.app-price-label{font-size:10px;color:var(--text3);display:block;margin-top:1px}
+.app-btn{background:linear-gradient(135deg,var(--purple),var(--purpleL));color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;transition:all 0.3s;border:none;cursor:pointer;white-space:nowrap}
+.app-btn:hover{box-shadow:var(--glow-p);transform:scale(1.05)}
+
+/* Demo badge */
+.demo-ribbon{position:absolute;top:40px;right:12px;background:rgba(0,255,157,0.18);border:1px solid rgba(0,255,157,0.5);border-radius:50px;padding:3px 10px;font-size:9px;color:var(--neon);font-weight:700;z-index:10;backdrop-filter:blur(4px)}
+
+/* ─── CLOUD SECTION ─── */
+.cloud-section{background:linear-gradient(180deg,transparent,rgba(123,47,255,0.03),transparent)}
+.cloud-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:28px}
+.cloud-card{background:linear-gradient(135deg,rgba(123,47,255,0.1),rgba(0,212,255,0.05));border:1px solid rgba(123,47,255,0.2);border-radius:24px;padding:36px;position:relative;overflow:hidden}
+.cloud-card::after{content:'☁️ CLOUD';position:absolute;top:20px;right:20px;font-size:10px;font-weight:700;color:var(--cyan);letter-spacing:1px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);padding:4px 10px;border-radius:50px}
+.cloud-icon{font-size:48px;margin-bottom:16px}
+.cloud-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px}
+.cloud-desc{font-size:15px;color:var(--text2);margin-bottom:24px}
+.cloud-features{display:flex;flex-direction:column;gap:8px;margin-bottom:28px}
+.cloud-feature-item{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2)}
+.cloud-feature-item::before{content:'✓';color:var(--neon);font-weight:700;flex-shrink:0}
+.cloud-price{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:var(--cyan);margin-bottom:4px}
+.cloud-price-note{font-size:12px;color:var(--text3);margin-bottom:24px}
+.btn-cloud{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(0,212,255,0.05));border:1px solid rgba(0,212,255,0.4);color:var(--cyan);padding:12px 24px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;transition:all 0.3s;cursor:pointer}
+.btn-cloud:hover{background:rgba(0,212,255,0.2);box-shadow:var(--glow-c)}
+
+/* ─── BOTS SECTION ─── */
+.bots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px}
+.bot-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:30px;position:relative;overflow:hidden;transition:all 0.4s}
+.bot-card:hover{border-color:rgba(255,107,157,0.4);box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 40px rgba(255,107,157,0.15)}
+.bot-icon{font-size:42px;margin-bottom:16px}
+.bot-name{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;margin-bottom:6px}
+.bot-desc{font-size:14px;color:var(--text2);margin-bottom:20px}
+.bot-price-row{display:flex;gap:20px;margin-bottom:24px}
+.bot-price-box{flex:1;background:rgba(255,255,255,0.04);border-radius:10px;padding:12px;text-align:center;border:1px solid var(--border)}
+.bot-price-box-label{font-size:10px;color:var(--text3);margin-bottom:4px}
+.bot-price-box-val{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--pink)}
+.btn-bot{display:inline-flex;align-items:center;gap:8px;width:100%;justify-content:center;background:linear-gradient(135deg,rgba(255,107,157,0.15),rgba(255,107,157,0.05));border:1px solid rgba(255,107,157,0.3);color:var(--pink);padding:11px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;cursor:pointer;transition:all 0.3s}
+.btn-bot:hover{background:rgba(255,107,157,0.2);box-shadow:0 0 30px rgba(255,107,157,0.2)}
+
+/* ─── PRICING SECTION ─── */
+.pricing-tabs{display:flex;gap:8px;margin-bottom:48px;background:rgba(255,255,255,0.04);border-radius:12px;padding:6px;border:1px solid var(--border);width:fit-content}
+.pricing-tab{padding:10px 24px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;border:none;color:var(--text3);background:transparent;transition:all 0.3s}
+.pricing-tab.active{background:linear-gradient(135deg,var(--purple),var(--purpleL));color:#fff;box-shadow:var(--glow-p)}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;perspective:1000px}
+.pricing-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 24px;text-align:center;transition:all 0.5s;transform-style:preserve-3d;position:relative}
+.pricing-card.featured{background:linear-gradient(145deg,rgba(123,47,255,0.15),rgba(0,212,255,0.08));border-color:rgba(123,47,255,0.5);transform:scale(1.04);box-shadow:0 0 60px rgba(123,47,255,0.2),0 30px 60px rgba(0,0,0,0.4)}
+.pricing-card.featured::before{content:'⭐ MÁS POPULAR';position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--purple),var(--purpleL));color:#fff;font-size:10px;font-weight:800;padding:5px 16px;border-radius:50px;white-space:nowrap;letter-spacing:1px}
+.pricing-card:hover:not(.featured){transform:translateY(-8px) scale(1.02);border-color:rgba(123,47,255,0.3);box-shadow:0 20px 60px rgba(0,0,0,0.3),var(--glow-p)}
+.pricing-plan{font-size:12px;font-weight:700;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+.pricing-amount{font-family:'Orbitron',monospace;font-size:44px;font-weight:900;color:var(--text1);margin-bottom:4px;line-height:1}
+.pricing-amount span{font-size:20px;color:var(--text3);vertical-align:top;margin-top:8px;display:inline-block}
+.pricing-note{font-size:12px;color:var(--text3);margin-bottom:24px}
+.pricing-highlight{font-size:13px;font-weight:700;color:var(--neon);margin-bottom:24px;padding:8px;background:rgba(0,255,157,0.07);border-radius:8px}
+.pricing-features{text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.pf-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)}
+.pf-item::before{content:'✓';color:var(--neon);font-weight:700;flex-shrink:0}
+.btn-pricing{width:100%;padding:13px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.3s}
+.btn-pricing-primary{background:linear-gradient(135deg,var(--purple),var(--purpleL));color:#fff;box-shadow:var(--glow-p)}
+.btn-pricing-primary:hover{transform:translateY(-2px);box-shadow:0 0 50px rgba(123,47,255,0.6)}
+.btn-pricing-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-pricing-outline:hover{border-color:var(--purple);color:var(--purpleL)}
+
+/* ─── WHY US ─── */
+.why-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.why-card{padding:30px;border-radius:18px;border:1px solid var(--border);background:var(--card);transition:all 0.3s}
+.why-card:hover{border-color:rgba(0,255,157,0.3);box-shadow:var(--glow-n)}
+.why-icon{font-size:38px;margin-bottom:16px}
+.why-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px}
+.why-text{font-size:14px;color:var(--text2)}
+
+/* ─── FAQ ─── */
+.faq-list{max-width:800px;display:flex;flex-direction:column;gap:12px}
+.faq-item{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.faq-q{padding:20px 24px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:15px;transition:color 0.3s}
+.faq-q:hover{color:var(--purpleL)}
+.faq-icon{color:var(--purpleL);font-size:20px;transition:transform 0.3s;flex-shrink:0}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s ease,padding 0.4s;color:var(--text2);font-size:14px;line-height:1.7}
+.faq-item.open .faq-a{max-height:200px;padding:0 24px 20px}
+
+/* ─── CTA SECTION ─── */
+.cta-section{background:linear-gradient(135deg,rgba(123,47,255,0.1),rgba(0,212,255,0.06));border-top:1px solid rgba(123,47,255,0.15);border-bottom:1px solid rgba(123,47,255,0.15)}
+.cta-inner{text-align:center;max-width:700px;margin:0 auto}
+.cta-inner h2{font-family:'Orbitron',monospace;font-size:clamp(24px,3.5vw,44px);font-weight:900;margin-bottom:16px}
+.cta-inner p{font-size:17px;color:var(--text2);margin-bottom:36px}
+.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;padding:14px 28px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:all 0.3s;box-shadow:0 0 30px rgba(37,211,102,0.25)}
+.btn-wa:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(37,211,102,0.4)}
+.btn-tg{background:linear-gradient(135deg,#229ED9,#1A7BAD);color:#fff;padding:14px 28px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:all 0.3s}
+.btn-tg:hover{transform:translateY(-3px);box-shadow:0 0 40px rgba(34,158,217,0.4)}
+
+/* ─── FOOTER ─── */
+footer{background:rgba(5,5,16,0.95);border-top:1px solid var(--border);padding:60px 28px 30px}
+.footer-inner{max-width:1280px;margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-brand .logo{display:flex;align-items:center;gap:10px;margin-bottom:16px;text-decoration:none;color:var(--text1)}
+.footer-brand p{font-size:14px;color:var(--text3);line-height:1.7;margin-bottom:20px}
+.footer-socials{display:flex;gap:10px}
+.social-btn{width:38px;height:38px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;text-decoration:none;transition:all 0.3s}
+.social-btn:hover{border-color:var(--purple);background:rgba(123,47,255,0.1)}
+.footer-col h4{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text1);margin-bottom:16px;letter-spacing:0.5px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col ul a{font-size:13px;color:var(--text3);text-decoration:none;transition:color 0.3s}
+.footer-col ul a:hover{color:var(--purpleL)}
+.footer-bottom{border-top:1px solid var(--border);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:gap;gap:12px}
+.footer-bottom p{font-size:13px;color:var(--text3)}
+.footer-powered{font-size:12px;color:var(--text3)}
+.footer-powered span{color:var(--purpleL)}
+
+/* ─── FLOATING WA BUTTON ─── */
+.wa-float{position:fixed;bottom:24px;right:24px;z-index:900;width:58px;height:58px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 8px 30px rgba(37,211,102,0.4);cursor:pointer;text-decoration:none;transition:all 0.3s;animation:wa-pulse 3s ease-in-out infinite}
+@keyframes wa-pulse{0%,100%{box-shadow:0 8px 30px rgba(37,211,102,0.4),0 0 0 0 rgba(37,211,102,0.3)}50%{box-shadow:0 8px 30px rgba(37,211,102,0.4),0 0 0 16px rgba(37,211,102,0)}}
+.wa-float:hover{transform:scale(1.1)}
+
+/* ─── DIVIDER ─── */
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(123,47,255,0.3),rgba(0,212,255,0.2),transparent);margin:0}
+
+/* ─── SECTION TABS (bodega, otros) ─── */
+.section-tabs{display:flex;gap:10px;margin-bottom:40px;flex-wrap:wrap}
+.stab{padding:9px 22px;border-radius:50px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);color:var(--text3);background:transparent;transition:all 0.3s}
+.stab.active{background:linear-gradient(135deg,var(--purple),var(--purpleL));color:#fff;border-color:transparent;box-shadow:var(--glow-p)}
+
+/* ─── CSS MOCKUP SCREENSHOTS (NexoPOS, Jarvis, ZYNC Electronics) ─── */
+.mockup-zync-elec{width:100%;height:100%;background:#06060a;display:flex;overflow:hidden;font-family:sans-serif}
+.mockup-zync-elec .ze-sidebar{width:46px;background:#00387e;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:10px;flex-shrink:0}
+.mockup-zync-elec .ze-icon{width:30px;height:30px;background:rgba(255,255,255,0.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.mockup-zync-elec .ze-icon.active{background:rgba(212,175,55,0.25);border:1px solid rgba(212,175,55,0.5)}
+.mockup-zync-elec .ze-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.mockup-zync-elec .ze-topbar{height:30px;background:#0d0d1a;border-bottom:1px solid rgba(212,175,55,0.2);display:flex;align-items:center;padding:0 10px;gap:8px;flex-shrink:0}
+.mockup-zync-elec .ze-brand{font-size:8.5px;font-weight:800;color:#D4AF37;letter-spacing:0.8px}
+.mockup-zync-elec .ze-body{flex:1;display:flex;overflow:hidden}
+.mockup-zync-elec .ze-products{flex:1;padding:6px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;overflow:hidden;align-content:start;background:#0a0a14}
+.mockup-zync-elec .ze-prod{background:#111128;border:1px solid rgba(0,56,126,0.4);border-radius:5px;padding:5px 4px;text-align:center}
+.mockup-zync-elec .ze-prod-icon{font-size:14px}
+.mockup-zync-elec .ze-prod-name{font-size:6.5px;color:#999;margin-top:2px;line-height:1.2}
+.mockup-zync-elec .ze-prod-price{font-size:7px;color:#D4AF37;font-weight:700}
+.mockup-zync-elec .ze-cart{width:108px;background:#0d0d1a;border-left:1px solid rgba(0,56,126,0.4);display:flex;flex-direction:column;flex-shrink:0}
+.mockup-zync-elec .ze-cart-title{font-size:7.5px;font-weight:800;color:#D4AF37;padding:5px 7px;border-bottom:1px solid rgba(212,175,55,0.2)}
+.mockup-zync-elec .ze-cart-item{padding:3px 7px;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;justify-content:space-between}
+.mockup-zync-elec .ze-cart-item span{font-size:6.5px;color:#888}
+.mockup-zync-elec .ze-cart-item strong{font-size:6.5px;color:#00b4ff}
+.mockup-zync-elec .ze-total{padding:5px 7px;background:rgba(0,56,126,0.45);margin:auto 5px 5px;border-radius:4px;text-align:center;border:1px solid rgba(212,175,55,0.3)}
+.mockup-zync-elec .ze-total-val{font-size:11px;font-weight:800;color:#D4AF37}
+.mockup-zync-elec .ze-total-label{font-size:6.5px;color:rgba(255,255,255,0.4)}
+.mockup-zync-elec .ze-btn{margin:0 5px 5px;background:#00387e;border-radius:4px;padding:5px;text-align:center;font-size:7.5px;font-weight:700;color:#fff}
+.mockup-nexo{width:100%;height:100%;background:#f0f4ff;display:flex;overflow:hidden}
+.mockup-nexo .nx-sidebar{width:52px;background:#00458f;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:14px;flex-shrink:0}
+.mockup-nexo .nx-icon{width:28px;height:28px;background:rgba(255,255,255,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.mockup-nexo .nx-icon.active{background:rgba(255,255,255,0.3)}
+.mockup-nexo .nx-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.mockup-nexo .nx-topbar{height:36px;background:#fff;border-bottom:1px solid #e0e6f0;display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0}
+.mockup-nexo .nx-search{flex:1;height:22px;background:#f0f4ff;border-radius:4px;border:1px solid #c8d4e8;font-size:9px;color:#888;display:flex;align-items:center;padding:0 8px}
+.mockup-nexo .nx-body{flex:1;display:flex;overflow:hidden}
+.mockup-nexo .nx-products{flex:1;padding:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;overflow:hidden;align-content:start}
+.mockup-nexo .nx-prod{background:#fff;border-radius:6px;padding:6px 4px;text-align:center;border:1px solid #e8eef8;cursor:pointer}
+.mockup-nexo .nx-prod-icon{font-size:14px}
+.mockup-nexo .nx-prod-name{font-size:7px;color:#444;margin-top:2px;font-weight:600;line-height:1.2}
+.mockup-nexo .nx-prod-price{font-size:7px;color:#00458f;font-weight:700}
+.mockup-nexo .nx-cart{width:110px;background:#fff;border-left:1px solid #e0e6f0;display:flex;flex-direction:column;flex-shrink:0}
+.mockup-nexo .nx-cart-title{font-size:8px;font-weight:800;color:#0d1c2e;padding:6px 8px;border-bottom:1px solid #e0e6f0}
+.mockup-nexo .nx-cart-item{padding:4px 8px;border-bottom:1px solid #f0f4ff;display:flex;justify-content:space-between}
+.mockup-nexo .nx-cart-item span{font-size:7px;color:#555}
+.mockup-nexo .nx-cart-item strong{font-size:7px;color:#00458f}
+.mockup-nexo .nx-total{padding:6px 8px;background:#00458f;margin:auto 6px 6px;border-radius:5px;text-align:center}
+.mockup-nexo .nx-total-val{font-size:11px;font-weight:800;color:#fff}
+.mockup-nexo .nx-total-label{font-size:7px;color:rgba(255,255,255,0.7)}
+.mockup-nexo .nx-btn{margin:0 6px 6px;background:#006c47;border-radius:4px;padding:5px;text-align:center;font-size:8px;font-weight:700;color:#fff}
+.mockup-jarvis{width:100%;height:100%;background:#0d0d1a;display:flex;flex-direction:column;font-family:monospace;overflow:hidden;padding:10px}
+.mockup-jarvis .jv-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(123,47,255,0.3)}
+.mockup-jarvis .jv-logo{font-size:16px}
+.mockup-jarvis .jv-title{font-size:10px;font-weight:700;color:#7B2FFF;letter-spacing:1px}
+.mockup-jarvis .jv-version{font-size:8px;color:#555;margin-left:auto}
+.mockup-jarvis .jv-line{font-size:8px;margin-bottom:3px;line-height:1.5}
+.mockup-jarvis .jv-system{color:#00d4ff}
+.mockup-jarvis .jv-ok{color:#00ff9d}
+.mockup-jarvis .jv-warn{color:#ffd700}
+.mockup-jarvis .jv-user{color:#ff6b9d}
+.mockup-jarvis .jv-response{color:#b0b0d0}
+.mockup-jarvis .jv-input{display:flex;align-items:center;gap:6px;margin-top:8px;padding:5px 8px;background:rgba(123,47,255,0.1);border-radius:5px;border:1px solid rgba(123,47,255,0.3)}
+.mockup-jarvis .jv-prompt{font-size:9px;color:#7B2FFF;font-weight:700}
+.mockup-jarvis .jv-cursor{width:6px;height:11px;background:#7B2FFF;animation:blink 1s infinite;margin-left:2px}
+
+/* ─── SCROLL ANIMATIONS (initial state) ─── */
+.fade-up{opacity:0;transform:translateY(40px)}
+.fade-left{opacity:0;transform:translateX(-40px)}
+.fade-right{opacity:0;transform:translateX(40px)}
+.scale-in{opacity:0;transform:scale(0.9)}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;text-align:center}
+  .hero-visual{display:none}
+  .hero p,.hero-btns{margin-left:auto;margin-right:auto}
+  .hero-btns{justify-content:center}
+  .hero-stats{justify-content:center}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  section{padding:70px 20px}
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  .apps-grid,.cloud-grid,.bots-grid,.why-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr 1fr}
+  .pricing-card.featured{transform:scale(1)}
+  .footer-grid{grid-template-columns:1fr}
+  .footer-bottom{flex-direction:column;text-align:center}
+  .cta-btns{flex-direction:column;align-items:center}
+  .hero-stats{flex-wrap:wrap;gap:20px}
+}
+@media(max-width:480px){
+  .pricing-grid{grid-template-columns:1fr}
+  .hero h1{font-size:28px}
+}
+</style>
+</head>
+<body>
+
+<!-- 3D Canvas -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- WhatsApp Float -->
+<a href="https://wa.me/584164117331?text=Hola%20A2K%20Digital%20Studio!%20Quiero%20información%20sobre%20sus%20apps." target="_blank" class="wa-float" title="WhatsApp">💬</a>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">⚡</div>
+      <span>A2K DIGITAL STUDIO</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#apps">Apps</a></li>
+      <li><a href="#cloud">Cloud</a></li>
+      <li><a href="#bots">Automatización</a></li>
+      <li><a href="#precios">Precios</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="https://wa.me/584164117331?text=Hola!%20Quiero%20solicitar%20una%20demo." target="_blank" class="nav-cta">Solicitar Demo</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu layer" id="mobileMenu">
+  <a href="#apps" onclick="toggleMenu()">Apps</a>
+  <a href="#cloud" onclick="toggleMenu()">Cloud</a>
+  <a href="#bots" onclick="toggleMenu()">Automatización</a>
+  <a href="#precios" onclick="toggleMenu()">Precios</a>
+  <a href="#faq" onclick="toggleMenu()">FAQ</a>
+  <a href="https://wa.me/584164117331" target="_blank" style="color:var(--neon)">💬 WhatsApp</a>
+</div>
+
+<!-- ════ HERO ════ -->
+<section class="hero layer">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-tag fade-left">⚡ SOFTWARE PROFESIONAL PARA NEGOCIOS</div>
+      <h1 class="fade-left" style="transition-delay:0.1s">
+        <span class="line1">Tecnología que</span>
+        <span class="line2">mueve negocios</span>
+        <span class="line3">al siguiente nivel.</span>
+      </h1>
+      <p class="fade-left" style="transition-delay:0.2s">Apps POS profesionales para barberías, bodegas, ferreterías, nail studios, farmacias y más. Sin mensualidades. Licencia de por vida desde <strong style="color:var(--neon)">$25</strong>.</p>
+      <div class="hero-btns fade-left" style="transition-delay:0.3s">
+        <a href="#apps" class="btn-hero-primary">🚀 Ver Apps</a>
+        <a href="#precios" class="btn-hero-ghost">💳 Ver Precios</a>
+      </div>
+      <div class="hero-stats fade-left" style="transition-delay:0.4s">
+        <div class="stat-item"><div class="stat-num" id="count-apps">0</div><div class="stat-label">Apps disponibles</div></div>
+        <div class="stat-item"><div class="stat-num" id="count-biz">0</div><div class="stat-label">Negocios activos</div></div>
+        <div class="stat-item"><div class="stat-num">24/7</div><div class="stat-label">Soporte</div></div>
+      </div>
+    </div>
+    <div class="hero-visual fade-right">
+      <div class="hero-orb"></div>
+      <img src="img/a2k-hero-banner.png" alt="A2K Digital Studio Apps" style="position:absolute;width:90%;max-width:420px;border-radius:20px;box-shadow:0 40px 120px rgba(0,0,0,0.7),0 0 80px rgba(123,47,255,0.25);border:1px solid rgba(123,47,255,0.2);animation:float 6s ease-in-out infinite;z-index:2;display:block" onerror="this.style.display='none'">
+      <div class="hero-screen" style="z-index:1">
+        <div class="screen-header">
+          <div class="screen-title">BODEGA PRO</div>
+          <div class="screen-sub">Punto de Venta — A2K Digital Studio</div>
+        </div>
+        <div class="screen-body">
+          <div class="screen-row"><span class="screen-row-name">Pan Canilla x2</span><span class="screen-row-val">$1.00</span></div>
+          <div class="screen-row"><span class="screen-row-name">Leche Completa x1</span><span class="screen-row-val">$1.50</span></div>
+          <div class="screen-row"><span class="screen-row-name">ArrozKg x3</span><span class="screen-row-val">$4.20</span></div>
+          <div class="screen-row"><span class="screen-row-name">Pasta 500g x2</span><span class="screen-row-val">$3.00</span></div>
+          <div class="screen-total">
+            <div class="screen-total-label">TOTAL</div>
+            <div class="screen-total-val">$9.70</div>
+          </div>
+          <div class="screen-btn">✅ COBRAR — Efectivo $</div>
+          <div class="screen-status">🔒 IRON LOCK v2 · Licencia Activa</div>
+        </div>
+      </div>
+      <div class="floating-badge badge-1">✅ Venta registrada</div>
+      <div class="floating-badge badge-2">📊 +47% ventas hoy</div>
+      <div class="floating-badge badge-3">💰 $347.80 en caja</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════ APPS LOCALES ════ -->
+<section id="apps" class="layer">
+  <div class="container">
+    <div class="section-tag fade-up">Apps Locales & Empresariales</div>
+    <h2 class="section-title fade-up">11 Soluciones POS <span>profesionales</span></h2>
+    <p class="section-sub fade-up">Una sola compra. Licencia de por vida. Sin mensualidades sorpresa. Con IRON LOCK v2 para máxima seguridad.</p>
+
+    <!-- SUB-GRUPO: BODEGAS & SUPERMERCADOS -->
+    <div style="margin-bottom:16px">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.25);border-radius:8px;padding:6px 16px;font-size:12px;font-weight:700;color:var(--neon);margin-bottom:20px">🏪 Bodega, Supermercado & Abastos</div>
+    </div>
+    <div class="apps-grid" style="margin-bottom:56px">
+
+      <!-- BODEGA PRO -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow"></div>
+          <img class="app-screenshot" src="img/app-bodega-pro.png" alt="Bodega Pro — Sistema POS" loading="lazy">
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">🏪</div>
+            <div><div class="app-name">Bodega Pro</div><div class="app-type">Sistema POS · Bodega / Minimarket</div></div>
+          </div>
+          <p class="app-desc">Inventario, fiados, proveedores, pesaje y todos los métodos de pago venezolanos.</p>
+          <div class="app-features"><span class="app-feature">Inventario</span><span class="app-feature">Fiados</span><span class="app-feature">Pesaje</span><span class="app-feature">Proveedores</span><span class="app-feature">Caja</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Bodega%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- MERCADO LOGIC -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow"></div>
+          <img class="app-screenshot" src="img/app-mercado-logic-pro.png" alt="Mercado Logic Pro — Sistema POS" loading="lazy">
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">🛒</div>
+            <div><div class="app-name">Mercado Logic Pro</div><div class="app-type">Sistema POS · Supermercado</div></div>
+          </div>
+          <p class="app-desc">Múltiples cajas, inventario masivo, códigos de barra y reportes avanzados.</p>
+          <div class="app-features"><span class="app-feature">Multi-caja</span><span class="app-feature">Barcode</span><span class="app-feature">Reportes</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Mercado%20Logic%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- FRUTERÍA PRO -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow"></div>
+          <img class="app-screenshot" src="img/app-fruteria-pro.png" alt="Frutería Pro — Sistema POS" loading="lazy">
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">🍎</div>
+            <div><div class="app-name">Frutería Pro</div><div class="app-type">Sistema POS · Frutería</div></div>
+          </div>
+          <p class="app-desc">Pesaje integrado, productos por kg, control de pérdidas y precios del día.</p>
+          <div class="app-features"><span class="app-feature">Pesaje</span><span class="app-feature">Precio/kg</span><span class="app-feature">Pérdidas</span><span class="app-feature">Caja</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Frutería%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEXO POS (NexoPOS) -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow" style="background:radial-gradient(circle at 50% 60%,rgba(0,69,143,0.4) 0%,transparent 65%);opacity:1"></div>
+          <div style="position:absolute;top:32px;left:0;right:0;bottom:0;overflow:hidden">
+            <div class="mockup-nexo">
+              <div class="nx-sidebar">
+                <div class="nx-icon active">🏪</div>
+                <div class="nx-icon">📦</div>
+                <div class="nx-icon">📊</div>
+                <div class="nx-icon">👥</div>
+                <div class="nx-icon">⚙️</div>
+              </div>
+              <div class="nx-main">
+                <div class="nx-topbar">
+                  <div style="width:20px;height:20px;background:#00458f;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">🔷</div>
+                  <div class="nx-search">🔍 Buscar producto...</div>
+                  <div style="font-size:8px;color:#00458f;font-weight:700;white-space:nowrap">📅 HOY</div>
+                </div>
+                <div class="nx-body">
+                  <div class="nx-products">
+                    <div class="nx-prod"><div class="nx-prod-icon">🍫</div><div class="nx-prod-name">Chocolate</div><div class="nx-prod-price">$2.50</div></div>
+                    <div class="nx-prod"><div class="nx-prod-icon">🥤</div><div class="nx-prod-name">Refresco</div><div class="nx-prod-price">$1.80</div></div>
+                    <div class="nx-prod"><div class="nx-prod-icon">🍞</div><div class="nx-prod-name">Pan</div><div class="nx-prod-price">$0.80</div></div>
+                    <div class="nx-prod"><div class="nx-prod-icon">🧴</div><div class="nx-prod-name">Shampoo</div><div class="nx-prod-price">$4.20</div></div>
+                    <div class="nx-prod"><div class="nx-prod-icon">🫙</div><div class="nx-prod-name">Atún</div><div class="nx-prod-price">$3.50</div></div>
+                    <div class="nx-prod"><div class="nx-prod-icon">🍚</div><div class="nx-prod-name">Arroz 1kg</div><div class="nx-prod-price">$1.20</div></div>
+                  </div>
+                  <div class="nx-cart">
+                    <div class="nx-cart-title">🛒 Carrito (3)</div>
+                    <div class="nx-cart-item"><span>Chocolate</span><strong>$2.50</strong></div>
+                    <div class="nx-cart-item"><span>Refresco x2</span><strong>$3.60</strong></div>
+                    <div class="nx-cart-item"><span>Pan</span><strong>$0.80</strong></div>
+                    <div style="flex:1"></div>
+                    <div class="nx-total"><div class="nx-total-label">TOTAL</div><div class="nx-total-val">$6.90</div></div>
+                    <div class="nx-btn">✅ COBRAR</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">🔷</div>
+            <div><div class="app-name">Nexo POS</div><div class="app-type">Sistema POS · Bodega Enterprise</div></div>
+          </div>
+          <p class="app-desc">POS profesional con Next.js, multi-moneda, IVA/IGTF venezolano, inventario masivo y reportes avanzados.</p>
+          <div class="app-features"><span class="app-feature">Multi-moneda</span><span class="app-feature">IVA/IGTF</span><span class="app-feature">Inventario</span><span class="app-feature">Reportes</span><span class="app-feature">Enterprise</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$35</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20Nexo%20POS" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZYNC ELECTRONICS -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap" style="background:#06060a">
+          <div class="app-screenshot-glow" style="background:radial-gradient(circle at 50% 55%,rgba(212,175,55,0.25) 0%,transparent 65%);opacity:1"></div>
+          <div style="position:absolute;top:32px;left:0;right:0;bottom:0;overflow:hidden">
+            <div class="mockup-zync-elec">
+              <div class="ze-sidebar">
+                <div class="ze-icon active">🖥️</div>
+                <div class="ze-icon">📦</div>
+                <div class="ze-icon">⚖️</div>
+                <div class="ze-icon">💳</div>
+                <div class="ze-icon">📊</div>
+                <div class="ze-icon">⚙️</div>
+              </div>
+              <div class="ze-main">
+                <div class="ze-topbar">
+                  <span class="ze-brand">⚡ ZYNC ELECTRONICS</span>
+                  <span style="font-size:7px;color:#555;margin-left:auto">Terminal Pro v2.0</span>
+                </div>
+                <div class="ze-body">
+                  <div class="ze-products">
+                    <div class="ze-prod"><div class="ze-prod-icon">📱</div><div class="ze-prod-name">iPhone 15</div><div class="ze-prod-price">$850</div></div>
+                    <div class="ze-prod"><div class="ze-prod-icon">💻</div><div class="ze-prod-name">Laptop HP</div><div class="ze-prod-price">$620</div></div>
+                    <div class="ze-prod"><div class="ze-prod-icon">📺</div><div class="ze-prod-name">Smart TV</div><div class="ze-prod-price">$380</div></div>
+                    <div class="ze-prod"><div class="ze-prod-icon">🎧</div><div class="ze-prod-name">AirPods</div><div class="ze-prod-price">$120</div></div>
+                    <div class="ze-prod"><div class="ze-prod-icon">⌚</div><div class="ze-prod-name">Smartwatch</div><div class="ze-prod-price">$290</div></div>
+                    <div class="ze-prod"><div class="ze-prod-icon">🖨️</div><div class="ze-prod-name">Impresora</div><div class="ze-prod-price">$95</div></div>
+                  </div>
+                  <div class="ze-cart">
+                    <div class="ze-cart-title">🛒 Carrito (2)</div>
+                    <div class="ze-cart-item"><span>iPhone 15</span><strong>$850</strong></div>
+                    <div class="ze-cart-item"><span>AirPods</span><strong>$120</strong></div>
+                    <div style="flex:1"></div>
+                    <div class="ze-total"><div class="ze-total-label">TOTAL</div><div class="ze-total-val">$970</div></div>
+                    <div class="ze-btn">✅ COBRAR</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">⚡</div>
+            <div><div class="app-name">ZYNC Electronics</div><div class="app-type">Sistema POS · Electrónica & Tecnología</div></div>
+          </div>
+          <p class="app-desc">POS especializado para tiendas tech: pesaje, garantías, cuotas, fórmula 50/30/20 financiera y etiquetas de precio.</p>
+          <div class="app-features"><span class="app-feature">Multi-moneda</span><span class="app-feature">Garantías</span><span class="app-feature">Pesaje</span><span class="app-feature">Cuotas</span><span class="app-feature">Etiquetas</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20ZYNC%20Electronics%20Terminal" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SUB-GRUPO: OTROS NEGOCIOS -->
+    <div style="margin-bottom:16px;margin-top:8px">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(123,47,255,0.08);border:1px solid rgba(123,47,255,0.25);border-radius:8px;padding:6px 16px;font-size:12px;font-weight:700;color:var(--purpleL);margin-bottom:20px">✂️ Servicios, Repuestos & Otros Negocios</div>
+    </div>
+    <div class="apps-grid">
+
+      <!-- BARBERÍA PRO -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow"></div>
+          <img class="app-screenshot" src="img/app-barberia-pro.png" alt="Barbería Pro — Sistema POS" loading="lazy">
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">💈</div>
+            <div><div class="app-name">Barbería Pro</div><div class="app-type">Sistema POS · Barbería</div></div>
+          </div>
+          <p class="app-desc">Control total: turnos, servicios, clientes frecuentes, caja diaria y reportes en tiempo real.</p>
+          <div class="app-features"><span class="app-feature">Agenda</span><span class="app-feature">Caja</span><span class="app-feature">Clientes</span><span class="app-feature">Reportes</span><span class="app-feature">IRON LOCK</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Barbería%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- NAIL STUDIO PRO -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow"></div>
+          <img class="app-screenshot" src="img/app-nail-studio-pro.png" alt="Nail Studio Pro — Sistema POS" loading="lazy">
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">💅</div>
+            <div><div class="app-name">Nail Studio Pro</div><div class="app-type">Sistema POS · Nail Studio</div></div>
+          </div>
+          <p class="app-desc">Agenda de citas, servicios, clientas frecuentes, materiales e inventario completo.</p>
+          <div class="app-features"><span class="app-feature">Agenda</span><span class="app-feature">Servicios</span><span class="app-feature">Materiales</span><span class="app-feature">Clientas</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Nail%20Studio%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- FERRETERÍA -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow"></div>
+          <img class="app-screenshot" src="img/app-ferreteria-pro.png" alt="Ferretería A2K Pro — Sistema POS" loading="lazy">
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">🔧</div>
+            <div><div class="app-name">Ferretería A2K Pro</div><div class="app-type">Sistema POS · Ferretería</div></div>
+          </div>
+          <p class="app-desc">Catálogo extenso, stock crítico, cotizaciones y control de proveedores.</p>
+          <div class="app-features"><span class="app-feature">Catálogo</span><span class="app-feature">Stock</span><span class="app-feature">Cotizaciones</span><span class="app-feature">Proveedores</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Ferretería%20A2K%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPUESTOS MOTOS -->
+      <div class="app-card fade-up">
+        <div class="app-screenshot-wrap">
+          <div class="app-screenshot-glow"></div>
+          <img class="app-screenshot" src="img/app-repuestos-motos-pro.png" alt="Repuestos Motos Pro — Sistema POS" loading="lazy">
+          <div class="app-screenshot-overlay"></div>
+          <div class="demo-ribbon">Demo 5 días</div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-top">
+            <div class="app-emoji">🏍️</div>
+            <div><div class="app-name">Repuestos Motos Pro</div><div class="app-type">Sistema POS · Motocicletas</div></div>
+          </div>
+          <p class="app-desc">Búsqueda por código, compatibilidad de piezas y órdenes de servicio.</p>
+          <div class="app-features"><span class="app-feature">Búsqueda</span><span class="app-feature">Órdenes</span><span class="app-feature">Stock</span><span class="app-feature">Ventas</span></div>
+          <div class="app-footer">
+            <div><div class="app-price">$25</div><div class="app-price-label">Licencia de por vida</div></div>
+            <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20comprar%20Repuestos%20Motos%20Pro" target="_blank" class="app-btn">Comprar PRO →</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════ CLOUD ════ -->
+<section id="cloud" class="layer cloud-section">
+  <div class="container">
+    <div class="section-tag fade-up">Soluciones Cloud</div>
+    <h2 class="section-title fade-up">Potencia <span>empresarial</span> en la nube</h2>
+    <p class="section-sub fade-up">Para negocios que necesitan múltiples sedes, sincronización en tiempo real y escalabilidad sin límites.</p>
+    <div class="cloud-grid">
+
+      <div class="cloud-card fade-up">
+        <div class="cloud-icon">🏪</div>
+        <div class="cloud-name">Bodega Pro Cloud</div>
+        <div class="cloud-desc">Gestión multi-sede para cadenas de bodegas. Inventario sincronizado en tiempo real entre todas tus sucursales.</div>
+        <div class="cloud-features">
+          <div class="cloud-feature-item">Sincronización en tiempo real</div>
+          <div class="cloud-feature-item">Hasta 10 sedes simultáneas</div>
+          <div class="cloud-feature-item">Dashboard centralizado</div>
+          <div class="cloud-feature-item">Reportes consolidados</div>
+          <div class="cloud-feature-item">Respaldo automático en Firebase</div>
+        </div>
+        <div class="cloud-price">Desde $15<span style="font-size:14px;color:var(--text3)">/mes</span></div>
+        <div class="cloud-price-note">Activación única · Escala según tus sedes</div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20Bodega%20Pro%20Cloud" target="_blank" class="btn-cloud">☁️ Cotizar Cloud →</a>
+      </div>
+
+      <div class="cloud-card fade-up">
+        <div class="cloud-icon">💊</div>
+        <div class="cloud-name">Farmacia Pro Plus</div>
+        <div class="cloud-desc">Sistema farmacéutico cloud con control de medicamentos, fechas de vencimiento, recetas y compliance regulatorio.</div>
+        <div class="cloud-features">
+          <div class="cloud-feature-item">Control de vencimientos</div>
+          <div class="cloud-feature-item">Gestión de recetas</div>
+          <div class="cloud-feature-item">Stock mínimo inteligente</div>
+          <div class="cloud-feature-item">Compliance SEFAR</div>
+          <div class="cloud-feature-item">Multi-sucursal</div>
+        </div>
+        <div class="cloud-price">Desde $15<span style="font-size:14px;color:var(--text3)">/mes</span></div>
+        <div class="cloud-price-note">Activación única · Plan según volumen</div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20Farmacia%20Pro%20Plus" target="_blank" class="btn-cloud">☁️ Cotizar Cloud →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════ BOTS ════ -->
+<section id="bots" class="layer">
+  <div class="container">
+    <div class="section-tag fade-up">Automatización IA</div>
+    <h2 class="section-title fade-up">Bots que trabajan <span>por ti</span></h2>
+    <p class="section-sub fade-up">Atiende clientes, responde preguntas y cierra ventas automáticamente — 24 horas, 7 días a la semana.</p>
+    <div class="bots-grid">
+
+      <div class="bot-card fade-up">
+        <div class="bot-icon">🤖</div>
+        <div class="bot-name">Bot Telegram</div>
+        <div class="bot-desc">Automatiza tu canal de Telegram: catálogo interactivo, consultas de precios, pedidos y soporte al cliente en piloto automático.</div>
+        <div class="bot-price-row">
+          <div class="bot-price-box"><div class="bot-price-box-label">Mensual</div><div class="bot-price-box-val">$39–$59</div></div>
+          <div class="bot-price-box"><div class="bot-price-box-label">Setup único</div><div class="bot-price-box-val">$100–$120</div></div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20del%20Bot%20Telegram" target="_blank" class="btn-bot">📱 Cotizar Bot Telegram</a>
+      </div>
+
+      <div class="bot-card fade-up">
+        <div class="bot-icon">💬</div>
+        <div class="bot-name">Bot WhatsApp</div>
+        <div class="bot-desc">Responde mensajes, filtra consultas, gestiona pedidos y enruta clientes inteligentemente desde tu WhatsApp Business.</div>
+        <div class="bot-price-row">
+          <div class="bot-price-box"><div class="bot-price-box-label">Mensual</div><div class="bot-price-box-val">$49–$79</div></div>
+          <div class="bot-price-box"><div class="bot-price-box-label">Setup único</div><div class="bot-price-box-val">$120–$150</div></div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20del%20Bot%20WhatsApp" target="_blank" class="btn-bot">💬 Cotizar Bot WhatsApp</a>
+      </div>
+
+      <div class="bot-card fade-up">
+        <div class="bot-icon">🎙️</div>
+        <div class="bot-name">Recepcionista AI</div>
+        <div class="bot-desc">Recepcionista virtual con voz: atiende llamadas, agenda citas, responde dudas frecuentes y transfiere al humano cuando corresponde.</div>
+        <div class="bot-price-row">
+          <div class="bot-price-box"><div class="bot-price-box-label">Mensual</div><div class="bot-price-box-val">$49–$99</div></div>
+          <div class="bot-price-box"><div class="bot-price-box-label">Setup único</div><div class="bot-price-box-val">$150–$250</div></div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20la%20Recepcionista%20AI" target="_blank" class="btn-bot">🎙️ Cotizar Recepcionista AI</a>
+      </div>
+
+      <div class="bot-card fade-up">
+        <div class="bot-icon">💸</div>
+        <div class="bot-name">Zync Pay</div>
+        <div class="bot-desc">Verificación automática de pagos por Zelle, Binance y Pago Móvil. Confirma y notifica en segundos sin intervención manual.</div>
+        <div class="bot-price-row">
+          <div class="bot-price-box"><div class="bot-price-box-label">Plan</div><div class="bot-price-box-val">Cotizar</div></div>
+          <div class="bot-price-box"><div class="bot-price-box-label">Setup</div><div class="bot-price-box-val">Incluido</div></div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20Zync%20Pay" target="_blank" class="btn-bot">💸 Cotizar Zync Pay</a>
+      </div>
+
+      <!-- NEXO JARVIS -->
+      <div class="bot-card fade-up">
+        <div class="mockup-jarvis" style="height:164px;border-radius:10px;margin-bottom:16px;box-shadow:0 4px 24px rgba(123,47,255,0.3)">
+          <div class="jv-header">
+            <span class="jv-logo">🤖</span>
+            <span class="jv-title">JARVIS MENTE MAESTRA</span>
+            <span class="jv-version">v4.0</span>
+          </div>
+          <div class="jv-line jv-system">[ SISTEMA ] Cargando módulos de IA...</div>
+          <div class="jv-line jv-ok">[ OK ] Motor conversacional activo</div>
+          <div class="jv-line jv-ok">[ OK ] Sintetizador de voz TTS listo</div>
+          <div class="jv-line jv-warn">[ INFO ] Verificador Zelle / Binance ON</div>
+          <div class="jv-line jv-user">Usuario: ¿Cuánto vendimos hoy?</div>
+          <div class="jv-line jv-response">Jarvis: 47 ventas · $1,283.40 en caja 🎯</div>
+          <div class="jv-input">
+            <span class="jv-prompt">&gt;</span>
+            <span style="font-size:8px;color:#aaa;flex:1">Escribe tu consulta...</span>
+            <span class="jv-cursor"></span>
+          </div>
+        </div>
+        <div class="bot-icon">🧠</div>
+        <div class="bot-name">Nexo Jarvis</div>
+        <div class="bot-desc">Asistente de escritorio con IA y voz: gestiona tu negocio por comandos, verifica pagos automáticamente, consulta inventario y reportes en tiempo real.</div>
+        <div class="bot-price-row">
+          <div class="bot-price-box"><div class="bot-price-box-label">Licencia</div><div class="bot-price-box-val">$35</div></div>
+          <div class="bot-price-box"><div class="bot-price-box-label">Plan</div><div class="bot-price-box-val">De por vida</div></div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20información%20de%20Nexo%20Jarvis" target="_blank" class="btn-bot">🧠 Cotizar Nexo Jarvis</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════ PRECIOS ════ -->
+<section id="precios" class="layer">
+  <div class="container">
+    <div class="section-tag fade-up">Precios</div>
+    <h2 class="section-title fade-up">Transparente. Sin <span>sorpresas.</span></h2>
+    <p class="section-sub fade-up">Elige cuántas terminales necesita tu negocio. Todas incluyen licencia de por vida, soporte por WhatsApp y actualizaciones.</p>
+
+    <div class="pricing-tabs fade-up">
+      <button class="pricing-tab active" onclick="switchTab('local',this)">Apps Locales</button>
+      <button class="pricing-tab" onclick="switchTab('cloud',this)">Apps Cloud</button>
+    </div>
+
+    <!-- LOCAL PRICING -->
+    <div id="tab-local" class="pricing-grid">
+      <div class="pricing-card fade-up">
+        <div class="pricing-plan">Básico</div>
+        <div class="pricing-amount"><span>$</span>25</div>
+        <div class="pricing-note">pago único · de por vida</div>
+        <div class="pricing-highlight">🖥️ 1 Terminal</div>
+        <div class="pricing-features">
+          <div class="pf-item">App POS completa</div>
+          <div class="pf-item">IRON LOCK v2</div>
+          <div class="pf-item">Inventario ilimitado</div>
+          <div class="pf-item">Reportes básicos</div>
+          <div class="pf-item">Soporte WhatsApp</div>
+          <div class="pf-item">Demo gratis 5 días</div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20el%20plan%20Básico%20de%201%20terminal%20-%20$25" target="_blank" class="btn-pricing btn-pricing-outline">Comprar $25</a>
+      </div>
+      <div class="pricing-card featured fade-up">
+        <div class="pricing-plan">Estándar</div>
+        <div class="pricing-amount"><span>$</span>35</div>
+        <div class="pricing-note">pago único · de por vida</div>
+        <div class="pricing-highlight">🖥️🖥️🖥️ 3 Terminales</div>
+        <div class="pricing-features">
+          <div class="pf-item">3 licencias activas</div>
+          <div class="pf-item">IRON LOCK v2</div>
+          <div class="pf-item">Inventario ilimitado</div>
+          <div class="pf-item">Reportes avanzados</div>
+          <div class="pf-item">Soporte prioritario</div>
+          <div class="pf-item">Demo gratis 5 días</div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20el%20plan%20Estándar%203%20terminales%20-%20$35" target="_blank" class="btn-pricing btn-pricing-primary">Comprar $35 →</a>
+      </div>
+      <div class="pricing-card fade-up">
+        <div class="pricing-plan">Profesional</div>
+        <div class="pricing-amount"><span>$</span>45</div>
+        <div class="pricing-note">pago único · de por vida</div>
+        <div class="pricing-highlight">🖥️×5 Terminales</div>
+        <div class="pricing-features">
+          <div class="pf-item">5 licencias activas</div>
+          <div class="pf-item">IRON LOCK v2</div>
+          <div class="pf-item">Inventario ilimitado</div>
+          <div class="pf-item">Reportes avanzados</div>
+          <div class="pf-item">Soporte prioritario</div>
+          <div class="pf-item">Demo gratis 5 días</div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20el%20plan%20Profesional%205%20terminales%20-%20$45" target="_blank" class="btn-pricing btn-pricing-outline">Comprar $45</a>
+      </div>
+      <div class="pricing-card fade-up">
+        <div class="pricing-plan">Empresarial</div>
+        <div class="pricing-amount"><span>$</span>65</div>
+        <div class="pricing-note">pago único · de por vida</div>
+        <div class="pricing-highlight">🖥️×10 Terminales</div>
+        <div class="pricing-features">
+          <div class="pf-item">10 licencias activas</div>
+          <div class="pf-item">IRON LOCK v2</div>
+          <div class="pf-item">Inventario ilimitado</div>
+          <div class="pf-item">Reportes ejecutivos</div>
+          <div class="pf-item">Soporte VIP</div>
+          <div class="pf-item">Terminal extra: $5 c/u</div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20el%20plan%20Empresarial%2010%20terminales%20-%20$65" target="_blank" class="btn-pricing btn-pricing-outline">Comprar $65</a>
+      </div>
+    </div>
+
+    <!-- CLOUD PRICING (hidden) -->
+    <div id="tab-cloud" class="pricing-grid" style="display:none">
+      <div class="pricing-card fade-up">
+        <div class="pricing-plan">Starter Cloud</div>
+        <div class="pricing-amount"><span>$</span>15</div>
+        <div class="pricing-note">por mes · 1 sede</div>
+        <div class="pricing-highlight">☁️ 1 Sede</div>
+        <div class="pricing-features">
+          <div class="pf-item">Sincronización en tiempo real</div>
+          <div class="pf-item">Respaldo automático</div>
+          <div class="pf-item">Dashboard web</div>
+          <div class="pf-item">Soporte WhatsApp</div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20el%20plan%20Cloud%20Starter%20-%20$15/mes" target="_blank" class="btn-pricing btn-pricing-outline">Cotizar →</a>
+      </div>
+      <div class="pricing-card featured fade-up">
+        <div class="pricing-plan">Negocio Cloud</div>
+        <div class="pricing-amount"><span>$</span>40</div>
+        <div class="pricing-note">por mes · hasta 5 sedes</div>
+        <div class="pricing-highlight">☁️ Hasta 5 Sedes</div>
+        <div class="pricing-features">
+          <div class="pf-item">Multi-sede sincronizado</div>
+          <div class="pf-item">Reportes consolidados</div>
+          <div class="pf-item">Respaldo automático</div>
+          <div class="pf-item">Dashboard ejecutivo</div>
+          <div class="pf-item">Soporte prioritario</div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20el%20plan%20Cloud%20Negocio%20-%20$40/mes" target="_blank" class="btn-pricing btn-pricing-primary">Cotizar →</a>
+      </div>
+      <div class="pricing-card fade-up">
+        <div class="pricing-plan">Enterprise Cloud</div>
+        <div class="pricing-amount"><span>$</span>80</div>
+        <div class="pricing-note">por mes · hasta 10 sedes</div>
+        <div class="pricing-highlight">☁️ Hasta 10 Sedes</div>
+        <div class="pricing-features">
+          <div class="pf-item">10 sedes sincronizadas</div>
+          <div class="pf-item">API personalizada</div>
+          <div class="pf-item">Reportes BI</div>
+          <div class="pf-item">SLA garantizado</div>
+          <div class="pf-item">Soporte VIP 24/7</div>
+        </div>
+        <a href="https://wa.me/584164117331?text=Hola!%20Quiero%20el%20plan%20Cloud%20Enterprise%20-%20$80/mes" target="_blank" class="btn-pricing btn-pricing-outline">Cotizar →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════ WHY US ════ -->
+<section class="layer">
+  <div class="container">
+    <div class="section-tag fade-up">Por qué elegirnos</div>
+    <h2 class="section-title fade-up">Construido para <span>tu realidad</span></h2>
+    <div class="why-grid">
+      <div class="why-card fade-up"><div class="why-icon">🔒</div><div class="why-title">IRON LOCK v2</div><div class="why-text">Sistema de licencias propio. Sin depender de servidores externos. Tu app funciona siempre, con o sin internet.</div></div>
+      <div class="why-card fade-up"><div class="why-icon">💰</div><div class="why-title">Sin mensualidades</div><div class="why-text">Pagas una sola vez y la app es tuya para siempre. Actualizaciones gratuitas incluidas en tu licencia.</div></div>
+      <div class="why-card fade-up"><div class="why-icon">📱</div><div class="why-title">Funciona en móvil</div><div class="why-text">Diseñadas para funcionar en cualquier dispositivo: celular Android, tablet, laptop o PC. Sin instalación.</div></div>
+      <div class="why-card fade-up"><div class="why-icon">⚡</div><div class="why-title">Ultra rápido</div><div class="why-text">Apps de una sola página (SPA). Respuesta inmediata sin recargar. Perfectas para el ritmo de un negocio real.</div></div>
+      <div class="why-card fade-up"><div class="why-icon">🇻🇪</div><div class="why-title">Para Venezuela</div><div class="why-text">Bs, USD, Pago Móvil, Zelle, Binance, Punto POS — todos los métodos de pago del mercado venezolano.</div></div>
+      <div class="why-card fade-up"><div class="why-icon">💬</div><div class="why-title">Soporte real</div><div class="why-text">Atención directa por WhatsApp. Sin tickets, sin bots. Una persona real resuelve tu problema hoy.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════ FAQ ════ -->
+<section id="faq" class="layer">
+  <div class="container">
+    <div class="section-tag fade-up">Preguntas frecuentes</div>
+    <h2 class="section-title fade-up">¿Tienes <span>dudas?</span></h2>
+    <div class="faq-list fade-up">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Cómo funciona la demo gratuita? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Al solicitar tu demo recibes un código de activación válido por 5 días completos. Puedes usar todas las funciones de la app sin restricciones. Si decides comprar, tu licencia PRO es definitiva.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Necesita internet para funcionar? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Las apps locales funcionan 100% offline. Solo necesitas internet la primera vez para activar la licencia. Las apps Cloud requieren conexión para sincronizar entre sedes.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Dónde se guardan los datos? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Los datos se guardan en el dispositivo del usuario (localStorage del navegador). Para las versiones Cloud, se sincronizan en Firebase con cifrado y respaldo automático diario.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Qué pasa si cambio de dispositivo? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Puedes exportar un respaldo completo de tus datos en JSON e importarlo en el nuevo dispositivo en segundos. Tu licencia también puede migrarse con soporte.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Las actualizaciones son gratuitas? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Sí. Todas las actualizaciones de la versión que compraste son gratuitas de por vida. Las apps se actualizan automáticamente al recargar la página.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">¿Cómo pago? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Aceptamos Zelle, Binance Pay, Pago Móvil, efectivo USD y transferencia bancaria. Contáctanos por WhatsApp y coordinamos el pago en minutos.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════ CTA FINAL ════ -->
+<section class="cta-section layer">
+  <div class="container">
+    <div class="cta-inner">
+      <div class="section-tag fade-up" style="justify-content:center">⚡ Empieza hoy</div>
+      <h2 class="fade-up">Tu negocio merece <span style="background:linear-gradient(90deg,var(--purple),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent">tecnología real</span></h2>
+      <p class="fade-up">Demo gratuita de 5 días. Sin tarjeta. Sin complicaciones. Solo escríbenos y en minutos tienes tu sistema funcionando.</p>
+      <div class="cta-btns fade-up">
+        <a href="https://wa.me/584164117331?text=Hola%20A2K!%20Quiero%20solicitar%20mi%20demo%20gratuita." target="_blank" class="btn-wa">💬 WhatsApp · Demo Gratis</a>
+        <a href="https://t.me/zync_shop_bot" target="_blank" class="btn-tg">✈️ Telegram</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FOOTER ════ -->
+<footer class="layer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="logo"><div class="logo-icon">⚡</div><span style="font-family:Orbitron;font-weight:900;font-size:15px;background:linear-gradient(90deg,var(--purpleL),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent">A2K DIGITAL STUDIO</span></a>
+        <p>Soluciones tecnológicas profesionales para negocios venezolanos. Construimos apps que funcionan en la realidad de nuestro país.</p>
+        <div class="footer-socials">
+          <a href="https://wa.me/584164117331" target="_blank" class="social-btn">💬</a>
+          <a href="https://t.me/zync_shop_bot" target="_blank" class="social-btn">✈️</a>
+          <a href="mailto:a2kdigitalstudio2025@gmail.com" class="social-btn">📧</a>
+          <a href="https://github.com/tiendadigitalaipro" target="_blank" class="social-btn">💻</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Apps Locales</h4>
+        <ul>
+          <li><a href="#apps">Barbería Pro</a></li>
+          <li><a href="#apps">Nail Studio Pro</a></li>
+          <li><a href="#apps">Bodega Pro</a></li>
+          <li><a href="#apps">Ferretería A2K Pro</a></li>
+          <li><a href="#apps">Repuestos Motos</a></li>
+          <li><a href="#apps">Mercado Logic Pro</a></li>
+          <li><a href="#apps">Frutería Pro</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Soluciones</h4>
+        <ul>
+          <li><a href="#cloud">Bodega Pro Cloud</a></li>
+          <li><a href="#cloud">Farmacia Pro Plus</a></li>
+          <li><a href="#bots">Bot Telegram</a></li>
+          <li><a href="#bots">Bot WhatsApp</a></li>
+          <li><a href="#bots">Recepcionista AI</a></li>
+          <li><a href="#bots">Zync Pay</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="https://wa.me/584164117331" target="_blank">📱 +58 416-4117331</a></li>
+          <li><a href="mailto:a2kdigitalstudio2025@gmail.com">📧 a2kdigitalstudio2025</a></li>
+          <li><a href="https://t.me/zync_shop_bot" target="_blank">✈️ @zync_shop_bot</a></li>
+          <li><a href="#precios">💳 Ver precios</a></li>
+          <li><a href="#faq">❓ FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 A2K Digital Studio · Todos los derechos reservados</p>
+      <p class="footer-powered">Powered by <span>IRON LOCK v2</span> · Built with ⚡ by A2K</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════
+// THREE.JS — FONDO 3D CON PARTÍCULAS Y GEOMETRÍAS
+// ═══════════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.z = 3;
+
+  // Partículas
+  const particleCount = 1200;
+  const positions = new Float32Array(particleCount * 3);
+  const colors = new Float32Array(particleCount * 3);
+  const colorPalette = [
+    new THREE.Color(0x7B2FFF),
+    new THREE.Color(0x00d4ff),
+    new THREE.Color(0x00ff9d),
+    new THREE.Color(0xff6b9d),
+  ];
+  for (let i = 0; i < particleCount; i++) {
+    positions[i * 3]     = (Math.random() - 0.5) * 20;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+    const c = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+    colors[i * 3]     = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+  }
+  const pgeo = new THREE.BufferGeometry();
+  pgeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  pgeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const pmat = new THREE.PointsMaterial({ size: 0.025, vertexColors: true, transparent: true, opacity: 0.7 });
+  scene.add(new THREE.Points(pgeo, pmat));
+
+  // Geometrías flotantes
+  const geos = [
+    new THREE.IcosahedronGeometry(0.4, 0),
+    new THREE.OctahedronGeometry(0.35, 0),
+    new THREE.TetrahedronGeometry(0.3, 0),
+    new THREE.IcosahedronGeometry(0.25, 0),
+    new THREE.OctahedronGeometry(0.4, 0),
+    new THREE.IcosahedronGeometry(0.3, 0),
+  ];
+  const meshes = [];
+  const meshColors = [0x7B2FFF, 0x00d4ff, 0x00ff9d, 0xff6b9d, 0x7B2FFF, 0x00d4ff];
+  geos.forEach((geo, i) => {
+    const mat = new THREE.MeshBasicMaterial({ color: meshColors[i], wireframe: true, transparent: true, opacity: 0.15 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(
+      (Math.random() - 0.5) * 8,
+      (Math.random() - 0.5) * 8,
+      (Math.random() - 0.5) * 4 - 2
+    );
+    mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+    meshes.push(mesh);
+    scene.add(mesh);
+  });
+
+  // Mouse parallax
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 0.3;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 0.3;
+  });
+
+  // Animate
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.005;
+    meshes.forEach((m, i) => {
+      m.rotation.x += 0.003 + i * 0.001;
+      m.rotation.y += 0.005 + i * 0.001;
+      m.position.y += Math.sin(t + i) * 0.003;
+    });
+    camera.position.x += (mouseX - camera.position.x) * 0.05;
+    camera.position.y += (-mouseY - camera.position.y) * 0.05;
+    camera.lookAt(scene.position);
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+})();
+
+// ═══════════════════════════════════════════════
+// GSAP SCROLL ANIMATIONS
+// ═══════════════════════════════════════════════
+gsap.registerPlugin(ScrollTrigger);
+
+gsap.utils.toArray('.fade-up').forEach(el => {
+  gsap.fromTo(el, { opacity: 0, y: 50 }, {
+    opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+  });
+});
+gsap.utils.toArray('.fade-left').forEach((el, i) => {
+  gsap.fromTo(el, { opacity: 0, x: -50 }, {
+    opacity: 1, x: 0, duration: 0.9, ease: 'power3.out', delay: i * 0.08,
+    scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none none' }
+  });
+});
+gsap.utils.toArray('.fade-right').forEach(el => {
+  gsap.fromTo(el, { opacity: 0, x: 50 }, {
+    opacity: 1, x: 0, duration: 1.1, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+  });
+});
+
+// ═══════════════════════════════════════════════
+// CONTADOR ANIMADO HERO
+// ═══════════════════════════════════════════════
+function animateCount(id, target, duration) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const step = target / (duration / 16);
+  let current = 0;
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = Math.floor(current) + (target >= 100 ? '+' : '');
+    if (current >= target) clearInterval(timer);
+  }, 16);
+}
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    animateCount('count-apps', 10, 1500);
+    animateCount('count-biz', 200, 2000);
+  }, 600);
+});
+
+// ═══════════════════════════════════════════════
+// VANILLA TILT — 3D CARDS
+// ═══════════════════════════════════════════════
+function applyTilt(selector, opts) {
+  document.querySelectorAll(selector).forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const rotX = ((y - cy) / cy) * -(opts.max || 10);
+      const rotY = ((x - cx) / cx) * (opts.max || 10);
+      card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(10px)`;
+      card.style.transition = 'transform 0.05s';
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+      card.style.transition = 'transform 0.5s ease';
+    });
+  });
+}
+applyTilt('.app-card', { max: 8 });
+applyTilt('.why-card', { max: 6 });
+applyTilt('.bot-card', { max: 7 });
+
+// ═══════════════════════════════════════════════
+// NAVBAR SCROLL
+// ═══════════════════════════════════════════════
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ═══════════════════════════════════════════════
+// MOBILE MENU
+// ═══════════════════════════════════════════════
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════
+// PRICING TABS
+// ═══════════════════════════════════════════════
+function switchTab(tab, btn) {
+  document.querySelectorAll('.pricing-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-local').style.display = tab === 'local' ? 'grid' : 'none';
+  document.getElementById('tab-cloud').style.display = tab === 'cloud' ? 'grid' : 'none';
+}
+
+// ═══════════════════════════════════════════════
+// FAQ ACCORDION
+// ═══════════════════════════════════════════════
+function toggleFaq(el) {
+  const item = el.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+>>>>>>> a2k-digital-studio/main
 </script>
 </body>
 </html>
