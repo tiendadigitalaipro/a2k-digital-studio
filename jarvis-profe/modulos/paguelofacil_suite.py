@@ -64,7 +64,9 @@ def generar_link_cobro(monto: float, concepto: str, id_referencia: str) -> str:
 
         # PágueloFácil retorna el link bajo distintas claves según versión de API
         link = (
-            data.get("data", {}).get("linkPago")
+            data.get("data", {}).get("data")       # /link/process/json devuelve aquí
+            or data.get("data", {}).get("linkPago")
+            or data.get("data", {}).get("link")
             or data.get("linkPago")
             or data.get("link")
         )
