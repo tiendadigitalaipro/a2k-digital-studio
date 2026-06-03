@@ -3877,7 +3877,7 @@ def _arrancar_servidor_sms(gui_app):
                 """
                 import time as _tt
                 ver  = str(int(_tt.time()))   # cache-buster dinámico por request
-                 html = f"""<!DOCTYPE html>
+                html = f"""<!DOCTYPE html>
  <html lang="es">
  <head>
    <meta charset="UTF-8">

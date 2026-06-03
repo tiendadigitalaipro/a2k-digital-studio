@@ -1,0 +1,44 @@
+# ── Credenciales y secretos — NUNCA subir ──────────────────────────
+.env
+.env.local
+.env.*.local
+*.env
+
+# Credenciales de servicio Google / Firebase
+*-credentials.json
+*-service-account.json
+jarvis-voice-system-*.json
+
+# ── Python ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── Logs y datos en tiempo real ─────────────────────────────────────
+*.log
+jarvis_error.log
+pagos_recibidos.log
+bitacora_zync.txt
+
+# ── Audio generado ──────────────────────────────────────────────────
+*.mp3
+*.wav
+temp_audio.*
+
+# ── Backups y archivos de datos locales ─────────────────────────────
+backups/
+historicos/
+capturas/
+
+# ── Binarios y builds ───────────────────────────────────────────────
+build/
+dist/
+*.exe
+cloudflared.exe
+
+# ── IDEs ────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
