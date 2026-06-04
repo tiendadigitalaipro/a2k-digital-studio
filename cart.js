@@ -8,7 +8,7 @@
 
   // ─── CONFIGURACIÓN ────────────────────────────────────────────────────
   const CONFIG = {
-    PROXY_URL:   'https://cart-proxy.a2kdigitalstudio.online/pagar',
+    PROXY_URL:   'https://cart-proxy.shoppingelectronics3112.workers.dev',
     SITE_URL:    'https://a2kdigitalstudio.online',
     STORAGE_KEY: 'a2k_cart_v1',
   };
