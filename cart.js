@@ -65,6 +65,16 @@
       subtitle: 'Asistente de escritorio con IA y voz',
       price: 35.00, tax: 0.00, currency: 'USD', icon: '🧠',
     },
+    'bodega-pro-cloud': {
+      id: 'bodega-pro-cloud', name: 'Bodega Pro Cloud',
+      subtitle: 'Gestión multi-sede · Activación mensual',
+      price: 15.00, tax: 0.00, currency: 'USD', icon: '☁️',
+    },
+    'farmacia-pro-plus': {
+      id: 'farmacia-pro-plus', name: 'Farmacia Pro Plus',
+      subtitle: 'Sistema farmacéutico cloud · Mensual',
+      price: 15.00, tax: 0.00, currency: 'USD', icon: '💊',
+    },
   };
 
   // ─── ESTADO ───────────────────────────────────────────────────────────
