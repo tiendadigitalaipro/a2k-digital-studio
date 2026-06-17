@@ -82,7 +82,9 @@
     .pcard::after { content: ''; position: absolute; inset: 0; border-radius: 20px; border: 1px solid transparent; background: linear-gradient(135deg, var(--purple), var(--teal)) border-box; -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); -webkit-mask-composite: destination-out; mask-composite: exclude; opacity: 0; transition: opacity .3s; pointer-events: none; }
     .pcard:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
     .pcard:hover::after { opacity: 1; }
-    .pcard-img-placeholder { width: 100%; height: 190px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border); font-size: 3.5rem; }
+    .pcard-img-placeholder { width: 100%; height: 190px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border); font-size: 3.5rem; overflow: hidden; }
+    .pcard-img-placeholder img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+    .pcard:hover .pcard-img-placeholder img { transform: scale(1.05); }
     .pcard-body { padding: 22px; flex: 1; display: flex; flex-direction: column; }
     .pcard-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
     .pcard-name { font-size: 1.1rem; font-weight: 800; line-height: 1.2; }
@@ -111,7 +113,8 @@
     .featured-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--purple), var(--teal), var(--purple)); }
     .featured-inner { display: grid; grid-template-columns: 1fr 1fr; }
     @media(max-width:768px){ .featured-inner { grid-template-columns: 1fr; } }
-    .featured-img-placeholder { width: 100%; min-height: 340px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(0,245,212,0.08)); font-size: 7rem; }
+    .featured-img-placeholder { width: 100%; min-height: 340px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(0,245,212,0.08)); font-size: 7rem; overflow: hidden; }
+    .featured-img-placeholder img { width: 100%; height: 100%; object-fit: cover; min-height: 340px; }
     .featured-body { padding: 44px 36px; display: flex; flex-direction: column; justify-content: center; }
     @media(max-width:768px){ .featured-body { padding: 28px 24px; } }
     .featured-label { display: inline-flex; align-items: center; padding: 5px 14px; background: rgba(0,245,212,0.1); border: 1px solid rgba(0,245,212,0.25); border-radius: 999px; font-size: 0.7rem; font-weight: 700; color: var(--teal); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 18px; width: fit-content; }
@@ -378,7 +381,7 @@
   <!-- FEATURED: A2K Comandas -->
   <div class="featured-card reveal" style="margin-top:48px;">
     <div class="featured-inner">
-      <div class="featured-img-placeholder">🍽️</div>
+      <div class="featured-img-placeholder"><img src="img/app-comandas-pro.png" alt="A2K Comandas Pro" onerror="this.parentElement.innerHTML='🍽️'"></div>
       <div class="featured-body">
         <div class="featured-label">⭐ NUEVO · Más solicitado</div>
         <h3 class="featured-title">A2K Comandas Pro</h3>
@@ -412,7 +415,7 @@
   <div class="grid-products" id="productGrid">
 
     <div class="pcard" data-cat="pos" onclick="openModal('bodega')">
-      <div class="pcard-img-placeholder" style="background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(0,245,212,0.06))">🏪</div>
+      <div class="pcard-img-placeholder"><img src="img/app-bodega-pro.png" alt="Bodega Pro" onerror="this.parentElement.innerHTML='🏪'"></div>
       <div class="pcard-body">
         <div class="pcard-header"><div class="pcard-name">Bodega Pro</div><span class="pcard-badge badge-hot">HOT</span></div>
         <div class="pcard-desc">Control completo de ventas, inventario y caja para bodegas, abastos y minimercados. El más vendido de A2K.</div>
@@ -429,7 +432,7 @@
     </div>
 
     <div class="pcard" data-cat="belleza" onclick="openModal('nail')">
-      <div class="pcard-img-placeholder" style="background:linear-gradient(135deg,rgba(244,63,94,0.12),rgba(167,139,250,0.08))">💅</div>
+      <div class="pcard-img-placeholder"><img src="img/app-nail-studio-pro.png" alt="Nail Studio Pro" onerror="this.parentElement.innerHTML='💅'"></div>
       <div class="pcard-body">
         <div class="pcard-header"><div class="pcard-name">Nail Studio Pro</div><span class="pcard-badge badge-new">NUEVO</span></div>
         <div class="pcard-desc">POS completo para nail studios. Agenda de citas, historial de clientas, catálogo de servicios y gestión de caja elegante.</div>
@@ -446,7 +449,7 @@
     </div>
 
     <div class="pcard" data-cat="ia" onclick="openModal('recepcionista')">
-      <div class="pcard-img-placeholder" style="background:linear-gradient(135deg,rgba(167,139,250,0.15),rgba(0,245,212,0.06))">🤖</div>
+      <div class="pcard-img-placeholder"><img src="img/app-recepcionista-ai.png" alt="Recepcionista AI" onerror="this.parentElement.innerHTML='🤖'"></div>
       <div class="pcard-body">
         <div class="pcard-header"><div class="pcard-name">Recepcionista AI</div><span class="pcard-badge badge-ia">IA</span></div>
         <div class="pcard-desc">Asistente de voz con inteligencia artificial que atiende clientes 24/7, agenda citas y gestiona consultas automáticamente.</div>
@@ -463,7 +466,7 @@
     </div>
 
     <div class="pcard" data-cat="salud" onclick="openModal('farmacia')">
-      <div class="pcard-img-placeholder" style="background:linear-gradient(135deg,rgba(0,245,212,0.1),rgba(124,58,237,0.06))">💊</div>
+      <div class="pcard-img-placeholder"><img src="img/app-farmacia-pro.png" alt="Farmacia Pro" onerror="this.parentElement.innerHTML='💊'"></div>
       <div class="pcard-body">
         <div class="pcard-header"><div class="pcard-name">Farmacia Pro</div><span class="pcard-badge badge-pro">PRO</span></div>
         <div class="pcard-desc">Sistema especializado para farmacias. Control de medicamentos, vencimientos y ventas por categoría terapéutica.</div>
@@ -480,7 +483,7 @@
     </div>
 
     <div class="pcard" data-cat="belleza" onclick="openModal('barberia')">
-      <div class="pcard-img-placeholder" style="background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(124,58,237,0.06))">✂️</div>
+      <div class="pcard-img-placeholder"><img src="img/app-barberia-pro.png" alt="Barbería Pro" onerror="this.parentElement.innerHTML='✂️'"></div>
       <div class="pcard-body">
         <div class="pcard-header"><div class="pcard-name">Barbería Pro</div><span class="pcard-badge badge-pro">PRO</span></div>
         <div class="pcard-desc">POS y agenda para barberías y peluquerías. Gestiona turnos, barberos, servicios y cobros en un solo lugar.</div>
@@ -497,7 +500,7 @@
     </div>
 
     <div class="pcard" data-cat="pos" onclick="openModal('repuestos')">
-      <div class="pcard-img-placeholder" style="background:linear-gradient(135deg,rgba(100,116,139,0.15),rgba(124,58,237,0.06))">🔧</div>
+      <div class="pcard-img-placeholder"><img src="img/app-repuestos-motos-pro.png" alt="Repuestos Motos Pro" onerror="this.parentElement.innerHTML='🔧'"></div>
       <div class="pcard-body">
         <div class="pcard-header"><div class="pcard-name">Repuestos Motos Pro</div><span class="pcard-badge badge-pro">PRO</span></div>
         <div class="pcard-desc">Gestión de repuestos para motos. Inventario por referencia, búsqueda rápida y control multi-terminal en red.</div>
@@ -514,7 +517,7 @@
     </div>
 
     <div class="pcard" data-cat="pos" onclick="openModal('fruteria')">
-      <div class="pcard-img-placeholder" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(124,58,237,0.06))">🍊</div>
+      <div class="pcard-img-placeholder"><img src="img/app-fruteria-pro.png" alt="Frutería Pro" onerror="this.parentElement.innerHTML='🍊'"></div>
       <div class="pcard-body">
         <div class="pcard-header"><div class="pcard-name">Frutería Pro</div><span class="pcard-badge badge-pro">PRO</span></div>
         <div class="pcard-desc">Venta por peso y unidad para fruterías y abarrotes. Control de perecederos, caja diaria y reportes.</div>
@@ -531,7 +534,7 @@
     </div>
 
     <div class="pcard" data-cat="pos" onclick="openModal('mercado')">
-      <div class="pcard-img-placeholder" style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(124,58,237,0.06))">🛒</div>
+      <div class="pcard-img-placeholder"><img src="img/app-mercado-logic-pro.png" alt="Mercado Logic Pro" onerror="this.parentElement.innerHTML='🛒'"></div>
       <div class="pcard-body">
         <div class="pcard-header"><div class="pcard-name">Mercado Logic Pro</div><span class="pcard-badge badge-new">NUEVO</span></div>
         <div class="pcard-desc">Sistema avanzado para supermercados. Múltiples cajeros, scanner de código de barras e inventario masivo.</div>
