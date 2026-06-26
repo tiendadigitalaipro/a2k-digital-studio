@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Panel Admin — A2K License Engine</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a12;--bg2:#0f0f1e;--bg3:#16162a;--bg4:#1e1e35;
+  --border:#2a2a45;--neon:#00ff88;--neon2:#00cc6a;
+  --blue:#4488ff;--warn:#ffb347;--danger:#ff4466;
+  --text:#e0e0f0;--text2:#a0a0c0;--text3:#606080;
+  --pro:#a78bfa;--demo:#fbbf24;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+/* ── TOPBAR ── */
+.topbar{background:var(--bg3);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-logo{font-size:16px;font-weight:800;color:var(--neon);letter-spacing:.5px}
+.topbar-logo span{color:var(--text2);font-weight:400;font-size:13px;margin-left:8px}
+.topbar-status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--neon);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* ── LOGIN ── */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:80vh}
+.login-box{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:380px;text-align:center}
+.login-box h2{font-size:22px;margin-bottom:8px}
+.login-box p{color:var(--text2);font-size:13px;margin-bottom:28px}
+/* ── INPUTS ── */
+input,select{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;outline:none;width:100%;transition:.2s}
+input:focus,select:focus{border-color:var(--neon)}
+input::placeholder{color:var(--text3)}
+/* ── BOTONES ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s}
+.btn-neon{background:var(--neon);color:#000}
+.btn-neon:hover{background:var(--neon2)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--neon);color:var(--neon)}
+.btn-danger{background:#2a1020;border:1px solid var(--danger);color:var(--danger)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-pro{background:#1a1030;border:1px solid var(--pro);color:var(--pro)}
+.btn-pro:hover{background:var(--pro);color:#000}
+.btn-sm{padding:6px 12px;font-size:12px}
+/* ── MAIN ── */
+#mainApp{display:none;padding:24px}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:gap}
+.page-title{font-size:20px;font-weight:700}
+.page-title span{color:var(--text2);font-size:13px;font-weight:400;margin-left:8px}
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.stat-val{font-size:26px;font-weight:800;color:var(--text)}
+.stat-val.neon{color:var(--neon)}
+.stat-val.pro{color:var(--pro)}
+.stat-val.demo{color:var(--demo)}
+.stat-val.danger{color:var(--danger)}
+/* ── CREAR LICENCIA ── */
+.crear-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px}
+.crear-box h3{font-size:14px;font-weight:700;margin-bottom:16px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px}
+.crear-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px}
+/* ── FILTROS ── */
+.filtros{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.filtros input{flex:1;min-width:180px}
+.filtros select{width:auto;min-width:140px}
+/* ── TABLA ── */
+.tabla-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{background:var(--bg4);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:12px 14px;text-align:left;font-weight:600}
+td{padding:12px 14px;border-top:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:hover td{background:var(--bg4)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-pro{background:#1a1030;color:var(--pro);border:1px solid var(--pro)}
+.badge-demo{background:#2a1a00;color:var(--demo);border:1px solid var(--demo)}
+.badge-revocada{background:#200a10;color:var(--danger);border:1px solid var(--danger)}
+.badge-expirada{background:#1a1010;color:var(--danger);border:1px solid #441020}
+.key-code{font-family:'Courier New',monospace;font-size:12px;color:var(--neon);background:var(--bg2);padding:3px 8px;border-radius:4px;cursor:pointer;letter-spacing:.5px}
+.key-code:hover{background:var(--bg4)}
+.dias-badge{font-size:11px;font-weight:700}
+.dias-ok{color:var(--neon)}
+.dias-warn{color:var(--warn)}
+.dias-crit{color:var(--danger)}
+.acciones{display:flex;gap:6px;flex-wrap:wrap}
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--bg4);border:1px solid var(--neon);color:var(--neon);padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:.3s;pointer-events:none}
+#toast.show{opacity:1}
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:460px;width:90%}
+.modal h3{font-size:18px;font-weight:700;margin-bottom:6px}
+.modal p{color:var(--text2);font-size:13px;margin-bottom:20px}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .crear-grid{grid-template-columns:1fr}
+  .acciones{justify-content:center}
+  td:nth-child(5),th:nth-child(5){display:none}
+}
+.empty{text-align:center;padding:40px;color:var(--text3)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.loading{text-align:center;padding:30px;color:var(--text3);font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">A2K License Engine <span>Panel Admin</span></div>
+  <div class="topbar-status"><div class="dot"></div><span id="statusText">Conectando...</span></div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div style="font-size:36px;margin-bottom:16px">🔐</div>
+    <h2>Acceso Admin</h2>
+    <p>Ingresa la clave de administrador para gestionar las licencias</p>
+    <input type="password" id="adminKeyInput" placeholder="A2K-ADMIN-2026-ABIGAIL" style="margin-bottom:12px;text-align:center;letter-spacing:2px">
+    <button class="btn btn-neon" style="width:100%;justify-content:center" onclick="iniciarSesion()">Entrar</button>
+    <p id="loginError" style="color:var(--danger);font-size:12px;margin-top:10px;display:none">Clave incorrecta</p>
+  </div>
+</div>
+
+<!-- APP PRINCIPAL -->
+<div id="mainApp">
+  <!-- STATS -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="stat-label">Total Licencias</div><div class="stat-val neon" id="st-total">—</div></div>
+    <div class="stat-card"><div class="stat-label">PRO Activas</div><div class="stat-val pro" id="st-pro">—</div></div>
+    <div class="stat-card"><div class="stat-label">Demo Activas</div><div class="stat-val demo" id="st-demo">—</div></div>
+    <div class="stat-card"><div class="stat-label">Vencidas/Revocadas</div><div class="stat-val danger" id="st-inact">—</div></div>
+  </div>
+
+  <!-- CREAR LICENCIA -->
+  <div class="crear-box">
+    <h3>Crear Nueva Licencia</h3>
+    <div class="crear-grid">
+      <div class="form-group">
+        <label class="form-label">Sistema</label>
+        <select id="cr-product">
+          <option value="barberia">Barbería Pro</option>
+          <option value="bodega">Bodega Pro v9</option>
+          <option value="comandas">A2K Comandas</option>
+          <option value="nail">Nail Studio Pro</option>
+          <option value="farmacia">Farmacia Pro</option>
+          <option value="recepcionista">Recepcionista IA</option>
+          <option value="zync">ZYNC Electronics</option>
+          <option value="dental">Zync Dental Pro</option>
+          <option value="ferreteria">Ferretería Zync</option>
+          <option value="mercado">Mercado Logic Pro</option>
+          <option value="fruteria">Frutería Pro</option>
+          <option value="motos">Repuestos Motos Pro</option>
+          <option value="synthtrade">SynthTrade Pro</option>
+          <option value="fiadospro">FiadosPro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <select id="cr-type">
+          <option value="demo">DEMO (5 días)</option>
+          <option value="pro">PRO (permanente)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre del cliente</label>
+        <input type="text" id="cr-cliente" placeholder="Ej: Bodega El Sol">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Teléfono (opcional)</label>
+        <input type="text" id="cr-telefono" placeholder="+58 412 000 0000">
+      </div>
+      <div class="form-group" style="justify-content:flex-end">
+        <button class="btn btn-neon" onclick="crearLicencia()" style="height:42px;width:100%;justify-content:center">
+          + Crear Licencia
+        </button>
+      </div>
+    </div>
+    <!-- Resultado de creación -->
+    <div id="cr-resultado" style="display:none;margin-top:16px;background:var(--bg2);border:1px solid var(--neon);border-radius:10px;padding:16px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px">Licencia creada — copia y envía al cliente</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span class="key-code" id="cr-key-display" onclick="copiarKey(this.textContent)" title="Clic para copiar"></span>
+        <button class="btn btn-ghost btn-sm" onclick="copiarKey(document.getElementById('cr-key-display').textContent)">📋 Copiar</button>
+        <button class="btn btn-ghost btn-sm" onclick="enviarPorWA()">💬 Enviar por WhatsApp</button>
+      </div>
+      <div id="cr-info" style="font-size:12px;color:var(--text2);margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- FILTROS + TABLA -->
+  <div class="page-header">
+    <div class="page-title">Todas las Licencias <span id="contadorLabel"></span></div>
+    <button class="btn btn-ghost btn-sm" onclick="cargarLicencias()">↻ Actualizar</button>
+  </div>
+
+  <div class="filtros">
+    <input type="text" id="buscar" placeholder="Buscar por cliente, código o sistema..." oninput="filtrarTabla()">
+    <select id="filtroProducto" onchange="filtrarTabla()">
+      <option value="">Todos los sistemas</option>
+      <option value="barberia">Barbería Pro</option>
+      <option value="bodega">Bodega Pro</option>
+      <option value="comandas">Comandas</option>
+      <option value="nail">Nail Studio</option>
+      <option value="farmacia">Farmacia</option>
+      <option value="recepcionista">Recepcionista IA</option>
+      <option value="zync">ZYNC</option>
+      <option value="dental">Dental</option>
+      <option value="ferreteria">Ferretería</option>
+      <option value="mercado">Mercado Logic</option>
+      <option value="fruteria">Frutería</option>
+      <option value="motos">Motos</option>
+      <option value="synthtrade">SynthTrade</option>
+      <option value="fiadospro">FiadosPro</option>
+    </select>
+    <select id="filtroTipo" onchange="filtrarTabla()">
+      <option value="">Todos los tipos</option>
+      <option value="pro">PRO</option>
+      <option value="demo">DEMO</option>
+    </select>
+  </div>
+
+  <div class="tabla-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Cliente</th>
+          <th>Sistema</th>
+          <th>Tipo / Estado</th>
+          <th>Vencimiento</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaBody">
+        <tr><td colspan="6" class="loading">Cargando licencias...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR -->
+<div class="modal-bg" id="modalConfirm">
+  <div class="modal">
+    <h3 id="modalTitle">Confirmar acción</h3>
+    <p id="modalMsg">¿Estás seguro?</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-neon" id="modalOkBtn" onclick="">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const ENGINE = 'https://a2k-license-engine.shoppingelectronics3112.workers.dev';
+let ADMIN_KEY = '';
+let todasLicencias = [];
+let crKeyActual = '';
+let crProductoActual = '';
+let crClienteActual = '';
+let crTelefonoActual = '';
+
+const NOMBRES = {
+  barberia:'Barbería Pro', bodega:'Bodega Pro', comandas:'A2K Comandas',
+  nail:'Nail Studio Pro', farmacia:'Farmacia Pro', recepcionista:'Recepcionista IA',
+  zync:'ZYNC Electronics', dental:'Zync Dental Pro', ferreteria:'Ferretería Zync',
+  mercado:'Mercado Logic Pro', fruteria:'Frutería Pro', motos:'Repuestos Motos Pro',
+  synthtrade:'SynthTrade Pro', fiadospro:'FiadosPro'
+};
+
+// ── Verificar conexión ──
+async function verificarConexion(){
+  try{
+    const r = await fetch(`${ENGINE}/`);
+    const d = await r.json();
+    document.getElementById('statusText').textContent = `Live · ${d.productos?.length || 14} productos`;
+  } catch {
+    document.getElementById('statusText').textContent = 'Sin conexión';
+    document.querySelector('.dot').style.background = 'var(--danger)';
+  }
+}
+
+// ── Login ──
+async function iniciarSesion(){
+  const key = document.getElementById('adminKeyInput').value.trim();
+  if(!key){ return; }
+  // Verificar con /todas
+  const r = await fetch(`${ENGINE}/todas`, { headers:{'X-Admin-Key': key} });
+  if(r.status === 401){
+    document.getElementById('loginError').style.display = 'block';
+    return;
+  }
+  ADMIN_KEY = key;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  const data = await r.json();
+  procesarLicencias(data.licencias || []);
+}
+
+document.getElementById('adminKeyInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') iniciarSesion();
+});
+
+// ── Cargar licencias ──
+async function cargarLicencias(){
+  const r = await fetch(`${ENGINE}/todas`, { headers:{'X-Admin-Key': ADMIN_KEY} });
+  const data = await r.json();
+  procesarLicencias(data.licencias || []);
+}
+
+function procesarLicencias(lics){
+  todasLicencias = lics;
+  actualizarStats(lics);
+  renderTabla(lics);
+}
+
+// ── Stats ──
+function actualizarStats(lics){
+  const hoy = new Date();
+  let pro=0, demo=0, inact=0;
+  lics.forEach(l => {
+    if(!l.activa){ inact++; return; }
+    if(l.type==='pro') pro++;
+    else {
+      const dias = l.expires ? Math.ceil((new Date(l.expires)-hoy)/(864e5)) : 999;
+      if(dias <= 0) inact++;
+      else demo++;
+    }
+  });
+  document.getElementById('st-total').textContent = lics.length;
+  document.getElementById('st-pro').textContent = pro;
+  document.getElementById('st-demo').textContent = demo;
+  document.getElementById('st-inact').textContent = inact;
+}
+
+// ── Render tabla ──
+function renderTabla(lics){
+  const tbody = document.getElementById('tablaBody');
+  document.getElementById('contadorLabel').textContent = `(${lics.length})`;
+  if(!lics.length){
+    tbody.innerHTML = `<tr><td colspan="6" class="empty"><div class="empty-icon">📋</div>No hay licencias registradas</td></tr>`;
+    return;
+  }
+  const hoy = new Date();
+  tbody.innerHTML = lics.map(l => {
+    const nombre = NOMBRES[l.product] || l.product;
+    let badge, diasHtml='—';
+    if(!l.activa){
+      badge = `<span class="badge badge-revocada">✕ Revocada</span>`;
+    } else if(l.type==='pro'){
+      badge = `<span class="badge badge-pro">★ PRO</span>`;
+      diasHtml = `<span style="color:var(--text3);font-size:11px">Permanente</span>`;
+    } else {
+      const dias = l.expires ? Math.ceil((new Date(l.expires)-hoy)/(864e5)) : 0;
+      if(dias <= 0){
+        badge = `<span class="badge badge-expirada">⏰ Expirada</span>`;
+        diasHtml = `<span class="dias-badge dias-crit">Vencida</span>`;
+      } else {
+        badge = `<span class="badge badge-demo">⏳ Demo</span>`;
+        const cls = dias<=1?'dias-crit':dias<=2?'dias-warn':'dias-ok';
+        diasHtml = `<span class="dias-badge ${cls}">${dias} día${dias!==1?'s':''}</span>`;
+      }
+    }
+    const tel = l.telefono ? `<br><span style="color:var(--text3);font-size:11px">${l.telefono}</span>` : '';
+    return `<tr>
+      <td><span class="key-code" onclick="copiarKey('${l.key}')" title="Clic para copiar">${l.key}</span></td>
+      <td>${l.cliente||'—'}${tel}</td>
+      <td style="color:var(--text2)">${nombre}</td>
+      <td>${badge}</td>
+      <td>${diasHtml}</td>
+      <td><div class="acciones">
+        ${l.type==='demo'&&l.activa?`<button class="btn btn-pro btn-sm" onclick="activarPRO('${l.key}','${l.cliente}')">↑ PRO</button>`:''}
+        ${l.activa?`<button class="btn btn-danger btn-sm" onclick="revocarLic('${l.key}','${l.cliente}')">✕ Revocar</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="copiarKey('${l.key}')">📋</button>
+        ${l.telefono?`<button class="btn btn-ghost btn-sm" onclick="waCliente('${l.telefono}','${l.key}','${l.product}')">💬</button>`:''}
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Filtrar ──
+function filtrarTabla(){
+  const q = document.getElementById('buscar').value.toLowerCase();
+  const prod = document.getElementById('filtroProducto').value;
+  const tipo = document.getElementById('filtroTipo').value;
+  const filtradas = todasLicencias.filter(l => {
+    const matchQ = !q || l.key.toLowerCase().includes(q) || (l.cliente||'').toLowerCase().includes(q) || l.product.includes(q);
+    const matchP = !prod || l.product === prod;
+    const matchT = !tipo || l.type === tipo;
+    return matchQ && matchP && matchT;
+  });
+  renderTabla(filtradas);
+}
+
+// ── Crear licencia ──
+async function crearLicencia(){
+  const product = document.getElementById('cr-product').value;
+  const type    = document.getElementById('cr-type').value;
+  const cliente = document.getElementById('cr-cliente').value.trim();
+  const telefono= document.getElementById('cr-telefono').value.trim();
+  if(!cliente){ toast('Ingresa el nombre del cliente'); return; }
+
+  const r = await fetch(`${ENGINE}/crear`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','X-Admin-Key':ADMIN_KEY},
+    body: JSON.stringify({product,type,cliente,telefono})
+  });
+  const d = await r.json();
+  if(!d.ok){ toast('Error: '+d.error,'danger'); return; }
+
+  crKeyActual  = d.key;
+  crProductoActual = product;
+  crClienteActual  = cliente;
+  crTelefonoActual = telefono;
+
+  document.getElementById('cr-key-display').textContent = d.key;
+  document.getElementById('cr-info').innerHTML =
+    `Cliente: <strong>${cliente}</strong> · Sistema: <strong>${NOMBRES[product]||product}</strong> · ` +
+    (type==='demo' ? `Vence: <strong>${d.expires}</strong>` : `Licencia <strong>PERMANENTE</strong>`);
+  document.getElementById('cr-resultado').style.display = 'block';
+
+  toast(`Licencia ${type.toUpperCase()} creada para ${cliente}`);
+  cargarLicencias();
+  document.getElementById('cr-cliente').value = '';
+  document.getElementById('cr-telefono').value = '';
+}
+
+// ── Activar PRO ──
+function activarPRO(key, cliente){
+  confirmar(
+    'Activar Licencia PRO',
+    `¿Convertir la licencia de <strong>${cliente}</strong> a PRO permanente?`,
+    async ()=>{
+      const r = await fetch(`${ENGINE}/activar`,{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Key':ADMIN_KEY},body:JSON.stringify({key})});
+      const d = await r.json();
+      if(d.ok){ toast(`${cliente} → PRO activado`); cargarLicencias(); }
+      else toast('Error: '+d.error,'danger');
+    },'btn-pro'
+  );
+}
+
+// ── Revocar ──
+function revocarLic(key, cliente){
+  confirmar(
+    'Revocar Licencia',
+    `¿Revocar la licencia de <strong>${cliente}</strong>? El cliente perderá el acceso inmediatamente.`,
+    async ()=>{
+      const r = await fetch(`${ENGINE}/revocar`,{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Key':ADMIN_KEY},body:JSON.stringify({key})});
+      const d = await r.json();
+      if(d.ok){ toast(`Licencia de ${cliente} revocada`); cargarLicencias(); }
+      else toast('Error: '+d.error,'danger');
+    },'btn-danger'
+  );
+}
+
+// ── Copiar clave ──
+function copiarKey(key){
+  navigator.clipboard.writeText(key).then(()=>toast(`Copiado: ${key}`));
+}
+
+// ── WhatsApp cliente ──
+function waCliente(tel, key, product){
+  const nombre = NOMBRES[product]||product;
+  const msg = encodeURIComponent(`Hola! Aquí tu código de acceso para ${nombre}:\n\n*${key}*\n\nÁbrelo en la app e ingresa este código. Cualquier duda escríbeme.\n— A2K Digital Studio`);
+  window.open(`https://wa.me/${tel.replace(/\D/g,'')}?text=${msg}`, '_blank');
+}
+
+// ── Enviar por WA (desde creación) ──
+function enviarPorWA(){
+  if(!crTelefonoActual){ toast('No hay teléfono registrado para este cliente','danger'); return; }
+  waCliente(crTelefonoActual, crKeyActual, crProductoActual);
+}
+
+// ── Modal confirmar ──
+let _cbConfirm = null;
+function confirmar(title, msg, cb, btnClass='btn-neon'){
+  document.getElementById('modalTitle').innerHTML = title;
+  document.getElementById('modalMsg').innerHTML = msg;
+  const btn = document.getElementById('modalOkBtn');
+  btn.className = `btn ${btnClass}`;
+  btn.textContent = 'Confirmar';
+  _cbConfirm = cb;
+  btn.onclick = ()=>{ cerrarModal(); _cbConfirm?.(); };
+  document.getElementById('modalConfirm').classList.add('open');
+}
+function cerrarModal(){ document.getElementById('modalConfirm').classList.remove('open'); }
+document.getElementById('modalConfirm').addEventListener('click', e=>{ if(e.target===e.currentTarget) cerrarModal(); });
+
+// ── Toast ──
+let _toastTimer;
+function toast(msg, type='ok'){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = type==='danger'?'var(--danger)':'var(--neon)';
+  el.style.color = type==='danger'?'var(--danger)':'var(--neon)';
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=>el.classList.remove('show'), 3000);
+}
+
+verificarConexion();
+</script>
+</body>
+</html>
