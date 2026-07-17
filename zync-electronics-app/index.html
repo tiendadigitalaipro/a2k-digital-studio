@@ -410,6 +410,10 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
         <span class="material-symbols-outlined text-base">label</span>
         <span>Etiquetas</span>
       </div>
+      <div class="nav-item" onclick="navigateTo('catalogo')" data-view="catalogo">
+        <span class="material-symbols-outlined text-base">storefront</span>
+        <span>Catálogo</span>
+      </div>
       <div class="nav-item" onclick="navigateTo('config')" data-view="config">
         <span class="material-symbols-outlined text-base">settings</span>
         <span>Configuración</span>
@@ -1354,6 +1358,175 @@ html.dark .shadow-sm { box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important; }
         </div>
       </div>
 
+      <!-- ── VIEW: CATÁLOGO ── -->
+      <div id="view-catalogo" class="view h-full bg-surface overflow-y-auto p-6">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="text-xl font-black text-on-surface">Catálogo de Productos</h2>
+            <p class="text-xs text-outline mt-0.5">Edita el precio y haz clic en Agregar — pasa directo al POS</p>
+          </div>
+          <div class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold" style="background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);color:#a08820;">
+            <span class="material-symbols-outlined fill-icon text-base">edit_note</span>
+            Precios editables por venta
+          </div>
+        </div>
+
+        <!-- ── RELOJES ── -->
+        <p class="text-[10px] font-black uppercase tracking-widest text-outline mb-3">⌚ Relojes Inteligentes</p>
+        <div class="grid grid-cols-2 gap-4 mb-7" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+
+          <!-- Reloj 130 ProMax (Hi Watch 10 / i30 Pro Max Suit) -->
+          <div class="bg-white rounded-2xl overflow-hidden border border-surface-highest shadow-sm flex flex-col">
+            <img src="img/hi-watch-10.jpeg" alt="Reloj 130 ProMax" class="w-full h-44 object-cover object-center"/>
+            <div class="p-4 flex flex-col flex-1">
+              <p class="font-black text-sm text-on-surface">Reloj 130 ProMax</p>
+              <p class="text-[10px] text-outline mb-3">i30 Pro Max Suit · 11 en 1 · Super AMOLED</p>
+              <div class="flex items-center gap-2 mb-3 mt-auto">
+                <span class="text-base font-black text-primary">$</span>
+                <input type="number" step="0.01" value="19.64" min="0" id="price-hw10"
+                  class="flex-1 text-xl font-black border border-surface-highest rounded-xl px-3 py-1.5 outline-none focus:ring-2 focus:ring-primary/20 bg-surface-low"/>
+              </div>
+              <button onclick="catalogAdd('Reloj 130 ProMax','REL-HW10',document.getElementById('price-hw10').value)"
+                class="w-full py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all active:scale-95 hover:opacity-90 flex items-center justify-center gap-1"
+                style="background:linear-gradient(135deg,#3e6a00,#2a4a00);color:#fff">
+                <span class="material-symbols-outlined fill-icon text-base">add_shopping_cart</span> Agregar al carrito
+              </button>
+            </div>
+          </div>
+
+          <!-- Reloj H55 ProMax -->
+          <div class="bg-white rounded-2xl overflow-hidden border border-surface-highest shadow-sm flex flex-col">
+            <img src="img/h55promax.jpeg" alt="H55 ProMax" class="w-full h-44 object-cover object-center"/>
+            <div class="p-4 flex flex-col flex-1">
+              <p class="font-black text-sm text-on-surface">Reloj H55 ProMax</p>
+              <p class="text-[10px] text-outline mb-3">10+1 · Wireless Charging · Big 2.09" Display</p>
+              <div class="flex items-center gap-2 mb-3 mt-auto">
+                <span class="text-base font-black text-primary">$</span>
+                <input type="number" step="0.01" value="19.64" min="0" id="price-h55"
+                  class="flex-1 text-xl font-black border border-surface-highest rounded-xl px-3 py-1.5 outline-none focus:ring-2 focus:ring-primary/20 bg-surface-low"/>
+              </div>
+              <button onclick="catalogAdd('Reloj H55 ProMax','REL-H55',document.getElementById('price-h55').value)"
+                class="w-full py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all active:scale-95 hover:opacity-90 flex items-center justify-center gap-1"
+                style="background:linear-gradient(135deg,#3e6a00,#2a4a00);color:#fff">
+                <span class="material-symbols-outlined fill-icon text-base">add_shopping_cart</span> Agregar al carrito
+              </button>
+            </div>
+          </div>
+
+          <!-- Reloj i20 ProMax Suit -->
+          <div class="bg-white rounded-2xl overflow-hidden border border-surface-highest shadow-sm flex flex-col">
+            <img src="img/relojes-abiertos-2.jpeg" alt="i20 ProMax Suit" class="w-full h-44 object-cover object-center"/>
+            <div class="p-4 flex flex-col flex-1">
+              <p class="font-black text-sm text-on-surface">Reloj i20 ProMax Suit</p>
+              <p class="text-[10px] text-outline mb-3">i20 Ultra · HiWatch Ultra App · Big Display</p>
+              <div class="flex items-center gap-2 mb-3 mt-auto">
+                <span class="text-base font-black text-primary">$</span>
+                <input type="number" step="0.01" value="19.64" min="0" id="price-i20"
+                  class="flex-1 text-xl font-black border border-surface-highest rounded-xl px-3 py-1.5 outline-none focus:ring-2 focus:ring-primary/20 bg-surface-low"/>
+              </div>
+              <button onclick="catalogAdd('Reloj i20 ProMax Suit','REL-I20',document.getElementById('price-i20').value)"
+                class="w-full py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all active:scale-95 hover:opacity-90 flex items-center justify-center gap-1"
+                style="background:linear-gradient(135deg,#3e6a00,#2a4a00);color:#fff">
+                <span class="material-symbols-outlined fill-icon text-base">add_shopping_cart</span> Agregar al carrito
+              </button>
+            </div>
+          </div>
+
+          <!-- Reloj ACE 240 -->
+          <div class="bg-white rounded-2xl overflow-hidden border border-surface-highest shadow-sm flex flex-col">
+            <img src="img/relojes-abiertos-1.jpeg" alt="ACE 240" class="w-full h-44 object-cover object-center"/>
+            <div class="p-4 flex flex-col flex-1">
+              <p class="font-black text-sm text-on-surface">Reloj ACE 240</p>
+              <p class="text-[10px] text-outline mb-3">ACE-240 · Sport · Bluetooth · Multifunción</p>
+              <div class="flex items-center gap-2 mb-3 mt-auto">
+                <span class="text-base font-black text-primary">$</span>
+                <input type="number" step="0.01" value="19.64" min="0" id="price-ace240"
+                  class="flex-1 text-xl font-black border border-surface-highest rounded-xl px-3 py-1.5 outline-none focus:ring-2 focus:ring-primary/20 bg-surface-low"/>
+              </div>
+              <button onclick="catalogAdd('Reloj ACE 240','REL-ACE240',document.getElementById('price-ace240').value)"
+                class="w-full py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all active:scale-95 hover:opacity-90 flex items-center justify-center gap-1"
+                style="background:linear-gradient(135deg,#3e6a00,#2a4a00);color:#fff">
+                <span class="material-symbols-outlined fill-icon text-base">add_shopping_cart</span> Agregar al carrito
+              </button>
+            </div>
+          </div>
+
+
+        </div>
+
+        <!-- ── ACCESORIOS ── -->
+        <p class="text-[10px] font-black uppercase tracking-widest text-outline mb-3">🎙️ Accesorios</p>
+        <div class="grid grid-cols-2 gap-4 mb-6" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+
+          <!-- Micrófono K9 ONE -->
+          <div class="bg-white rounded-2xl overflow-hidden border border-surface-highest shadow-sm flex flex-col">
+            <img src="img/k9-airmax.jpeg" alt="Micrófono K9 ONE" class="w-full h-44 object-cover object-top"/>
+            <div class="p-4 flex flex-col flex-1">
+              <p class="font-black text-sm text-on-surface">Micrófono K9 ONE</p>
+              <p class="text-[10px] text-outline mb-3">Wireless · 1 micrófono · Live / Vlog / TikTok</p>
+              <div class="flex items-center gap-2 mb-3 mt-auto">
+                <span class="text-base font-black text-primary">$</span>
+                <input type="number" step="0.01" value="9.45" min="0" id="price-k9"
+                  class="flex-1 text-xl font-black border border-surface-highest rounded-xl px-3 py-1.5 outline-none focus:ring-2 focus:ring-primary/20 bg-surface-low"/>
+              </div>
+              <button onclick="catalogAdd('Micrófono K9 ONE','MIC-K9-ONE',document.getElementById('price-k9').value)"
+                class="w-full py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all active:scale-95 hover:opacity-90 flex items-center justify-center gap-1"
+                style="background:linear-gradient(135deg,#3e6a00,#2a4a00);color:#fff">
+                <span class="material-symbols-outlined fill-icon text-base">add_shopping_cart</span> Agregar al carrito
+              </button>
+            </div>
+          </div>
+
+          <!-- Micrófono K9 DUO -->
+          <div class="bg-white rounded-2xl overflow-hidden border border-surface-highest shadow-sm flex flex-col">
+            <img src="img/k9-airmax.jpeg" alt="Micrófono K9 DUO" class="w-full h-44 object-cover object-top"/>
+            <div class="p-4 flex flex-col flex-1">
+              <p class="font-black text-sm text-on-surface">Micrófono K9 DUO</p>
+              <p class="text-[10px] text-outline mb-3">Wireless · 2 micrófonos · Entrevistas / Podcasts</p>
+              <div class="flex items-center gap-2 mb-3 mt-auto">
+                <span class="text-base font-black text-primary">$</span>
+                <input type="number" step="0.01" value="10.45" min="0" id="price-k9-duo"
+                  class="flex-1 text-xl font-black border border-surface-highest rounded-xl px-3 py-1.5 outline-none focus:ring-2 focus:ring-primary/20 bg-surface-low"/>
+              </div>
+              <button onclick="catalogAdd('Micrófono K9 DUO','MIC-K9-DUO',document.getElementById('price-k9-duo').value)"
+                class="w-full py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all active:scale-95 hover:opacity-90 flex items-center justify-center gap-1"
+                style="background:linear-gradient(135deg,#3e6a00,#2a4a00);color:#fff">
+                <span class="material-symbols-outlined fill-icon text-base">add_shopping_cart</span> Agregar al carrito
+              </button>
+            </div>
+          </div>
+
+          <!-- Audífonos AirMax -->
+          <div class="bg-white rounded-2xl overflow-hidden border border-surface-highest shadow-sm flex flex-col">
+            <img src="img/k9-airmax.jpeg" alt="Audífonos AirMax" class="w-full h-44 object-cover object-bottom"/>
+            <div class="p-4 flex flex-col flex-1">
+              <p class="font-black text-sm text-on-surface">Audífonos Inteligentes AirMax</p>
+              <p class="text-[10px] text-outline mb-3">True Wireless · Bluetooth · LED Display · HiFi</p>
+              <div class="flex items-center gap-2 mb-3 mt-auto">
+                <span class="text-base font-black text-primary">$</span>
+                <input type="number" step="0.01" value="11.36" min="0" id="price-airmax"
+                  class="flex-1 text-xl font-black border border-surface-highest rounded-xl px-3 py-1.5 outline-none focus:ring-2 focus:ring-primary/20 bg-surface-low"/>
+              </div>
+              <button onclick="catalogAdd('Audífonos Inteligentes AirMax','AUD-AIRMAX',document.getElementById('price-airmax').value)"
+                class="w-full py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all active:scale-95 hover:opacity-90 flex items-center justify-center gap-1"
+                style="background:linear-gradient(135deg,#3e6a00,#2a4a00);color:#fff">
+                <span class="material-symbols-outlined fill-icon text-base">add_shopping_cart</span> Agregar al carrito
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Nota -->
+        <div class="flex items-start gap-3 p-4 rounded-xl text-xs" style="background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.2);">
+          <span class="material-symbols-outlined fill-icon text-base mt-0.5" style="color:#D4AF37;">info</span>
+          <div>
+            <p class="font-black mb-0.5" style="color:#a08820;">Precios por defecto — actualiza antes de vender</p>
+            <p class="text-outline">Edita el número en cada tarjeta. Al agregar, el producto va directo al carrito del POS. Cada venta completada se registra en Reportes y Jarvis recibe la notificación automáticamente.</p>
+          </div>
+        </div>
+      </div>
+
     </div><!-- end views -->
   </div><!-- end main area -->
 </div><!-- end appShell -->
@@ -1993,7 +2166,8 @@ const viewTitles = {
   pos: 'Punto de Venta', inventario: 'Inventario', pesaje: 'Pesaje gr/L',
   fiados: 'Fiados y Créditos', reportes: 'Reportes', config: 'Configuración',
   devoluciones: 'Devoluciones', cotizaciones: 'Cotizaciones',
-  caja: 'Gestión de Caja', formula: 'Fórmula 50/30/20', etiquetas: 'Impresión de Etiquetas'
+  caja: 'Gestión de Caja', formula: 'Fórmula 50/30/20', etiquetas: 'Impresión de Etiquetas',
+  catalogo: 'Catálogo de Productos'
 };
 let currentView = 'pos';
 function navigateTo(view) {
@@ -2569,6 +2743,13 @@ function payConfirm() {
   posPausedRender();
   invRender(); rptRender();
   toast('Venta registrada exitosamente', 'success');
+  // Notificar a Jarvis (silencioso si no está corriendo)
+  try {
+    fetch('http://127.0.0.1:7799/venta-zync', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticket: ticket.ticketNum, total, metodo: method, productos: ticket.items.map(i => ({ sku: i.sku, nombre: i.desc, qty: i.qty, precio: i.price })), fecha: ticket.date })
+    }).catch(() => {});
+  } catch(e) {}
   isPaying = false;
 }
 
@@ -3885,6 +4066,23 @@ function mpPopulateCatList() {
   const cats = [...new Set(prods.map(p => p.cat).filter(Boolean))].sort();
   const dl = document.getElementById('mpCatList');
   dl.innerHTML = cats.map(c => `<option value="${c}">`).join('');
+}
+
+// ════════════════════════════════════════════
+// CATÁLOGO — AGREGAR AL CARRITO DIRECTO
+// ════════════════════════════════════════════
+function catalogAdd(desc, sku, priceRaw) {
+  const price = parseFloat(priceRaw) || 0;
+  if (!price) { toast('Configura el precio del producto primero', 'error'); return; }
+  const existing = cart.findIndex(c => c.sku === sku);
+  if (existing >= 0) {
+    cart[existing].qty += 1;
+  } else {
+    cart.push({ id: 'cat_' + Date.now(), sku, desc, price, iva: 0, qty: 1 });
+  }
+  navigateTo('pos');
+  posRender();
+  toast(`${desc} · $${price.toFixed(2)} → carrito`, 'success');
 }
 
 // ════════════════════════════════════════════

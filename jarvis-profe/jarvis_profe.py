@@ -20,6 +20,7 @@ from modulos import vision as vision_mod
 from modulos import fintech_scraper as _fintech
 from modulos import voz as _voz
 from modulos import logger as _logger
+from modulos import telegram_bridge as _tg_bridge
 from modulos.config_loader import get_api_key
 from modulos.rutas import base_exe as _base_exe
 from modulos.comando_engine import procesar_comando as _cmd_engine, nombre_usuario as _nombre_usuario
@@ -30,21 +31,56 @@ load_dotenv(_base_exe() / ".env", override=True)
 URL_ZYNC_PAY = "http://localhost/zync-pay/index.php"
 VERSION      = "JARVIS MENTE MAESTRA  v4.0"
 
+# ── PLAN DE TRADING A2K — reglas del plan aplicadas a la voz de Binarias ─────
+# Nunca "adivina" si conviene operar — solo reporta datos reales (RSI, racha,
+# horario, PnL del dia) y aplica las reglas ya escritas en GUIA-TRADING-A2K-v2.
+# Ver memoria [[project_binarias_whatsapp_numeros]] y la guia en el Escritorio.
+_HORARIO_PLAN_BUENO = ((6, 0, 10, 0), (14, 30, 16, 0))  # (hIni,mIni,hFin,mFin)
+_JOURNAL_TRADES_PATH = r"C:\Users\ASUS\whatsapp-bot-a2k\journal-trades.json"
+_RECOMENDACION_KW = (
+    "me recomienda", "recomiendas", "recomendacion", "recomendación",
+    "la tomo", "la autorizo", "autorizo la senal", "autorizo la señal",
+    "debo operar", "debo entrar", "opero o no", "entro o no",
+    "la apruebo", "que hago con esta", "qué hago con esta",
+    "tomo la señal", "tomo la senal",
+)
+
+
+def _en_horario_plan(ahora=None):
+    """True si la hora actual cae en una de las ventanas buenas del plan."""
+    ahora = ahora or _dt.now()
+    minutos_ahora = ahora.hour * 60 + ahora.minute
+    for hIni, mIni, hFin, mFin in _HORARIO_PLAN_BUENO:
+        if hIni * 60 + mIni <= minutos_ahora < hFin * 60 + mFin:
+            return True
+    return False
+
+
+def _pnl_binarias_hoy():
+    """Suma real del PnL de hoy en Binarias, leido directo del journal — no inventa nada."""
+    try:
+        with open(_JOURNAL_TRADES_PATH, encoding="utf-8") as f:
+            trades = json.load(f)
+        hoy = _dt.now().strftime("%Y-%m-%d")
+        de_hoy = [t for t in trades if t.get("sistema") == "binarias" and t.get("fecha") == hoy]
+        pnl = sum(t.get("pnl", 0) or 0 for t in de_hoy)
+        return pnl, len(de_hoy)
+    except Exception:
+        return None, None
+
 # ── CLASIFICACIÓN DE MONEDA POR BANCO ─────────────────────────────────────────
 # Bancos nacionales → VES (Bolívares)
 _BANCOS_VES = frozenset({
-    "banesco", "mercantil", "bdv", "banco de venezuela", "provincial", "bnc",
-    "banco nacional de crédito", "bicentenario", "sofitasa", "del tesoro",
-    "exterior", "bfc", "bangente", "caroni", "bod", "agricola",
-    "fondo comun", "mi banco", "pago movil", "pago móvil", "biopago", "bov",
-    "100%banco", "bancamiga", "banplus", "venezolano de crédito", "delsur",
+    "banesco", "mercantil", "bdv", "banco de venezuela", "venezuela",
+    "provincial", "bnc", "banco nacional de crédito", "banco nacional de credito",
+    "del tesoro", "banco del tesoro", "exterior", "banco exterior",
+    "bancamiga", "bdt", "banco digital de los trabajadores",
 })
-# Plataformas internacionales → USD
+# Pasarelas con link → USD  (métodos A2K Digital Studio)
 _BANCOS_USD = frozenset({
-    "zinli", "wally", "paypal", "zelle", "wise", "remitly", "western union",
-    "airtm", "binance", "bybit", "reserve", "usdt", "coinbase", "usdc",
-    "mypal", "pipol", "pipol pay", "pipo pay", "facebank",
-    "mercantil panama", "mercantil panamá", "mony",
+    "zinli", "meru", "wally", "airtm", "binance",
+    "mypal", "facebank",
+    "mercantil panama", "mercantil panamá",
 })
 
 def _moneda_por_banco(banco_raw: str) -> tuple:
@@ -2305,7 +2341,7 @@ class JarvisGUI:
         self._mic_activo = not self._mic_activo
         if self._mic_activo:
             self.btn_mic.config(text="🎤 MIC: ON", bg="#003a10", fg="#00ff41")
-            self.log("Micrófono activado — escuchando ciclos de 5 seg.", "info")
+            self.log("Micrófono activado — grabación dinámica (se corta sola al detectar silencio).", "info")
             speak("Micrófono activado. Te escucho.")
             threading.Thread(target=self._escuchar_continuo, daemon=True).start()
         else:
@@ -2318,7 +2354,7 @@ class JarvisGUI:
             import speech_recognition as sr
             import sounddevice as sd
             import numpy as np
-            import io, wave
+            import io, wave, queue
         except ImportError as e:
             self.root.after(0, lambda err=str(e): self.log(
                 f"Dependencia faltante: {err} — ejecuta: pip install SpeechRecognition sounddevice numpy", "err"))
@@ -2332,8 +2368,14 @@ class JarvisGUI:
         rec.dynamic_energy_threshold = True   # se ajusta al entorno real
         RATE     = 16000
         CHANNELS = 1
-        DURACION = 5
         RMS_MIN  = 70    # umbral de energía RMS — ignora silencio y ruido bajo
+
+        # Grabación dinámica (reemplaza la duración fija de 5s de antes, que
+        # cortaba preguntas largas a la mitad y producía texto basura):
+        CHUNK_SEG     = 0.25   # tamaño de cada pedazo que se analiza
+        ESPERA_INICIO = 6.0    # cuánto espera a que la persona empiece a hablar
+        SILENCIO_FIN  = 1.1    # silencio después de hablar = ya terminó la frase
+        MAX_DURACION  = 25.0   # tope de seguridad por si nunca hay silencio
 
         # "jarvis" + variantes que Google SR en español produce al escuchar "Jarvis"
         _WAKE = {"jarvis", "harry", "harvis", "davis", "travis", "javi",
@@ -2357,10 +2399,54 @@ class JarvisGUI:
             "en mis ojos", "en mi cabeza", "en mi cuello",
             "en mi muñeca", "en mis dedos", "en mi mano",
         )
+        _TRADING_KW = (
+            "el mercado", "los mercados", "revisar el mercado", "revisar el grafico",
+            "revisar el gráfico", "el grafico", "el gráfico", "ver el grafico", "ver el gráfico",
+            "como ves el grafico", "cómo ves el gráfico", "como ves el formato",
+            "binarias", "que esta pasando en el mercado", "qué está pasando en el mercado",
+            "hay alguna señal", "hay alguna senal", "alguna señal", "alguna senal",
+            "como esta el mercado", "cómo está el mercado",
+            "es de compra o de venta", "compra o venta", "el rsi", "que dice el rsi", "qué dice el rsi",
+            "la vela", "las velas", "vela actual", "patron de vela", "patrón de vela",
+            "estrella de la manana", "estrella de la mañana", "estrella en la manana", "estrella en la mañana",
+            "me recomienda", "recomiendas", "recomendacion", "recomendación",
+            "la tomo", "la autorizo", "autorizo la senal", "autorizo la señal",
+            "debo operar", "debo entrar", "opero o no", "entro o no",
+            "la apruebo", "tomo la señal", "tomo la senal",
+        )
 
         modo_txt = "sin wake word" if self._modo_libre else "di 'Jarvis [comando]' para activar"
+
+        # Micrófono abierto UNA sola vez y leído en continuo — abrir/cerrar el
+        # dispositivo cada fracción de segundo (como se hacía antes) es lo que
+        # causaba "[WinError 50] Solicitud no compatible" en Windows.
+        _q = queue.Queue()
+
+        def _callback(indata, frames, time_info, status):
+            _q.put(indata.copy())
+
+        try:
+            stream = sd.InputStream(samplerate=RATE, channels=CHANNELS,
+                                     dtype="int16", blocksize=int(CHUNK_SEG * RATE),
+                                     callback=_callback)
+            stream.start()
+        except Exception as e:
+            self.root.after(0, lambda err=str(e): self.log(
+                f"Error abriendo micrófono: {err} — revisa que no esté en uso por otro programa.", "err"))
+            self._mic_activo = False
+            self.root.after(0, lambda: self.btn_mic.config(
+                text="🎤 MIC: OFF", bg="#1a0800", fg="#ff6633"))
+            return
+
         self.root.after(0, lambda m=modo_txt: self.log(
             f"Micrófono listo — {m}.", "info"))
+
+        def _leer_chunk():
+            """Un pedazo de audio del micrófono, o silencio si no llegó nada a tiempo."""
+            try:
+                return _q.get(timeout=CHUNK_SEG * 4)
+            except queue.Empty:
+                return np.zeros((int(CHUNK_SEG * RATE), CHANNELS), dtype="int16")
 
         _ciclo = 0
         while self._mic_activo:
@@ -2375,23 +2461,54 @@ class JarvisGUI:
                 if not self._mic_activo:
                     break
 
-                raw = sd.rec(int(DURACION * RATE), samplerate=RATE,
-                             channels=CHANNELS, dtype="int16")
-                sd.wait()
+                # Vacía lo que se haya acumulado en la cola mientras esperaba
+                # o mientras Jarvis hablaba — para no procesar audio viejo.
+                while not _q.empty():
+                    try:
+                        _q.get_nowait()
+                    except queue.Empty:
+                        break
+
+                chunks            = []
+                hablando          = False
+                silencio_acum     = 0.0
+                tiempo_total      = 0.0
+                tiempo_sin_hablar = 0.0
+
+                while self._mic_activo:
+                    if _voz.esta_hablando():
+                        break   # Jarvis empezó a hablar — descarta esta captura
+
+                    chunk = _leer_chunk()
+                    chunk_rms = float(np.sqrt(np.mean(chunk.astype(np.float32) ** 2)))
+                    tiempo_total += CHUNK_SEG
+
+                    if chunk_rms >= RMS_MIN:
+                        hablando = True
+                        silencio_acum = 0.0
+                        tiempo_sin_hablar = 0.0
+                        chunks.append(chunk)
+                    elif hablando:
+                        silencio_acum += CHUNK_SEG
+                        chunks.append(chunk)   # incluye pausas cortas entre palabras
+                        if silencio_acum >= SILENCIO_FIN:
+                            break
+                    else:
+                        tiempo_sin_hablar += CHUNK_SEG
+                        if tiempo_sin_hablar >= ESPERA_INICIO:
+                            break   # nunca empezó a hablar — silencio o ruido bajo
+
+                    if tiempo_total >= MAX_DURACION:
+                        break
 
                 if not self._mic_activo:
                     break
 
-                # Descartar audio grabado mientras Jarvis está hablando (evita eco TTS)
-                if _voz.esta_hablando():
+                # Descartar: nunca habló, o Jarvis empezó a hablar (evita eco TTS)
+                if not hablando or _voz.esta_hablando():
                     continue
 
-                rms = float(np.sqrt(np.mean(raw.astype(np.float32) ** 2)))
-                if rms < RMS_MIN:
-                    if rms > 80:
-                        self.root.after(0, lambda v=int(rms): self.log(
-                            f"[MIC] Señal débil (RMS={v}/{RMS_MIN}) — habla más fuerte o acércate", "info"))
-                    continue
+                raw = np.concatenate(chunks, axis=0)
 
                 buf = io.BytesIO()
                 with wave.open(buf, "wb") as wf:
@@ -2488,6 +2605,13 @@ class JarvisGUI:
                         daemon=True).start()
                     continue
 
+                # ── BINARIAS — estado del mercado en vivo, hilo aparte ────────
+                if any(x in cmd_limpio for x in _TRADING_KW):
+                    threading.Thread(
+                        target=lambda c=cmd_limpio: self._trading_voz_async(c),
+                        daemon=True).start()
+                    continue
+
                 # ── DIAGNÓSTICO — confirmar antes de ejecutar ─────────────────
                 if any(x in cmd_limpio for x in _DIAG_KW):
                     self._pendiente_confirmacion = cmd_limpio
@@ -2524,6 +2648,12 @@ class JarvisGUI:
                 self.root.after(0, lambda: self.btn_mic.config(
                     text="🎤 MIC: OFF", bg="#1a0800", fg="#ff6633"))
                 break
+
+        try:
+            stream.stop()
+            stream.close()
+        except Exception:
+            pass
 
     def _activar_reposo(self):
         if not self._mic_activo:
@@ -2808,6 +2938,98 @@ class JarvisGUI:
                     speak(res[:200])
         threading.Thread(target=_run, daemon=True).start()
 
+    def _trading_voz_async(self, pregunta: str):
+        """
+        Contesta por voz preguntas sobre el mercado del bot de binarias,
+        con datos reales (RSI, tendencia, patrón de vela) — no adivina nada,
+        si el servicio no responde lo dice claro en vez de inventar.
+        """
+        def _run():
+            try:
+                r = requests.get("http://localhost:3099/binarias/estado", timeout=5)
+                data = r.json()
+            except Exception:
+                msg = "No pude conectarme al bot de binarias — revisa que el servicio de WhatsApp esté corriendo."
+                self.root.after(0, lambda: self.log(f"[BINARIAS VOZ] {msg}", "err"))
+                speak(msg)
+                return
+
+            mercados = data.get("mercados", [])
+            if not mercados:
+                speak("El bot de binarias no está vigilando ningún mercado todavía.")
+                return
+
+            # ¿Pregunta por un símbolo específico? (75 / 100 / 50)
+            pedido = None
+            for num in ("75", "100", "50"):
+                if num in pregunta:
+                    pedido = num
+                    break
+            if pedido:
+                mercados = [m for m in mercados if pedido in m["simbolo"]] or mercados
+
+            pide_recomendacion = any(kw in pregunta for kw in _RECOMENDACION_KW)
+
+            partes = []
+            racha = data.get("perdidasSeguidas", 0)
+            if data.get("pausado"):
+                partes.append(
+                    f"El bot está pausado ahora mismo, no va a operar. "
+                    f"Lleva {racha} pérdida(s) seguida(s) — la regla del plan es parar en 3."
+                )
+
+            pendientes = [m for m in mercados if m.get("senalPendiente")]
+            for m in pendientes:
+                partes.append(
+                    f"Ojo, hay una señal pendiente en {m['simbolo']}: {m['senalPendiente']}. "
+                    f"Contéstala por WhatsApp."
+                )
+
+            # ── Recomendación basada en TU plan, no en adivinar el mercado ────
+            if pide_recomendacion and not data.get("pausado"):
+                if racha >= 2:
+                    partes.append(
+                        f"Cuidado, ya llevas {racha} pérdida(s) seguida(s) — "
+                        f"estás a una de que el bot se pause solo por la regla del plan."
+                    )
+                if not _en_horario_plan():
+                    partes.append(
+                        "Estás fuera del horario que recomienda tu plan — la mejor hora es "
+                        "de 6 a 10 de la mañana o de 2:30 a 4 de la tarde. Mejor espera."
+                    )
+                pnl_hoy, n_trades_hoy = _pnl_binarias_hoy()
+                if pnl_hoy is not None and n_trades_hoy:
+                    signo = "ganancia" if pnl_hoy >= 0 else "pérdida"
+                    partes.append(
+                        f"Hoy en Binarias llevas {n_trades_hoy} operación(es) con "
+                        f"{signo} de {abs(pnl_hoy):.2f} dólares."
+                    )
+                if not pendientes:
+                    partes.append("No tengo ninguna señal pendiente esperando confirmación ahora mismo.")
+                else:
+                    partes.append(
+                        "Yo no te puedo decir si va a ganar o perder — eso no lo sabe nadie con certeza. "
+                        "Fíjate en la confianza que te mandó el mensaje de WhatsApp: si dice alta, tu plan "
+                        "dice que la tomes con más confianza; si dice media, tómala con el monto más bajo."
+                    )
+
+            for m in mercados:
+                if m.get("senalPendiente"):
+                    continue
+                if not m.get("conectado"):
+                    partes.append(f"{m['simbolo']} está desconectado ahora mismo.")
+                    continue
+                trozo = f"{m['simbolo']}: RSI en {m['rsi']}, tendencia {m['tendencia']}"
+                if m.get("patronVela"):
+                    trozo += f", con un patrón {m['patronVela']['patron']}, {m['patronVela']['descripcion']}"
+                trozo += f". Necesita {m['umbralAlto']} arriba o {m['umbralBajo']} abajo para dar señal."
+                partes.append(trozo)
+
+            respuesta = " ".join(partes)
+            self.root.after(0, lambda: self.log(f"[BINARIAS VOZ] {respuesta}", "cian"))
+            speak(respuesta)
+        threading.Thread(target=_run, daemon=True).start()
+
     def _instalar_vision_async(self):
         """Lanza ollama pull moondream en background y loguea el progreso."""
         self.log("[VISIÓN] Iniciando descarga de moondream (~800MB)... esto toma unos minutos.", "info")
@@ -2956,6 +3178,160 @@ def _monitor_zync(gui):
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+#  ZYNC ELECTRONICS — SERVIDOR DE VENTAS (puerto 7799)
+# ──────────────────────────────────────────────────────────────────────────────
+def _arrancar_servidor_zync(gui_app):
+    """
+    Escucha POST /venta-zync desde la app ZYNC Electronics.
+    Reduce stock en inventario_zync.json y muestra la venta en el log de Jarvis.
+    """
+    import json as _json
+    from http.server import HTTPServer, BaseHTTPRequestHandler
+    from socketserver import ThreadingMixIn
+    from datetime import datetime as _dt
+
+    PORT_ZYNC = 7799
+    inv_path  = _base_exe() / "inventario_zync.json"
+
+    def _leer_inv():
+        try:
+            with open(inv_path, encoding="utf-8") as f:
+                return _json.load(f)
+        except Exception:
+            return {"grupos": {}, "ventas_hoy": 0}
+
+    def _guardar_inv(data):
+        data["ultima_actualizacion"] = _dt.now().strftime("%Y-%m-%d %H:%M")
+        with open(inv_path, "w", encoding="utf-8") as f:
+            _json.dump(data, f, ensure_ascii=False, indent=2)
+
+    def _grupo_por_sku(grupos: dict, sku: str) -> str | None:
+        """Devuelve la clave del grupo al que pertenece un SKU."""
+        for key, g in grupos.items():
+            if sku in g.get("skus", []):
+                return key
+        return None
+
+    class _ZyncHandler(BaseHTTPRequestHandler):
+        def log_message(self, *args):
+            pass
+
+        def do_OPTIONS(self):
+            self.send_response(200)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type")
+            self.end_headers()
+
+        def do_POST(self):
+            if self.path == "/venta-web":
+                try:
+                    length = int(self.headers.get("Content-Length", 0))
+                    body   = _json.loads(self.rfile.read(length))
+                    metodo = body.get("metodo_pago", "?")
+                    total  = body.get("total", 0)
+                    moneda = body.get("moneda", "USD")
+                    items  = body.get("items", [])
+                    items_txt = ", ".join(
+                        f"{i.get('nombre', '?')} x{i.get('qty', 1)}" for i in items
+                    ) or "productos"
+
+                    msg = f"[WEB A2K] Pedido — {moneda} {total:.2f} ({metodo}) | {items_txt}"
+                    gui_app.root.after(0, lambda m=msg: gui_app.log(m, "ok"))
+
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.end_headers()
+                    self.wfile.write(_json.dumps({"ok": True}).encode())
+                except Exception as _e:
+                    self.send_response(500)
+                    self.end_headers()
+                    gui_app.root.after(0, lambda e=str(_e): gui_app.log(f"[WEB A2K] Error webhook: {e}", "err"))
+                return
+
+            if self.path != "/venta-zync":
+                self.send_response(404)
+                self.end_headers()
+                return
+
+            try:
+                length   = int(self.headers.get("Content-Length", 0))
+                body     = _json.loads(self.rfile.read(length))
+                ticket   = body.get("ticket", "?")
+                total    = body.get("total", 0)
+                metodo   = body.get("metodo", "?")
+                productos = body.get("productos", [])
+
+                # Reducir stock por grupo
+                inv     = _leer_inv()
+                grupos  = inv.get("grupos", {})
+                alertas = []
+
+                for item in productos:
+                    sku  = item.get("sku", "")
+                    qty  = int(item.get("qty", 1))
+                    nom  = item.get("nombre", sku)
+                    gkey = _grupo_por_sku(grupos, sku)
+                    if gkey:
+                        grupos[gkey]["stock"] = max(0, grupos[gkey]["stock"] - qty)
+                        stk = grupos[gkey]["stock"]
+                        if stk <= 3:
+                            alertas.append(f"{grupos[gkey]['label']}: {stk} und")
+
+                inv["grupos"]     = grupos
+                inv["ventas_hoy"] = inv.get("ventas_hoy", 0) + 1
+                _guardar_inv(inv)
+
+                # Resumen de la venta para el log
+                items_txt = ", ".join(
+                    f"{i.get('nombre', i.get('sku','?'))} x{i.get('qty',1)}"
+                    for i in productos
+                ) or "productos"
+
+                msg_venta = f"[ZYNC] Venta #{ticket} — ${total:.2f} ({metodo}) | {items_txt}"
+                gui_app.root.after(0, lambda m=msg_venta: gui_app.log(m, "ok"))
+
+                # Resumen de stock actualizado
+                relojes = grupos.get("relojes", {}).get("stock", "?")
+                mics    = grupos.get("microfonos", {}).get("stock", "?")
+                auds    = grupos.get("audifonos", {}).get("stock", "?")
+                msg_stk = f"[ZYNC] Stock actual — Relojes: {relojes} | Micrófonos: {mics} | Audífonos: {auds}"
+                gui_app.root.after(0, lambda m=msg_stk: gui_app.log(m, "info"))
+
+                if alertas:
+                    msg_alerta = f"[ZYNC] ⚠ Stock bajo: {' | '.join(alertas)}"
+                    gui_app.root.after(0, lambda m=msg_alerta: gui_app.log(m, "warn"))
+
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(_json.dumps({"ok": True}).encode())
+
+            except Exception as _e:
+                self.send_response(500)
+                self.end_headers()
+                gui_app.root.after(0, lambda e=str(_e): gui_app.log(f"[ZYNC] Error webhook: {e}", "err"))
+
+    class _ZyncServer(ThreadingMixIn, HTTPServer):
+        allow_reuse_address = True
+        daemon_threads      = True
+
+    try:
+        srv = _ZyncServer(("127.0.0.1", PORT_ZYNC), _ZyncHandler)
+        gui_app.root.after(0, lambda: gui_app.log(
+            f"[ZYNC SERVER] Escuchando en puerto {PORT_ZYNC} — inventario automático activo", "ok"))
+        srv.serve_forever()
+    except OSError as e:
+        gui_app.root.after(0, lambda: gui_app.log(
+            f"[ZYNC SERVER] Puerto {PORT_ZYNC} ocupado: {e}", "warn"))
+    except Exception as e:
+        gui_app.root.after(0, lambda: gui_app.log(
+            f"[ZYNC SERVER] Error: {e}", "err"))
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 #  SÍNTESIS DE VOZ PARA FRONTEND — Google Cloud Neural2 → bytes WAV
 # ──────────────────────────────────────────────────────────────────────────────
 def _sintetizar_wav(texto: str) -> bytes | None:
@@ -3072,8 +3448,8 @@ def _arrancar_servidor_sms(gui_app):
         except ImportError:
             HOST_SMS, PORT_SMS = "0.0.0.0", 5000
 
-        RUTAS_SMS = {"/ping", "/alerta", "/pago", "/pago-link", "/arbitraje", "/comando", 
-"/chat", "/bodega", "/tecnico", "/voz", "/analitica", "/clientes", "/telegram", "/importaciones", "/divisas", "/webhook/paguelofacil"}
+        RUTAS_SMS = {"/ping", "/alerta", "/pago", "/arbitraje", "/comando",
+"/chat", "/bodega", "/tecnico", "/voz", "/analitica", "/clientes", "/telegram", "/importaciones", "/divisas"}
 
         _RE_MONTO = re.compile(
             r'[Bb][Ss]\.?\s*[Ff]?\.?\s*([\d]{1,10}[,\.][\d]{2})'
@@ -3205,16 +3581,6 @@ def _arrancar_servidor_sms(gui_app):
                     self._manejar_divisas(datos)
                     return
 
-                # /pago-link — enlace de cobro PágueloFácil (síncrono — el POS web espera la respuesta)
-                # Nota: /pago queda intacto para notificaciones SMS de Pago Móvil
-                if ruta == "/pago-link":
-                    self._manejar_pago_link(datos)
-                    return
-
-                # /webhook/paguelofacil — webhook de notificaciones de pago (asíncrono)
-                if ruta == "/webhook/paguelofacil":
-                    self._manejar_webhook_paguelofacil(datos)
-                    return
 
                 self._ok({"recibido": True, "status": "ok"})
                 threading.Thread(target=self._despachar,
@@ -3737,132 +4103,6 @@ def _arrancar_servidor_sms(gui_app):
                         "status":   "error",
                     }, 400)
 
-            # ──────────────────────────────────────────────────────────────
-            #  PASARELA PAGUELOFÁCIL — POST /pago  (síncrono, CORS *)
-            # ──────────────────────────────────────────────────────────────
-            def _manejar_pago_link(self, datos):
-                """
-                Genera un enlace de cobro PágueloFácil para el POS web (bodega-pro).
-                POST /pago  { monto: float, concepto: str, referencia?: str }
-                Respuesta:  { ok: bool, link: str, ref: str, monto: float }
-                El handler es síncrono porque el frontend hace fetch() y espera el link.
-                """
-                try:
-                    from modulos.paguelofacil_suite import generar_link_cobro
-                    monto    = float(datos.get("monto", 0))
-                    concepto = str(datos.get("concepto", "Venta POS")).strip() or "Venta POS"
-                    ref      = str(datos.get("referencia", "")).strip()
-                    if not ref:
-                        ref = f"REF-{_dt.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
-                    if monto <= 0:
-                        self._ok({"ok": False, "error": "El monto debe ser mayor a 0"}, 400)
-                        return
-                    link = generar_link_cobro(monto, concepto, ref)
-                    _cprint("OK",
-                        f"[/pago] ref={ref}  monto=${monto:.2f}  link={link[:55]}…")
-                    gui_app.root.after(0, lambda: gui_app.log(
-                        f"[PAGUELOFÁCIL] Cobro generado — ${monto:.2f}  ref={ref}", "info"))
-                    self._ok({"ok": True, "link": link, "ref": ref, "monto": monto})
-                except Exception as e:
-                    _cprint("WARN", f"[/pago] {type(e).__name__}: {e}")
-                    self._ok({"ok": False, "error": str(e)}, 500)
-
-            # ──────────────────────────────────────────────────────────────
-            #  WEBHOOK PAGUELOFÁCIL — POST /webhook/paguelofacil (asíncrono)
-            # ──────────────────────────────────────────────────────────────
-            def _manejar_webhook_paguelofacil(self, datos):
-                """
-                Maneja el webhook entrante de PagueloFacil para notificaciones de pago.
-                POST /webhook/paguelofacil  { estado: str, referencia: str, monto: float, ... }
-                Respuesta:  { recibido: bool, procesado: bool, mensaje: str }
-                """
-                # Responder inmediatamente con 200 OK para evitar timeouts de PagueloFacil
-                self._ok({"recibido": True, "mensaje": "Webhook recibido"})
-                
-                # Procesar en segundo plano para evitar bloquear la respuesta
-                threading.Thread(target=self._procesar_webhook_paguelofacil, 
-                                args=(datos,), daemon=True).start()
-            
-            def _procesar_webhook_paguelofacil(self, datos):
-                """Procesa el webhook de PagueloFacil en segundo plano"""
-                try:
-                    # Extraer datos relevantes del webhook de PagueloFacil
-                    estado_raw = str(datos.get("estado", datos.get("status", ""))).strip().upper()
-                    referencia = str(datos.get("referencia", datos.get("reference", ""))).strip()
-                    monto = float(datos.get("monto", datos.get("amount", 0)))
-                    
-                    # Log de depuración para ver qué se recibió
-                    _cprint("INFO", f"[WEBHOOK PF] Procesando - Estado: {estado_raw}, Referencia: {referencia}, Monto: {monto}")
-                    _cprint("DEBUG", f"[WEBHOOK PF] Datos completos: {datos}")
-                    
-                    # Validar que tengamos los datos mínimos necesarios
-                    if not referencia:
-                        _cprint("WARN", "[WEBHOOK PF] Falta referencia de pago")
-                        return
-                        
-                    # Procesar según el estado del pago
-                    pagado = estado_raw in ("APROBADA", "APPROVED", "PAGADA", "PAID", "COMPLETADA", "COMPLETED")
-                    
-                    if pagado:
-                        # Pago exitoso - actualizar registro en el sistema
-                        _cprint("PAGO", f"[WEBHOOK PF] Pago confirmado - Ref: {referencia}, Monto: ${monto:.2f}")
-                        
-                        # Intentar actualizar en el sistema de cuentas por cobrar
-                        try:
-                            # Buscar cliente por referencia (asumiendo que la referencia es el ID de factura o similar)
-                            data = _leer_cuentas_cobrar()
-                            cliente_actualizado = False
-                            
-                            for cliente in data.get("clientes", []):
-                                # Buscar por referencia en historial o como identificador
-                                if str(cliente.get("id", "")) == referencia or str(cliente.get("numero_factura", "")) == referencia:
-                                    # Actualizar deuda y registrar pago
-                                    hoy = _dtd.now().strftime("%Y-%m-%d")
-                                    cliente["deuda_bs"] = max(round(float(cliente.get("deuda_bs", 0)) - monto, 2), 0.0)
-                                    cliente["fecha_ultimo_pago"] = hoy
-                                    
-                                    # Agregar al historial de pagos
-                                    cliente.setdefault("historial", []).append({
-                                        "fecha": hoy,
-                                        "monto_bs": monto,  # Asumiendo que el monto está en BS para simplificar
-                                        "monto_usd": 0.0,   # Esto debería ajustarse según la tasa de cambio
-                                        "referencia": referencia,
-                                        "tipo": "paguelofacil_webhook"
-                                    })
-                                    
-                                    _guardar_cuentas_cobrar(data)
-                                    cliente_actualizado = True
-                                    
-                                    _cprint("INFO", f"[WEBHOOK PF] Cliente actualizado: {cliente.get('nombre', 'Desconocido')}")
-                                    break
-                                
-                                # También buscar en el historial de pagos por referencia
-                                for pago in cliente.get("historial", []):
-                                    if str(pago.get("referencia", "")) == referencia:
-                                        # Este pago ya fue registrado, evitar duplicados
-                                        _cprint("INFO", f"[WEBHOOK PF] Pago ya registrado previamente para referencia {referencia}")
-                                        cliente_actualizado = True
-                                        break
-                                
-                                if cliente_actualizado:
-                                    break
-                            
-                            if not cliente_actualizado:
-                                _cprint("WARN", f"[WEBHOOK PF] No se encontró cliente para referencia {referencia}")
-                                # Aún así consideramos el webhook como procesado correctamente
-                                
-                        except Exception as db_error:
-                            _cprint("ERROR", f"[WEBHOOK PF] Error actualizando base de datos: {db_error}")
-                            # No fallamos el webhook por errores de base de datos
-                            pass
-                    
-                    else:
-                        _cprint("INFO", f"[WEBHOOK PF] Pago no exitoso - Estado: {estado_raw}")
-                        
-                except ValueError as ve:
-                    _cprint("ERROR", f"[WEBHOOK PF] Error de valor en datos: {ve}")
-                except Exception as e:
-                    _cprint("ERROR", f"[WEBHOOK PF] Error inesperado: {type(e).__name__}: {e}")
 
             # ──────────────────────────────────────────────────────────────
             #  SERVIR FRONTEND WEB — index.html + jarvis_frontend.js
@@ -4209,29 +4449,37 @@ def _arrancar_servidor_sms(gui_app):
                 # ── Log de depuración — confirma recepción de cualquier update ──
                 _cprint("INFO", f"[TG WEBHOOK] Update recibido — keys={list(datos.keys())}")
                 mensaje_tg = datos.get("message", {})
-                texto      = mensaje_tg.get("text", "").strip()
                 chat_id    = str(mensaje_tg.get("chat", {}).get("id", ""))
+                # ── Soporte foto + caption (para /costo con foto) ─────────────
+                fotos      = mensaje_tg.get("photo", [])
+                caption    = mensaje_tg.get("caption", "").strip()
+                texto      = mensaje_tg.get("text", "").strip()
+                # Si hay foto con caption que empieza en /costo, usamos el caption como comando
+                file_id    = None
+                if fotos and caption.lower().startswith("/costo"):
+                    texto   = caption
+                    file_id = fotos[-1].get("file_id", None)  # foto más grande = última
                 # Confirmar recepción a Telegram antes de 5 s (evita reintentos)
                 self._ok({"ok": True})
                 if not texto or not chat_id:
                     _cprint("INFO", f"[TG WEBHOOK] Update sin texto/chat ignorado — datos={str(datos)[:120]}")
                     return
-                _cprint("INFO", f"[TG MSG] chat={chat_id[:10]}  cmd/texto='{texto[:60]}'")
+                _cprint("INFO", f"[TG MSG] chat={chat_id[:10]}  cmd/texto='{texto[:60]}'  foto={'sí' if file_id else 'no'}")
                 threading.Thread(
                     target=self._relay_telegram,
-                    args=(chat_id, texto),
+                    args=(chat_id, texto, file_id),
                     daemon=True,
                 ).start()
 
-            def _relay_telegram(self, chat_id: str, texto: str):
+            def _relay_telegram(self, chat_id: str, texto: str, file_id: str = None):
                 """
                 Retransmite el mensaje al endpoint cloud de catálogos y devuelve
                 la respuesta al usuario vía Telegram sendMessage.
                 Anclado siempre en un hilo daemon — no bloquea el servidor HTTP.
 
                 Comandos locales interceptados antes del relay:
-                  /cobrar [monto] [concepto]  — genera enlace PágueloFácil
-                  /status [id_transaccion]    — consulta estado de un pago
+                  /cobrar [monto] [concepto]  — genera solicitud de cobro (Zinli/JotForm)
+                  /costo [datos]              — calculadora de importación ZYNC
                   /start /help               — menú de bienvenida
                   Métodos de Pago            — info de métodos disponibles
                 """
@@ -4239,7 +4487,7 @@ def _arrancar_servidor_sms(gui_app):
                 # Guardavalla: si algo explota fuera de los try/except internos,
                 # el hilo no muere mudo — avisa al chat
                 try:
-                    self._relay_telegram_inner(chat_id, texto, tg_token)
+                    self._relay_telegram_inner(chat_id, texto, tg_token, file_id)
                 except Exception as _e_outer:
                     _cprint("WARN", f"[TG UNCAUGHT] {type(_e_outer).__name__}: {_e_outer}")
                     if tg_token and chat_id:
@@ -4253,7 +4501,7 @@ def _arrancar_servidor_sms(gui_app):
                         except Exception:
                             pass
 
-            def _relay_telegram_inner(self, chat_id: str, texto: str, tg_token: str):
+            def _relay_telegram_inner(self, chat_id: str, texto: str, tg_token: str, file_id: str = None):
                 """Cuerpo real del relay — llamado desde _relay_telegram con guardavalla."""
                 tg_token   = tg_token or os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
                 cloud_url  = os.environ.get(
@@ -4285,37 +4533,40 @@ def _arrancar_servidor_sms(gui_app):
                 elif texto.strip().lower() in ("/start", "/help", "/ayuda"):
                     respuesta = (
                         "👋 <b>Hola, soy Jarvis — A2K Digital Studio</b>\n\n"
-                        "Comandos disponibles:\n\n"
-                        "💳 /cobrar [monto] [concepto]\n"
-                        "   Genera un enlace de pago PágueloFácil\n"
+                        "📦 <b>Catálogo e Inventario:</b>\n"
+                        "/catalogo — Ver todos los productos y precios\n"
+                        "/precio [producto] — Buscar precio de un artículo\n"
+                        "/stock — Ver disponibilidad del inventario\n"
+                        "/tasa — Ver tasa del día Bs/USD\n\n"
+                        "🧮 <b>Suite Financiera ZYNC:</b>\n"
+                        "/costo [nombre] [costo$] [cant] [flete$] [envio_vzla$]\n"
+                        "   <i>Ej: /costo RelojH55 8.50 10 25.00 40.00</i>\n"
+                        "   Calcula precio de venta USD y Bs con 50% ganancia.\n\n"
+                        "💳 <b>Cobros:</b>\n"
+                        "/cobrar [monto] [concepto] — Generar enlace de pago\n"
                         "   <i>Ej: /cobrar 45.50 Servicio Técnico Aire</i>\n\n"
-                        "🔍 /status [id_transaccion]\n"
-                        "   Consulta el estado de un pago\n"
-                        "   <i>Ej: /status 1234567</i>\n\n"
-                        "💬 Cualquier otro mensaje se procesa con inteligencia artificial."
+                        "💬 Cualquier otro mensaje se procesa con IA."
                     )
                     parse_mode = "HTML"
                     _cprint("INFO", f"[TG /start] chat={chat_id[:10]}")
 
-                # ── /cobrar — genera enlace de cobro PágueloFácil ────────────────
+                # ── /cobrar — solicitud de pago vía formulario JotForm ───────────
                 elif texto.strip().lower().startswith("/cobrar"):
                     try:
-                        from modulos.paguelofacil_suite import (
-                            generar_link_cobro, CCLW, ACCESS_TOKEN,
-                        )
                         partes = texto.strip().split(None, 2)
+                        fecha  = _dt.now().strftime("%Y%m%d")
+                        ref    = f"REF-{fecha}-{random.randint(1000, 9999)}"
+
                         if len(partes) < 3:
                             respuesta = (
-                                "⚠️ Uso incorrecto.\n"
-                                "Sintaxis: /cobrar [monto] [concepto]\n"
-                                "Ejemplo:  /cobrar 45.50 Servicio Técnico Aire"
+                                "💳 <b>Solicitud de Pago — A2K Digital Studio</b>\n"
+                                "──────────────────────\n"
+                                "Envía este formulario al cliente:\n\n"
+                                "📋 <a href='https://form.jotform.com/261694668966076'>👉 FORMULARIO DE PAGO</a>\n\n"
+                                "<i>El cliente llena sus datos, tú recibes la info y "
+                                "le envías el link de Zinli.</i>\n\n"
+                                "💡 Tip: /cobrar 45.50 Servicio — incluye monto y concepto."
                             )
-                        elif CCLW == "TU_CCLW_AQUI" or ACCESS_TOKEN == "TU_TOKEN_AQUI":
-                            respuesta = (
-                                "⚠️ <b>Credenciales PágueloFácil no configuradas.</b>\n"
-                                "Define PAGUELOFACIL_CCLW y PAGUELOFACIL_TOKEN en el .env."
-                            )
-                            parse_mode = "HTML"
                         else:
                             try:
                                 monto = float(partes[1].replace(",", "."))
@@ -4325,83 +4576,320 @@ def _arrancar_servidor_sms(gui_app):
                                     f"'{partes[1]}' no es un número válido.\n"
                                     "Ejemplo: /cobrar 45.50 Servicio Técnico"
                                 )
-                                raise  # relanza para salir del bloque
-                            concepto   = partes[2].strip()
-                            fecha      = _dt.now().strftime("%Y%m%d")
-                            ref        = f"REF-{fecha}-{random.randint(1000, 9999)}"
-                            link       = generar_link_cobro(monto, concepto, ref)
-                            # Escapar & en el URL para que el HTML de Telegram sea válido
-                            link_html  = link.replace("&", "&amp;")
-                            respuesta  = (
-                                f"💳 <b>Enlace de Cobro Generado</b>\n"
+                                raise
+                            concepto  = partes[2].strip()
+                            respuesta = (
+                                f"💳 <b>Solicitud de Pago Generada</b>\n"
                                 f"──────────────────────\n"
-                                f"💰 <b>Monto:</b>      ${monto:,.2f}\n"
-                                f"📋 <b>Concepto:</b>   {concepto}\n"
-                                f"🔖 <b>Ref:</b>        <code>{ref}</code>\n"
+                                f"💰 <b>Monto:</b>    ${monto:,.2f}\n"
+                                f"📋 <b>Concepto:</b> {concepto}\n"
+                                f"🔖 <b>Ref:</b>      <code>{ref}</code>\n"
                                 f"──────────────────────\n"
-                                f'<a href="{link_html}">👉 <b>PAGAR AHORA</b></a>\n\n'
-                                f"<i>Reenvía este mensaje a tu cliente.</i>"
+                                f"📋 <a href='https://form.jotform.com/261694668966076'>👉 FORMULARIO DE PAGO</a>\n\n"
+                                f"<b>Pasos:</b>\n"
+                                f"1️⃣ Envía el formulario al cliente\n"
+                                f"2️⃣ Cliente llena sus datos\n"
+                                f"3️⃣ Recibes su WhatsApp y monto\n"
+                                f"4️⃣ Generas link Zinli y se lo envías\n"
+                                f"5️⃣ Cliente paga y manda captura\n"
+                                f"6️⃣ Confirmas con /confirmar {ref}"
                             )
-                            parse_mode = "HTML"
-                            _cprint("INFO",
-                                f"[TG /cobrar] ref={ref}  monto={monto}  link={link[:50]}…")
+                            _cprint("INFO", f"[TG /cobrar] ref={ref}  monto={monto}")
+                        parse_mode = "HTML"
 
                     except ValueError:
-                        if not respuesta or respuesta == "Servicio no disponible en este momento.":
-                            respuesta = (
-                                "⚠️ Error procesando el cobro.\n"
-                                "Verifica el monto e intenta de nuevo.\n"
-                                "Ejemplo: /cobrar 45.50 Servicio Técnico"
-                            )
-                    except requests.RequestException as e:
-                        respuesta = f"⚠️ Sin conexión con PágueloFácil:\n{e}"
-                        _cprint("WARN", f"[TG /cobrar] Red: {e}")
+                        pass
                     except Exception as e:
-                        respuesta = f"⚠️ Error al generar cobro: {type(e).__name__}: {e}"
+                        respuesta = f"⚠️ Error: {type(e).__name__}: {e}"
                         _cprint("WARN", f"[TG /cobrar] {type(e).__name__}: {e}")
 
-                # ── /status — consulta estado de transacción PágueloFácil ─────────
-                elif texto.strip().lower().startswith("/status"):
+                # ── /tasa — tasa del día ────────────────────────────────────────
+                elif texto.strip().lower().startswith("/tasa"):
                     try:
-                        from modulos.paguelofacil_suite import consultar_estado_pago
-                        partes = texto.strip().split()
-                        if len(partes) < 2:
-                            respuesta = (
-                                "⚠️ Uso incorrecto.\n"
-                                "Sintaxis: /status [id_transaccion]\n"
-                                "Ejemplo:  /status 1234567"
-                            )
+                        _inv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inventario_bodega.json")
+                        with open(_inv_path, "r", encoding="utf-8") as _f:
+                            _inv = json.load(_f)
+                        _tasa = _inv.get("tasa_bs_usd", "N/D")
+                        respuesta = (
+                            f"💱 <b>Tasa del día</b>\n"
+                            f"──────────────────────\n"
+                            f"1 USD = <b>{_tasa:,.2f} Bs</b>\n"
+                            f"──────────────────────\n"
+                            f"<i>{_inv.get('ultima_actualizacion', '')}</i>"
+                        )
+                        parse_mode = "HTML"
+                        _cprint("INFO", f"[TG /tasa] tasa={_tasa}")
+                    except Exception as _e:
+                        respuesta = f"⚠️ No pude leer la tasa: {_e}"
+                        _cprint("WARN", f"[TG /tasa] {_e}")
+
+                # ── /precio — precio de un producto ─────────────────────────────
+                elif texto.strip().lower().startswith("/precio"):
+                    try:
+                        _inv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inventario_bodega.json")
+                        with open(_inv_path, "r", encoding="utf-8") as _f:
+                            _inv = json.load(_f)
+                        _partes = texto.strip().split(None, 1)
+                        if len(_partes) < 2:
+                            respuesta = "⚠️ Uso: /precio [nombre del producto]\nEj: /precio arroz"
                         else:
-                            id_tx  = partes[1].strip()
-                            datos  = consultar_estado_pago(id_tx)
-                            estado = datos.get("estado", "DESCONOCIDO")
-                            monto  = datos.get("monto")
-                            monto_txt = f"${float(monto):,.2f}" if monto is not None else "N/D"
-                            _EMOJIS = {
-                                "APROBADA": "🟢", "APPROVED": "🟢",
-                                "PAGADA":   "🟢", "PAID":     "🟢",
-                                "PENDIENTE":"🟡", "PENDING":  "🟡",
-                                "RECHAZADA":"🔴", "REJECTED": "🔴",
-                                "DECLINED": "🔴", "FAILED":   "🔴",
-                            }
-                            emoji     = _EMOJIS.get(estado, "⚪")
+                            _busq = _partes[1].strip().lower()
+                            _encontrados = [p for p in _inv.get("productos", []) if _busq in p["nombre"].lower()]
+                            if not _encontrados:
+                                respuesta = f"❌ No encontré «{_partes[1]}».\nPrueba /catalogo para ver todos."
+                            else:
+                                _lineas = [f"🔍 <b>Resultados para «{_partes[1]}»</b>\n──────────────────────"]
+                                for _p in _encontrados[:5]:
+                                    _stock_txt = "✅ Disponible" if _p["stock"] > 0 else "❌ Agotado"
+                                    _lineas.append(
+                                        f"📦 <b>{_p['nombre']}</b>\n"
+                                        f"   💵 ${_p['precio_usd']:.2f}  |  Bs {_p['precio_bs']:,.2f}\n"
+                                        f"   Stock: {_p['stock']}  {_stock_txt}"
+                                    )
+                                respuesta = "\n".join(_lineas)
+                                parse_mode = "HTML"
+                        _cprint("INFO", f"[TG /precio] busq='{_busq if len(_partes) > 1 else '?'}' resultados={len(_encontrados) if len(_partes) > 1 else 0}")
+                    except Exception as _e:
+                        respuesta = f"⚠️ Error al buscar producto: {_e}"
+                        _cprint("WARN", f"[TG /precio] {_e}")
+
+                # ── /stock — resumen de stock ────────────────────────────────────
+                elif texto.strip().lower().startswith("/stock"):
+                    try:
+                        _inv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inventario_bodega.json")
+                        with open(_inv_path, "r", encoding="utf-8") as _f:
+                            _inv = json.load(_f)
+                        _prods      = _inv.get("productos", [])
+                        _disponibles = [p for p in _prods if p["stock"] > 0]
+                        _agotados    = [p for p in _prods if p["stock"] == 0]
+                        _lineas = [
+                            f"📊 <b>Estado del Stock</b>\n──────────────────────\n"
+                            f"Total: {len(_prods)}  |  ✅ {len(_disponibles)}  |  ❌ {len(_agotados)}\n"
+                        ]
+                        if _agotados:
+                            _lineas.append("❌ <b>Agotados:</b>")
+                            for _p in _agotados[:10]:
+                                _lineas.append(f"  • {_p['nombre']}")
+                        if _disponibles:
+                            _lineas.append("\n✅ <b>Con stock:</b>")
+                            for _p in sorted(_disponibles, key=lambda x: x["stock"])[:10]:
+                                _lineas.append(f"  • {_p['nombre']} — {_p['stock']} unid.")
+                        respuesta = "\n".join(_lineas)
+                        parse_mode = "HTML"
+                        _cprint("INFO", f"[TG /stock] total={len(_prods)} agotados={len(_agotados)}")
+                    except Exception as _e:
+                        respuesta = f"⚠️ Error al leer stock: {_e}"
+                        _cprint("WARN", f"[TG /stock] {_e}")
+
+                # ── /catalogo — listado completo con precios ─────────────────────
+                elif texto.strip().lower().startswith(("/catalogo", "/catálogo")):
+                    try:
+                        _inv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inventario_bodega.json")
+                        with open(_inv_path, "r", encoding="utf-8") as _f:
+                            _inv = json.load(_f)
+                        _prods = _inv.get("productos", [])
+                        _tasa  = _inv.get("tasa_bs_usd", 1)
+                        if not _prods:
+                            respuesta = "📭 El catálogo está vacío.\nAgrega productos en inventario_bodega.json"
+                        else:
+                            _lineas = ["🛒 <b>Catálogo A2K Digital Studio</b>\n──────────────────────"]
+                            for _p in _prods:
+                                _ico = "✅" if _p["stock"] > 0 else "❌"
+                                _lineas.append(
+                                    f"{_ico} <b>{_p['nombre']}</b>\n"
+                                    f"   💵 ${_p['precio_usd']:.2f}  |  Bs {_p['precio_bs']:,.2f}"
+                                )
+                            _lineas.append(f"\n──────────────────────\n💱 Tasa: 1 USD = {_tasa:,.2f} Bs")
+                            respuesta = "\n".join(_lineas)
+                            parse_mode = "HTML"
+                        _cprint("INFO", f"[TG /catalogo] productos={len(_prods)}")
+                    except Exception as _e:
+                        respuesta = f"⚠️ Error al leer catálogo: {_e}"
+                        _cprint("WARN", f"[TG /catalogo] {_e}")
+
+                # ── /costo — calculadora de importación ZYNC ────────────────────
+                elif texto.strip().lower().startswith("/costo"):
+                    _INTERNET_MES  = 30.0   # USD/mes fijo
+                    _ENVIO_LOCAL   = 5.0    # USD por pieza (MRW/Zoom)
+                    _MARGEN        = 0.50   # 50% ganancia sobre costo
+                    try:
+                        _partes = texto.strip().split()
+                        # /costo nombre costo_unit qty flete_china envio_vzla
+                        if len(_partes) < 6:
                             respuesta = (
-                                f"{emoji} <b>Estado de Transacción</b>\n"
-                                f"──────────────────────\n"
-                                f"🔢 <b>ID:</b>      <code>{id_tx}</code>\n"
-                                f"📊 <b>Estado:</b>  <b>{estado}</b>\n"
-                                f"💰 <b>Monto:</b>   {monto_txt}\n"
-                                f"──────────────────────"
+                                "📦 <b>Calculadora de Importación ZYNC</b>\n\n"
+                                "<b>Uso:</b>\n"
+                                "<code>/costo [nombre] [costo$] [cant] [flete_china$] [envio_vzla$]</code>\n\n"
+                                "<b>Ejemplo:</b>\n"
+                                "<code>/costo RelojH55 8.50 10 25.00 40.00</code>\n\n"
+                                "📌 <i>Internet $30/mes y envío local $5/pieza se aplican automáticamente.</i>"
                             )
                             parse_mode = "HTML"
-                            _cprint("INFO", f"[TG /status] id={id_tx}  estado={estado}")
+                        else:
+                            _nombre     = _partes[1].replace("_", " ")
+                            _costo_u    = float(_partes[2].replace(",", "."))
+                            _qty        = int(_partes[3])
+                            _flete_ch   = float(_partes[4].replace(",", "."))
+                            _envio_vzla = float(_partes[5].replace(",", "."))
 
-                    except requests.RequestException as e:
-                        respuesta = f"⚠️ Sin conexión con PágueloFácil:\n{e}"
-                        _cprint("WARN", f"[TG /status] Red: {e}")
-                    except Exception as e:
-                        respuesta = f"⚠️ Error al consultar estado: {type(e).__name__}: {e}"
-                        _cprint("WARN", f"[TG /status] {type(e).__name__}: {e}")
+                            # ── Desglose por unidad ──────────────────────────────
+                            _c_producto  = _costo_u
+                            _c_flete     = _flete_ch   / _qty
+                            _c_envio_vzl = _envio_vzla / _qty
+                            _c_internet  = _INTERNET_MES / _qty
+                            _c_local     = _ENVIO_LOCAL
+
+                            _costo_total = _c_producto + _c_flete + _c_envio_vzl + _c_internet + _c_local
+                            _ganancia    = _costo_total * _MARGEN
+                            _precio_usd  = _costo_total + _ganancia
+
+                            # ── Tasa P2P desde inventario_bodega.json ────────────
+                            try:
+                                _inv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inventario_bodega.json")
+                                with open(_inv_path, "r", encoding="utf-8") as _f:
+                                    _inv_b = json.load(_f)
+                                _tasa_p2p = float(_inv_b.get("tasa_bs_usd", 980))
+                            except Exception:
+                                _tasa_p2p = 980.0
+
+                            _precio_bs = _precio_usd * _tasa_p2p
+
+                            respuesta = (
+                                f"📦 <b>{_nombre}</b> — Lote x{_qty}\n"
+                                f"──────────────────────────\n"
+                                f"Costo producto:      <b>${_c_producto:.2f}</b>\n"
+                                f"Flete China ÷{_qty}:  ${_c_flete:.2f}\n"
+                                f"Envío Venezuela ÷{_qty}: ${_c_envio_vzl:.2f}\n"
+                                f"Internet ÷{_qty}:    ${_c_internet:.2f}\n"
+                                f"Envío local MRW:     ${_c_local:.2f}\n"
+                                f"──────────────────────────\n"
+                                f"Costo total:         <b>${_costo_total:.2f}</b>\n"
+                                f"Ganancia 50%:        +${_ganancia:.2f}\n"
+                                f"──────────────────────────\n"
+                                f"💵 Precio USD:  <b>${_precio_usd:.2f}</b>\n"
+                                f"🇻🇪 Precio P2P: <b>{_precio_bs:,.0f} Bs</b>\n"
+                                f"   <i>(Tasa: {_tasa_p2p:,.0f} Bs/$)</i>"
+                            )
+                            parse_mode = "HTML"
+
+                            # ── Descargar foto si viene con el mensaje ────────────
+                            _foto_path = None
+                            if file_id and tg_token:
+                                try:
+                                    _fotos_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fotos_suite")
+                                    os.makedirs(_fotos_dir, exist_ok=True)
+                                    _r_file = requests.get(
+                                        f"https://api.telegram.org/bot{tg_token}/getFile",
+                                        params={"file_id": file_id},
+                                        timeout=10,
+                                    )
+                                    if _r_file.ok:
+                                        _file_path_tg = _r_file.json()["result"]["file_path"]
+                                        _r_foto = requests.get(
+                                            f"https://api.telegram.org/file/bot{tg_token}/{_file_path_tg}",
+                                            timeout=20,
+                                        )
+                                        if _r_foto.ok:
+                                            _ext        = _file_path_tg.split(".")[-1] or "jpg"
+                                            _safe_name  = "".join(c if c.isalnum() or c in "-_" else "_" for c in _nombre)
+                                            _foto_path  = os.path.join(_fotos_dir, f"{_safe_name}.{_ext}")
+                                            with open(_foto_path, "wb") as _ff:
+                                                _ff.write(_r_foto.content)
+                                            _cprint("INFO", f"[/costo] Foto guardada: {_foto_path}")
+                                except Exception as _e_foto:
+                                    _cprint("WARN", f"[/costo] No pudo descargar foto: {_e_foto}")
+
+                            # ── Guardar en historial de productos Suite Financiera ─
+                            try:
+                                _suite_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "productos_suite.json")
+                                try:
+                                    with open(_suite_path, "r", encoding="utf-8") as _sf:
+                                        _suite = json.load(_sf)
+                                except Exception:
+                                    _suite = {"productos": []}
+                                _suite["productos"] = [
+                                    p for p in _suite["productos"]
+                                    if p.get("nombre", "").lower() != _nombre.lower()
+                                ]
+                                _entrada = {
+                                    "nombre":       _nombre,
+                                    "costo_usd":    round(_costo_total, 2),
+                                    "precio_usd":   round(_precio_usd, 2),
+                                    "precio_bs":    round(_precio_bs, 0),
+                                    "qty_lote":     _qty,
+                                    "tasa":         _tasa_p2p,
+                                    "desglose": {
+                                        "costo_producto":  round(_c_producto, 2),
+                                        "flete_china":     round(_c_flete, 2),
+                                        "envio_venezuela": round(_c_envio_vzl, 2),
+                                        "internet":        round(_c_internet, 2),
+                                        "envio_local":     round(_c_local, 2),
+                                    },
+                                    "fecha":        _dt.now().strftime("%Y-%m-%d %H:%M"),
+                                }
+                                if _foto_path:
+                                    _entrada["foto"] = _foto_path
+                                _suite["productos"].append(_entrada)
+                                with open(_suite_path, "w", encoding="utf-8") as _sf:
+                                    json.dump(_suite, _sf, ensure_ascii=False, indent=2)
+                                _cprint("INFO", f"[/costo] '{_nombre}' guardado en productos_suite.json")
+                            except Exception as _e_save:
+                                _cprint("WARN", f"[/costo] No pudo guardar en suite: {_e_save}")
+
+                            # ── Añadir confirmación de foto en respuesta ──────────
+                            if _foto_path:
+                                respuesta += "\n📸 <i>Foto guardada en Suite Financiera</i>"
+
+                            gui_app.root.after(0, lambda n=_nombre, p=_precio_usd: gui_app.log(
+                                f"[/costo] {n} → ${p:.2f}", "info"))
+
+                    except (ValueError, IndexError) as _e_c:
+                        respuesta = (
+                            f"⚠️ Error en los datos: <code>{_e_c}</code>\n\n"
+                            "Formato correcto:\n"
+                            "<code>/costo RelojH55 8.50 10 25.00 40.00</code>\n"
+                            "nombre · costo$ · cantidad · flete_china$ · envio_vzla$"
+                        )
+                        parse_mode = "HTML"
+                    except Exception as _e_c:
+                        respuesta = f"⚠️ Error: {type(_e_c).__name__}: {_e_c}"
+                        _cprint("WARN", f"[TG /costo] {_e_c}")
+
+                # ── Precios de servicios A2K Digital Studio — link directo ───────
+                # (excluye menciones a electrónicos ZYNC, esas van al relay cloud
+                #  que sabe responder precios puntuales de smartwatch/micrófonos/etc.)
+                elif (not any(z in _txt_lower for z in (
+                            "smartwatch", "smart watch", "reloj", "watch", "microfono",
+                            "micrófono", "k9", "audifono", "audífono", "airmax", "combo"))
+                        and any(x in _txt_lower for x in (
+                            # preguntas genéricas de precio
+                            "precio", "precios", "cuanto cuesta", "cuánto cuesta",
+                            "quiero contratar", "servicios", "lista de precios",
+                            "tabla de precios", "tarifas", "costos",
+                            # nombres de trabajos concretos del catálogo de diseño
+                            "volante", "flyer", "tarjeta de presentacion", "tarjetas de presentación",
+                            "publicacion", "publicación", "edicion de fotos", "edición de fotos",
+                            "landing page", "landing", "branding", "video promocional",
+                            "presentacion corporativa", "presentación corporativa",
+                            "pagina web", "página web", "sitio web", "bot de ventas",
+                            "pack de marketing", "asistente virtual", "catalogo digital",
+                            "catálogo digital", "imagen de marca", "automatizacion integral",
+                            "automatización integral", "desarrollo web", "ecosistema de bots",
+                            "e-commerce", "ecommerce", "tienda online", "logo", "logotipo",
+                            "diseño grafico", "diseño gráfico", "identidad visual",
+                            "manual de marca", "mockup"))):
+                    respuesta = (
+                        "¡Claro! Aquí tienes nuestra tabla de precios completa con todos los "
+                        "servicios de A2K Digital Studio 👇\n"
+                        "👉 https://www.a2kdigitalstudio.online/precios.html\n\n"
+                        "Tenemos 4 niveles:\n"
+                        "⭐ Básicos: desde $5\n"
+                        "🔥 Intermedios: desde $20\n"
+                        "💎 Avanzados: desde $60\n"
+                        "👑 Premium: desde $200\n\n"
+                        "¿Sobre qué servicio te gustaría más información? Escríbeme y te ayudo 🤖🔥"
+                    )
+                    _cprint("INFO", f"[TG precios servicios] chat={chat_id[:10]}")
 
                 else:
                     # ── Relay estándar al cloud de catálogos ─────────────────────
@@ -4618,9 +5106,192 @@ if __name__ == "__main__":
         threading.Thread(target=_verificar_estado_apis,                    daemon=True).start()
         threading.Thread(target=_arrancar_servidor_sms,     args=(app,),   daemon=True).start()
         threading.Thread(target=_monitor_zync,              args=(app,),   daemon=True).start()
+        threading.Thread(target=_arrancar_servidor_zync,    args=(app,),   daemon=True).start()
         threading.Thread(target=_cierre_diario_automatico,  args=(app,),   daemon=True).start()
         threading.Thread(target=_cron_cobros_sabado,        args=(app,),   daemon=True).start()
         threading.Thread(target=_monitor_tasas_automatico,  args=(app,),   daemon=True).start()
+
+        # ── Telegram Bot ────────────────────────────────────────────────────
+        _tg_bridge.iniciar(
+            on_texto=app.parser.procesar,
+            log_fn=lambda m, t="info": app.root.after(
+                0, lambda msg=m, tag=t: app.log(msg, tag)
+            ),
+        )
+
+        # ── WhatsApp local service — auto-arranca si no está corriendo ──────
+        def _chk_whatsapp():
+            import urllib.request, json as _json, subprocess, time as _time
+            wa_url = os.environ.get("WA_URL", "")
+            base   = wa_url.replace("/send-text", "") if wa_url else "http://localhost:3099"
+
+            def _status():
+                with urllib.request.urlopen(f"{base}/status", timeout=4) as resp:
+                    return _json.loads(resp.read())
+
+            # La tarea "PM2 Resurrect Jarvis" ya deja wa-jarvis-service.js corriendo
+            # solo al iniciar sesión, pero Puppeteer/Chrome puede tardar bastante más
+            # de unos segundos en levantar tras un reinicio. Si no le damos tiempo real
+            # aquí antes de decidir "no está corriendo", este bloque lanza un SEGUNDO
+            # proceso node que choca con el de PM2 por el mismo perfil de Chrome
+            # (bug real confirmado en logs: "browser is already running for
+            # session-jarvis-wa-service", 2026-07-16 y 2026-07-17) — eso rompe la
+            # sesión de WhatsApp y con ella el bot de binarias, que depende de que
+            # esa sesión esté sana para recibir "activar binarias".
+            for _intento in range(12):  # ~60s dándole tiempo a PM2 antes de asumir que no está
+                try:
+                    data = _status()
+                    if data.get("connected"):
+                        app.root.after(0, lambda: app.log("[WHATSAPP] Servicio local conectado — +584164117331 activo ✓", "ok"))
+                    else:
+                        app.root.after(0, lambda: app.log("[WHATSAPP] Servicio local iniciado pero sin sesión — abre http://localhost:3099/qr", "warn"))
+                    return
+                except Exception:
+                    _time.sleep(5)
+
+            # No respondió en ~60s — arrancarlo solo, igual que JARVIS-WHATSAPP.bat
+            wa_dir = r"C:\Users\ASUS\whatsapp-bot-a2k"
+            try:
+                subprocess.Popen(
+                    ["node", "wa-jarvis-service.js"],
+                    cwd=wa_dir,
+                    creationflags=subprocess.CREATE_NEW_CONSOLE,
+                )
+                app.root.after(0, lambda: app.log("[WHATSAPP] Servicio local no encontrado — arrancando automáticamente (revisa la ventana nueva por si pide QR)...", "warn"))
+            except Exception as _e:
+                app.root.after(0, lambda m=str(_e): app.log(f"[WHATSAPP] No se pudo arrancar el servicio solo — ejecuta JARVIS-WHATSAPP.bat a mano ({m})", "error"))
+                return
+
+            # Reintentar el status cada 5s — Puppeteer/Chromium puede tardar en conectar
+            import time as _time
+            for _intento in range(9):  # ~45s en total
+                _time.sleep(5)
+                try:
+                    data = _status()
+                    if data.get("connected"):
+                        app.root.after(0, lambda: app.log("[WHATSAPP] Servicio arrancado y conectado ✓", "ok"))
+                    else:
+                        app.root.after(0, lambda: app.log("[WHATSAPP] Servicio arrancado — abre http://localhost:3099/qr si pide sesión", "warn"))
+                    return
+                except Exception:
+                    continue
+            app.root.after(0, lambda: app.log("[WHATSAPP] Sigue arrancando después de 45s — revisa la ventana nueva por si hay un error", "warn"))
+        threading.Thread(target=_chk_whatsapp, daemon=True).start()
+
+        # ── License Engine — estado al arrancar ────────────────────────────
+        def _chk_license_engine():
+            import time as _time
+            _time.sleep(3)
+            engine_url = "https://a2k-license-engine.shoppingelectronics3112.workers.dev"
+            admin_key  = "A2K-ADMIN-2026-ABIGAIL"
+            try:
+                resp = requests.get(
+                    f"{engine_url}/todas",
+                    headers={"X-Admin-Key": admin_key},
+                    timeout=10,
+                )
+                resp.raise_for_status()
+                data = resp.json()
+
+                licencias = data.get("licencias", [])
+                total     = len(licencias)
+                activas   = [l for l in licencias if l.get("activa")]
+                pro       = [l for l in activas if l.get("type") == "pro"]
+                demo      = [l for l in activas if l.get("type") == "demo"]
+                revocadas = total - len(activas)
+
+                partes = []
+                if pro:
+                    partes.append(f"{len(pro)} PRO")
+                if demo:
+                    partes.append(f"{len(demo)} demo activa{'s' if len(demo) > 1 else ''}")
+                if revocadas:
+                    partes.append(f"{revocadas} revocada{'s' if revocadas > 1 else ''}")
+
+                resumen = " · ".join(partes) if partes else "sin licencias emitidas"
+                msg = f"[LICENSE ENGINE] Cloudflare activo — 14 productos · {resumen}"
+                app.root.after(0, lambda m=msg: app.log(m, "ok"))
+
+            except Exception as _e:
+                msg = f"[LICENSE ENGINE] Sin respuesta — {type(_e).__name__}: verifica conexión"
+                app.root.after(0, lambda m=msg: app.log(m, "warn"))
+        threading.Thread(target=_chk_license_engine, daemon=True).start()
+
+        # ── FiadosPro — cobros pendientes al arrancar ───────────────────────
+        def _chk_fiadospro():
+            import json as _json, time as _time
+            from datetime import date as _date, timedelta as _td
+            _time.sleep(4)
+            # Buscar el archivo en la carpeta hermana whatsapp-bot-a2k
+            base = _base_exe()
+            candidatos = [
+                base.parent / "whatsapp-bot-a2k" / "fiadospro-data.json",
+                base / ".." / "whatsapp-bot-a2k" / "fiadospro-data.json",
+            ]
+            data_path = next((p for p in candidatos if p.exists()), None)
+            try:
+                if data_path is None:
+                    raise FileNotFoundError("fiadospro-data.json no encontrado")
+                with open(data_path, encoding="utf-8") as f:
+                    data = _json.load(f)
+                fiados     = data.get("fiados", [])
+                pendientes = [x for x in fiados if x.get("estado") == "pendiente"]
+                hoy        = _date.today()
+                hoy_str    = str(hoy)
+                limite_str = str(hoy + _td(days=3))
+                vencidos   = [x for x in pendientes if x.get("fechaVence", "9999") <= hoy_str]
+
+                if not pendientes:
+                    msg, tag = "[FIADOSPRO] Sin cobros pendientes — todo al día ✓", "ok"
+                elif vencidos:
+                    total_venc = sum(x.get("monto", 0) for x in vencidos)
+                    msg = f"[FIADOSPRO] {len(vencidos)} fiado(s) VENCIDO(S) — ${total_venc:.0f} por cobrar ⚠"
+                    tag = "warn"
+                else:
+                    total_pend = sum(x.get("monto", 0) for x in pendientes)
+                    msg = f"[FIADOSPRO] {len(pendientes)} cobro(s) pendiente(s) — ${total_pend:.0f} total"
+                    tag = "info"
+                app.root.after(0, lambda m=msg, t=tag: app.log(m, t))
+            except Exception:
+                app.root.after(0, lambda: app.log("[FIADOSPRO] Sin datos — verifica whatsapp-bot-a2k/fiadospro-data.json", "warn"))
+        threading.Thread(target=_chk_fiadospro, daemon=True).start()
+
+        # ── Apify Viral — confirmar módulo activo ───────────────────────────
+        def _chk_apify_viral():
+            import time as _time
+            _time.sleep(4.5)
+            tiene_token  = bool(os.environ.get("APIFY_TOKEN", ""))
+            tiene_modulo = (_base_exe() / "modulos" / "apify_viral.py").exists()
+            if tiene_modulo and tiene_token:
+                app.root.after(0, lambda: app.log("[APIFY VIRAL] Módulo activo — usa /viral [tema] [plataforma] en Telegram", "ok"))
+            elif tiene_modulo and not tiene_token:
+                app.root.after(0, lambda: app.log("[APIFY VIRAL] Módulo cargado pero falta APIFY_TOKEN en .env", "warn"))
+            else:
+                app.root.after(0, lambda: app.log("[APIFY VIRAL] Módulo no encontrado — verifica modulos/apify_viral.py", "warn"))
+        threading.Thread(target=_chk_apify_viral, daemon=True).start()
+
+        # ── ZYNC Electrónica — inventario al arrancar ───────────────────────
+        def _chk_inventario_zync():
+            import json as _json, time as _time
+            _time.sleep(5)
+            inv_path = _base_exe() / "inventario_zync.json"
+            try:
+                with open(inv_path, encoding="utf-8") as f:
+                    inv = _json.load(f)
+                grupos   = inv.get("grupos", {})
+                criticos = [(g["label"], g["stock"]) for g in grupos.values() if 0 < g.get("stock", 0) <= 3]
+                partes   = [f"{g['label'].split('(')[0].strip()}: {g['stock']}" for g in grupos.values()]
+                if criticos:
+                    alertas = " | ".join(f"{n}: {s} und" for n, s in criticos)
+                    msg = f"[ZYNC STOCK] Stock bajo — {alertas}"
+                    tag = "warn"
+                else:
+                    msg = f"[ZYNC STOCK] {' | '.join(partes)}"
+                    tag = "ok"
+                app.root.after(0, lambda m=msg, t=tag: app.log(m, t))
+            except Exception:
+                app.root.after(0, lambda: app.log("[ZYNC STOCK] inventario_zync.json no encontrado", "warn"))
+        threading.Thread(target=_chk_inventario_zync, daemon=True).start()
 
         # ── Backup inicial al arrancar (síncrono, rápido) ───────────────────
         _crear_backup_inicial()

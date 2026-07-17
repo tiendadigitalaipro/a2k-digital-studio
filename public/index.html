@@ -43,6 +43,8 @@
     .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
     .hero-bg { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 90% 60% at 50% -10%, rgba(124,58,237,0.22) 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 90% 90%, rgba(0,245,212,0.07) 0%, transparent 55%); }
     .hero-grid { position: absolute; inset: 0; pointer-events: none; opacity: 0.025; background-image: linear-gradient(var(--border2) 1px, transparent 1px), linear-gradient(90deg, var(--border2) 1px, transparent 1px); background-size: 40px 40px; }
+    #hero3d { position: absolute; inset: 0; pointer-events: none; width: 100%; height: 100%; display: block; }
+    @media(max-width:560px){ #hero3d { opacity: 0.6; } }
     .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 20px; background: var(--purple-dim); border: 1px solid var(--purple-bd); border-radius: 999px; font-size: 0.72rem; color: var(--purple-l); font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 32px; animation: fadeUp .6s ease both; }
     .hero-badge span { color: var(--teal); }
     .hero-title { font-size: clamp(2.6rem, 7.5vw, 5.8rem); font-weight: 900; letter-spacing: -2.5px; line-height: 1.02; margin-bottom: 24px; animation: fadeUp .6s ease .1s both; }
@@ -74,6 +76,29 @@
     .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 40px 0 0; }
     .ftab { padding: 8px 18px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all .2s; font-family: 'Inter', sans-serif; }
     .ftab:hover, .ftab.active { background: var(--purple-dim); border-color: var(--purple-bd); color: var(--purple-l); }
+
+    /* SERVICIOS DE DISEÑO */
+    .dsvc-level { margin-bottom: 40px; }
+    .dsvc-level-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .dsvc-level-tag { padding: 5px 16px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; white-space: nowrap; }
+    .dsvc-level-tag.basic { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+    .dsvc-level-tag.inter { background: rgba(0,245,212,0.1); color: var(--teal); border: 1px solid rgba(0,245,212,0.25); }
+    .dsvc-level-tag.adv { background: rgba(245,158,11,0.1); color: var(--gold); border: 1px solid rgba(245,158,11,0.25); }
+    .dsvc-level-tag.prem { background: var(--purple-dim); color: var(--purple-l); border: 1px solid var(--purple-bd); }
+    .dsvc-level-desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 16px; }
+    .dsvc-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+    .dsvc-table td { padding: 14px 18px; font-size: 0.88rem; background: var(--surface2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .dsvc-table td:first-child { border-left: 1px solid var(--border); border-radius: 10px 0 0 10px; font-weight: 700; color: var(--text); width: 60%; }
+    .dsvc-table td:last-child { border-right: 1px solid var(--border); border-radius: 0 10px 10px 0; text-align: right; font-weight: 800; color: var(--teal); white-space: nowrap; }
+    .dsvc-table td .dsvc-desc { display: block; font-size: 0.78rem; color: var(--muted); font-weight: 400; margin-top: 4px; line-height: 1.5; }
+    .dsvc-table tr[data-servicio] { cursor: pointer; }
+    .dsvc-table tr[data-servicio]:hover td { background: var(--purple-dim); }
+    .dsvc-table tr[data-servicio]:hover td:last-child::after { content: ' 💬'; }
+    @media(max-width:680px){
+      .dsvc-table td { display: block; width: auto !important; border-radius: 0 !important; border-left: 1px solid var(--border) !important; border-right: 1px solid var(--border) !important; text-align: left !important; }
+      .dsvc-table td:first-child { border-top: 1px solid var(--border); border-radius: 10px 10px 0 0 !important; padding-bottom: 6px; }
+      .dsvc-table td:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 10px 10px !important; padding-top: 6px; font-size: 1rem; }
+    }
 
     /* PRODUCT CARDS */
     .grid-products { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; margin-top: 28px; }
@@ -214,30 +239,6 @@
     .co-total-label { font-size: 0.9rem; font-weight: 700; }
     .co-total-value { font-size: 1.3rem; font-weight: 900; color: var(--teal); }
 
-    /* Payment note */
-    .pay-note { background: rgba(0,245,212,0.06); border: 1px solid rgba(0,245,212,0.15); border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; }
-    .pay-note-title { font-size: 0.78rem; font-weight: 700; color: var(--teal); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .pay-note p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
-    .pay-brands { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-    .pay-brand { padding: 4px 12px; background: var(--surface3); border: 1px solid var(--border2); border-radius: 6px; font-size: 0.72rem; font-weight: 700; color: var(--muted); }
-
-    /* Card form */
-    .card-form { display: flex; flex-direction: column; gap: 14px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media(max-width:480px){ .form-row { grid-template-columns: 1fr; } }
-    .form-row.full { grid-template-columns: 1fr; }
-    .fg2 { display: flex; flex-direction: column; gap: 5px; }
-    .fg2 label { font-size: 0.78rem; font-weight: 600; color: var(--muted); }
-    .fg2 input, .fg2 select { background: var(--surface); border: 1px solid var(--border2); border-radius: 9px; padding: 11px 13px; color: var(--text); font-size: 0.9rem; font-family: 'Inter', sans-serif; outline: none; transition: all .2s; width: 100%; }
-    .fg2 input:focus, .fg2 select:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
-    .fg2 input::placeholder { color: var(--muted); }
-    .card-number-wrap { position: relative; }
-    .card-type-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; }
-    .btn-pay { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--purple), #6d28d9); color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all .25s; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
-    .btn-pay:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(124,58,237,0.5); }
-    .btn-pay:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
-    .secure-note { text-align: center; font-size: 0.72rem; color: var(--muted); margin-top: 10px; }
-
     /* WhatsApp tab */
     .wa-checkout { text-align: center; padding: 20px 0; }
     .wa-checkout-ico { font-size: 4rem; display: block; margin-bottom: 16px; }
@@ -245,12 +246,6 @@
     .wa-checkout p { color: var(--muted); font-size: 0.88rem; line-height: 1.7; margin-bottom: 24px; }
     .btn-wa-big { display: inline-flex; align-items: center; gap: 10px; padding: 16px 36px; background: #25D366; color: #fff; border: none; border-radius: 14px; font-size: 1rem; font-weight: 800; cursor: pointer; text-decoration: none; transition: all .25s; font-family: 'Inter', sans-serif; }
     .btn-wa-big:hover { background: #1db954; transform: translateY(-2px); box-shadow: 0 10px 40px rgba(37,211,102,0.4); }
-
-    /* Payment result */
-    .pay-result { text-align: center; padding: 32px 20px; }
-    .pay-result-ico { font-size: 4rem; display: block; margin-bottom: 18px; }
-    .pay-result h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
-    .pay-result p { color: var(--muted); line-height: 1.7; margin-bottom: 24px; font-size: 0.9rem; }
 
     /* HOW IT WORKS */
     .steps-wrap { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 100px 24px; }
@@ -322,11 +317,26 @@
 
     /* ANIMATIONS */
     @keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
-    .reveal { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal { opacity: 0; transform: translateY(36px) scale(.97); transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1); transition-delay: calc(var(--stagger, 0) * 70ms); will-change: transform, opacity; }
+    .reveal.visible { opacity: 1; transform: translateY(0) scale(1); }
+
+    /* CURSOR GLOW — resplandor ambiental que sigue el mouse */
+    #cursorGlow { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 0%), rgba(124,58,237,0.10), rgba(0,245,212,0.03) 35%, transparent 60%); transition: opacity .3s; }
+    @media(pointer:coarse){ #cursorGlow { display: none; } }
+
+    /* TILT 3D — tarjetas, pasos y testimonios */
+    .pcard, .step, .testi-card, .dsvc-table tr[data-servicio] td:first-child { transform-style: preserve-3d; }
+    @media(pointer:coarse){ .pcard, .step, .testi-card { transform: none !important; } }
+
+    /* STEPS 3D BG */
+    .steps-wrap { position: relative; }
+    #steps3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0.5; pointer-events: none; }
+    .steps-inner { position: relative; z-index: 1; }
   </style>
 </head>
 <body>
+
+<div id="cursorGlow"></div>
 
 <!-- NAV -->
 <nav id="mainNav">
@@ -336,6 +346,8 @@
   </a>
   <ul class="nav-links">
     <li><a href="#sistemas">Sistemas</a></li>
+    <li><a href="#servicios-diseno">Servicios</a></li>
+    <li><a href="#electronicos">Electrónicos</a></li>
     <li><a href="#como-funciona">Cómo funciona</a></li>
     <li><a href="#testimonios">Clientes</a></li>
     <li><a href="https://wa.me/584164117331?text=Hola%20A2K" target="_blank" class="nav-wa">💬 WhatsApp</a></li>
@@ -346,13 +358,16 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="hero-bg"></div><div class="hero-grid"></div><canvas id="hero3d"></canvas>
   <div class="hero-badge">⚡ <span>10+</span> Sistemas Disponibles · Hecho en Venezuela 🇻🇪</div>
   <h1 class="hero-title">El software que<br>tu negocio <span class="grad">necesitaba</span></h1>
-  <p class="hero-sub">Sistemas de gestión profesionales para bodegas, restaurantes, farmacias, nail studios y más. Licencia vitalicia · Activación en 24h · Paga con tarjeta.</p>
+  <p class="hero-sub">Sistemas de gestión profesionales para bodegas, restaurantes, farmacias, nail studios y más. Licencia vitalicia · Activación en 24h · Paga en USD.</p>
   <div class="hero-btns">
     <a href="#sistemas" class="btn-p">🚀 Ver sistemas y precios</a>
     <a href="https://wa.me/584164117331?text=Hola%20A2K%2C%20quiero%20informaci%C3%B3n" target="_blank" class="btn-g">💬 Hablar por WhatsApp</a>
+  </div>
+  <div style="margin-top:18px;">
+    <a href="#servicios-diseno" style="color:var(--muted); font-size:0.85rem; text-decoration:underline; text-underline-offset:3px;">📋 Ver precios de servicios de diseño ↓</a>
   </div>
   <div class="hero-apps">
     <div class="hero-app-chip">🏪 Bodega Pro</div>
@@ -369,14 +384,14 @@
   <div class="stat-item"><span class="stat-n" data-target="10">0</span><div class="stat-l">Sistemas disponibles</div></div>
   <div class="stat-item"><span class="stat-n" data-target="100">0</span><div class="stat-l">Negocios activos</div></div>
   <div class="stat-item"><span class="stat-n" style="-webkit-text-fill-color:initial;color:var(--teal)">24h</span><div class="stat-l">Activación rápida</div></div>
-  <div class="stat-item"><span class="stat-n" style="-webkit-text-fill-color:initial;color:var(--teal)">USD</span><div class="stat-l">Paga con tarjeta</div></div>
+  <div class="stat-item"><span class="stat-n" style="-webkit-text-fill-color:initial;color:var(--teal)">USD</span><div class="stat-l">Paga en dólares</div></div>
 </div>
 
 <!-- SISTEMAS -->
 <section class="sec" id="sistemas">
   <div class="sec-label reveal">// Nuestro Portfolio</div>
   <h2 class="sec-title reveal">Soluciones para cada negocio</h2>
-  <p class="sec-sub reveal">Sin suscripciones — pagas una vez y es tuyo para siempre. Paga con Visa, Mastercard o dólares de tu banco venezolano.</p>
+  <p class="sec-sub reveal">Sin suscripciones — pagas una vez y es tuyo para siempre. Paga en USD por Zinli, Meru, Wally, Zelle, Binance Pay o efectivo.</p>
 
   <!-- FEATURED: A2K Comandas -->
   <div class="featured-card reveal" style="margin-top:48px;">
@@ -448,18 +463,27 @@
       </div>
     </div>
 
-    <div class="pcard" data-cat="ia" onclick="openModal('recepcionista')">
-      <div class="pcard-img-placeholder"><img src="img/app-recepcionista-ai.png" alt="Recepcionista AI" onerror="this.parentElement.innerHTML='🤖'"></div>
+    <div class="pcard" data-cat="ia" onclick="openModal('recepcionista')" style="grid-column: span 1;">
+      <div class="pcard-img-placeholder" style="position:relative;"><img src="img/app-recepcionista-ai.png" alt="Recepcionista AI" onerror="this.parentElement.innerHTML='🤖'"><div style="position:absolute;top:8px;left:8px;background:linear-gradient(135deg,#7c3aed,#00f5d4);color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:6px;letter-spacing:.1em;">15 AGENTES ACTIVOS</div></div>
       <div class="pcard-body">
-        <div class="pcard-header"><div class="pcard-name">Recepcionista AI</div><span class="pcard-badge badge-ia">IA</span></div>
-        <div class="pcard-desc">Asistente de voz con inteligencia artificial que atiende clientes 24/7, agenda citas y gestiona consultas automáticamente.</div>
+        <div class="pcard-header"><div class="pcard-name">Recepcionista AI — Bot de Voz</div><span class="pcard-badge badge-ia">IA</span></div>
+        <div class="pcard-desc">Asistente de voz con inteligencia artificial que atiende a tus clientes 24/7, agenda citas y responde consultas. Disponible para múltiples sectores:</div>
+        <div style="display:flex; flex-wrap:wrap; gap:5px; margin:10px 0;">
+          <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;">🏥 Clínica</span>
+          <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;">🔧 Taller Mecánico</span>
+          <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;">🔩 Ferretería</span>
+          <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;">✂️ Barbería</span>
+          <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;">🍽️ Restaurante</span>
+          <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;">💅 Nail Studio</span>
+          <span style="background:rgba(0,245,212,0.1);border:1px solid rgba(0,245,212,0.25);color:var(--teal);font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;">+ más sectores</span>
+        </div>
         <div class="pcard-features">
-          <div class="pcard-feat">Voz natural con IA (VAPI)</div>
-          <div class="pcard-feat">Agenda citas automáticamente</div>
-          <div class="pcard-feat">Disponible 24/7 sin descanso</div>
+          <div class="pcard-feat">Voz natural con IA (VAPI) · Habla como humano</div>
+          <div class="pcard-feat">Agenda citas y responde preguntas 24/7</div>
+          <div class="pcard-feat">Configurado para tu negocio específico</div>
         </div>
         <div class="pcard-foot">
-          <div><div class="pcard-price-l">Licencia mensual</div><div class="pcard-price-v">$99 USD</div></div>
+          <div><div class="pcard-price-l">Mensual · Setup incluido</div><div class="pcard-price-v">$97 USD</div></div>
           <button class="btn-add" onclick="addToCart('recepcionista',event)">🛒 Agregar</button>
         </div>
       </div>
@@ -550,6 +574,85 @@
       </div>
     </div>
 
+    <div class="pcard" data-cat="restaurante" onclick="openModal('comandas')">
+      <div class="pcard-img-placeholder"><img src="img/app-comandas-pro.png" alt="A2K Comandas Pro" onerror="this.parentElement.innerHTML='🍽️'"></div>
+      <div class="pcard-body">
+        <div class="pcard-header"><div class="pcard-name">A2K Comandas Pro</div><span class="pcard-badge badge-hot">HOT</span></div>
+        <div class="pcard-desc">POS para restaurantes, hoteles, cafeterías y bares. Comandas en tiempo real, vista de cocina e impresora ESC/POS.</div>
+        <div class="pcard-features">
+          <div class="pcard-feat">Comandas en tiempo real (Supabase)</div>
+          <div class="pcard-feat">Vista de cocina con temporizadores</div>
+          <div class="pcard-feat">Dashboard KPIs, meseros, top platos</div>
+        </div>
+        <div class="pcard-foot">
+          <div><div class="pcard-price-l">Licencia vitalicia</div><div class="pcard-price-v">$49 USD</div></div>
+          <button class="btn-add" onclick="addToCart('comandas',event)">🛒 Agregar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SERVICIOS DE DISEÑO Y AUTOMATIZACIÓN -->
+<section class="sec" id="servicios-diseno">
+  <div class="sec-label reveal">// Servicios Adicionales</div>
+  <h2 class="sec-title reveal">Diseño, marketing y automatización</h2>
+  <p class="sec-sub reveal">Además de nuestros sistemas, hacemos diseño gráfico, desarrollo web y automatización a la medida. 4 niveles, precios claros — pagas en USD o el equivalente en bolívares a la tasa BCV del día.</p>
+  <p class="sec-sub reveal" style="font-size:0.85rem; margin-top:8px;">👉 Toca cualquier servicio de la lista para cotizarlo directo por WhatsApp.</p>
+
+  <div class="dsvc-level reveal" style="margin-top:40px;">
+    <div class="dsvc-level-head"><span class="dsvc-level-tag basic">⭐ Básicos</span></div>
+    <p class="dsvc-level-desc">Para emprendedores, negocios pequeños y trabajos exprés</p>
+    <table class="dsvc-table"><tbody>
+      <tr data-servicio="Volantes básicos" onclick="cotizarServicio(this)"><td>📄 Volantes básicos<span class="dsvc-desc">Diseño simple para promociones o negocios · entrega 24h</span></td><td>$10 – $15</td></tr>
+      <tr data-servicio="Publicaciones para redes" onclick="cotizarServicio(this)"><td>📱 Publicaciones para redes<span class="dsvc-desc">Instagram, Facebook, WhatsApp · formato PNG/JPG</span></td><td>$8 – $12</td></tr>
+      <tr data-servicio="Edición de fotos" onclick="cotizarServicio(this)"><td>🖼️ Edición de fotos<span class="dsvc-desc">Color, recorte, limpieza de fondo · hasta 3 fotos</span></td><td>$5</td></tr>
+      <tr data-servicio="Tarjetas de presentación" onclick="cotizarServicio(this)"><td>💳 Tarjetas de presentación<span class="dsvc-desc">Frontal y posterior · logo incluido · PDF + PNG</span></td><td>$8 – $15</td></tr>
+      <tr data-servicio="Flyers promocionales" onclick="cotizarServicio(this)"><td>📋 Flyers promocionales<span class="dsvc-desc">Con llamada a la acción · entrega 24h</span></td><td>$10 – $18</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="dsvc-level reveal">
+    <div class="dsvc-level-head"><span class="dsvc-level-tag inter">🔥 Intermedios</span></div>
+    <p class="dsvc-level-desc">Para marcas consolidadas, profesionales y proyectos con identidad</p>
+    <table class="dsvc-table"><tbody>
+      <tr data-servicio="Flyers profesionales" onclick="cotizarServicio(this)"><td>🎯 Flyers profesionales<span class="dsvc-desc">Copy persuasivo + iconografía · entrega 48h</span></td><td>$20 – $35</td></tr>
+      <tr data-servicio="Landing page básica" onclick="cotizarServicio(this)"><td>🌐 Landing page básica<span class="dsvc-desc">1 sección · formulario · hosting Vercel gratis</span></td><td>$40 – $80</td></tr>
+      <tr data-servicio="Branding básico" onclick="cotizarServicio(this)"><td>🎨 Branding básico<span class="dsvc-desc">Logo · colores · tipografía · mockups</span></td><td>$35 – $70</td></tr>
+      <tr data-servicio="Video corto promocional" onclick="cotizarServicio(this)"><td>🎬 Video corto promocional<span class="dsvc-desc">15-30s · formato Reel/TikTok</span></td><td>$20 – $50</td></tr>
+      <tr data-servicio="Presentación corporativa" onclick="cotizarServicio(this)"><td>📊 Presentación corporativa<span class="dsvc-desc">10-15 slides · formato PDF/PPT</span></td><td>$30 – $60</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="dsvc-level reveal">
+    <div class="dsvc-level-head"><span class="dsvc-level-tag adv">💎 Avanzados</span></div>
+    <p class="dsvc-level-desc">Para empresas, tiendas online y proyectos con automatización</p>
+    <table class="dsvc-table"><tbody>
+      <tr data-servicio="Página web completa" onclick="cotizarServicio(this)"><td>🌍 Página web completa<span class="dsvc-desc">Hasta 5 secciones · SEO on-page · hosting 1 año</span></td><td>$120 – $300</td></tr>
+      <tr data-servicio="Landing de alto impacto" onclick="cotizarServicio(this)"><td>🎯 Landing de alto impacto<span class="dsvc-desc">Estructura AIDA · CTA · integración de pago</span></td><td>$80 – $150</td></tr>
+      <tr data-servicio="Bot de ventas inteligente" onclick="cotizarServicio(this)"><td>🤖 Bot de ventas inteligente<span class="dsvc-desc">WhatsApp/Telegram · respuestas IA · captura de leads</span></td><td>$150 – $400</td></tr>
+      <tr data-servicio="Pack de marketing visual" onclick="cotizarServicio(this)"><td>📦 Pack de marketing visual<span class="dsvc-desc">5-8 piezas gráficas + estrategia de contenido</span></td><td>$70 – $180</td></tr>
+      <tr data-servicio="Asistente virtual IA" onclick="cotizarServicio(this)"><td>🎧 Asistente virtual IA<span class="dsvc-desc">Agenda de citas · atención al cliente 24/7</span></td><td>$120 – $350</td></tr>
+      <tr data-servicio="Catálogo digital interactivo" onclick="cotizarServicio(this)"><td>📱 Catálogo digital interactivo<span class="dsvc-desc">Tipo app · botón WhatsApp por producto</span></td><td>$60 – $120</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="dsvc-level reveal">
+    <div class="dsvc-level-head"><span class="dsvc-level-tag prem">👑 Premium / Agencia</span></div>
+    <p class="dsvc-level-desc">Para empresas grandes, franquicias y proyectos integrales</p>
+    <table class="dsvc-table"><tbody>
+      <tr data-servicio="Imagen de marca completa" onclick="cotizarServicio(this)"><td>👑 Imagen de marca completa<span class="dsvc-desc">Manual de marca completo · 5 rondas de ajuste</span></td><td>$200 – $500</td></tr>
+      <tr data-servicio="Automatización integral" onclick="cotizarServicio(this)"><td>⚡ Automatización integral<span class="dsvc-desc">Bots IA + CRM automatizado + dashboard · soporte 30 días</span></td><td>$300 – $700</td></tr>
+      <tr data-servicio="Desarrollo web avanzado" onclick="cotizarServicio(this)"><td>💻 Desarrollo web avanzado<span class="dsvc-desc">Full-stack · panel admin · pasarela de pago</span></td><td>$300 – $1,000</td></tr>
+      <tr data-servicio="Ecosistema de bots + IA" onclick="cotizarServicio(this)"><td>🤖 Ecosistema de bots + IA<span class="dsvc-desc">Múltiples bots interconectados · analítica en tiempo real</span></td><td>$400 – $900</td></tr>
+      <tr data-servicio="E-commerce completo" onclick="cotizarServicio(this)"><td>🛒 E-commerce completo<span class="dsvc-desc">Carrito · pasarela USDT/Bs · panel admin · delivery</span></td><td>$350 – $800</td></tr>
+    </tbody></table>
+  </div>
+
+  <div style="text-align:center; margin-top:32px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+    <a href="https://wa.me/584164117331?text=Hola%20A2K!%20Quiero%20cotizar%20un%20servicio%20de%20dise%C3%B1o" target="_blank" class="btn-p">💬 Cotizar por WhatsApp</a>
+    <a href="/precios-a2k-2026.pdf" class="btn-g">⬇️ Descargar PDF</a>
   </div>
 </section>
 
@@ -580,7 +683,7 @@
         <div class="cart-total-label">Total a pagar</div>
         <div class="cart-total-value" id="cartTotal">$0</div>
       </div>
-      <div class="cart-sub-note">💳 Paga con Visa, Mastercard, Amex o dólares de tu banco venezolano. Procesado por PagueloFácil — 100% seguro.</div>
+      <div class="cart-sub-note">💵 Paga en USD: Zinli · Meru · Wally · Zelle · Efectivo · y más. Coordina por WhatsApp.</div>
       <button class="btn-checkout" onclick="openCheckout()">💳 Finalizar compra →</button>
     </div>
   </div>
@@ -595,7 +698,7 @@
       <p>Selecciona cómo prefieres pagar tu pedido</p>
     </div>
     <div class="checkout-tabs">
-      <button class="ctab active" id="tab-card" onclick="switchTab('card')">💳 Pagar con tarjeta</button>
+      <button class="ctab active" id="tab-card" onclick="switchTab('card')">💵 Métodos de Pago</button>
       <button class="ctab" id="tab-wa" onclick="switchTab('wa')">💬 Coordinar por WhatsApp</button>
     </div>
     <div class="checkout-body">
@@ -603,45 +706,74 @@
       <div class="co-cart-items" id="coItems"></div>
       <div class="co-total"><span class="co-total-label">Total</span><span class="co-total-value" id="coTotal">$0 USD</span></div>
 
-      <!-- Payment note -->
-      <div class="pay-note">
-        <div class="pay-note-title">💳 Métodos de pago aceptados</div>
-        <p>Paga con tu <strong>tarjeta de crédito o débito internacional</strong> (Visa, Mastercard, Amex). También puedes usar los <strong>dólares de tu cuenta bancaria venezolana</strong> si tu banco emite tarjeta en USD.</p>
-        <div class="pay-brands">
-          <span class="pay-brand">Visa</span>
-          <span class="pay-brand">Mastercard</span>
-          <span class="pay-brand">Amex</span>
-          <span class="pay-brand">🇻🇪 Bancos VE (USD)</span>
-          <span class="pay-brand">🔒 PagueloFácil</span>
-        </div>
-      </div>
-
-      <!-- CARD TAB -->
+      <!-- MÉTODOS DE PAGO TAB -->
       <div id="panelCard">
-        <form id="payForm" class="card-form" onsubmit="processPayment(event)">
-          <div class="form-row">
-            <div class="fg2"><label>Nombre completo *</label><input type="text" id="pf-name" placeholder="Como aparece en la tarjeta" required></div>
-            <div class="fg2"><label>Teléfono WhatsApp *</label><input type="tel" id="pf-phone" placeholder="+58 412 0000000" required></div>
+        <div style="margin-bottom:14px;">
+          <div style="font-size:12px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.1em; margin-bottom:12px;">💵 Selecciona tu método de pago en USD</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+
+            <a href="https://wa.me/584164117331?text=Hola%21+Quiero+pagar+con+ZINLI+mi+pedido" target="_blank" onclick="notifyJarvis('Zinli')" style="display:flex;align-items:center;gap:10px;background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(0,245,212,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+              <span style="font-size:22px;">💳</span>
+              <div><div style="font-weight:700;font-size:13px;color:var(--teal);">Zinli</div><div style="font-size:11px;color:var(--muted);">USD directo</div></div>
+            </a>
+
+            <a href="https://wa.me/584164117331?text=Hola%21+Quiero+pagar+con+MERU+mi+pedido" target="_blank" onclick="notifyJarvis('Meru')" style="display:flex;align-items:center;gap:10px;background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(0,245,212,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+              <span style="font-size:22px;">📱</span>
+              <div><div style="font-weight:700;font-size:13px;color:var(--teal);">Meru</div><div style="font-size:11px;color:var(--muted);">USD app móvil</div></div>
+            </a>
+
+            <a href="https://wa.me/584164117331?text=Hola%21+Quiero+pagar+con+WALLY+mi+pedido" target="_blank" onclick="notifyJarvis('Wally')" style="display:flex;align-items:center;gap:10px;background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(0,245,212,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+              <span style="font-size:22px;">🌐</span>
+              <div><div style="font-weight:700;font-size:13px;color:var(--teal);">Wally</div><div style="font-size:11px;color:var(--muted);">USD internacional</div></div>
+            </a>
+
+            <a href="https://wa.me/584164117331?text=Hola%21+Quiero+pagar+con+ZELLE+mi+pedido" target="_blank" onclick="notifyJarvis('Zelle')" style="display:flex;align-items:center;gap:10px;background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(0,245,212,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+              <span style="font-size:22px;">🏦</span>
+              <div><div style="font-weight:700;font-size:13px;color:var(--teal);">Zelle</div><div style="font-size:11px;color:var(--muted);">USD desde EE.UU.</div></div>
+            </a>
+
+            <a href="https://wa.me/584164117331?text=Hola%21+Quiero+pagar+con+BINANCE+mi+pedido" target="_blank" onclick="notifyJarvis('Binance Pay')" style="display:flex;align-items:center;gap:10px;background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(245,158,11,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+              <span style="font-size:22px;">₿</span>
+              <div><div style="font-weight:700;font-size:13px;color:var(--gold);">Binance Pay</div><div style="font-size:11px;color:var(--muted);">USDT/Crypto</div></div>
+            </a>
+
+            <a href="https://wa.me/584164117331?text=Hola%21+Quiero+pagar+con+EFECTIVO+USD+mi+pedido" target="_blank" onclick="notifyJarvis('Efectivo USD')" style="display:flex;align-items:center;gap:10px;background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(34,197,94,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+              <span style="font-size:22px;">💵</span>
+              <div><div style="font-weight:700;font-size:13px;color:var(--green);">Efectivo USD</div><div style="font-size:11px;color:var(--muted);">Presencial Venezuela</div></div>
+            </a>
+
           </div>
-          <div class="form-row full">
-            <div class="fg2"><label>Correo electrónico *</label><input type="email" id="pf-email" placeholder="tucorreo@email.com" required></div>
-          </div>
-          <div class="form-row full">
-            <div class="fg2">
-              <label>Número de tarjeta *</label>
-              <div class="card-number-wrap">
-                <input type="text" id="pf-card" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)" required>
-                <span class="card-type-icon" id="cardTypeIco">💳</span>
+
+          <!-- Transferencia Bancaria en Bolívares -->
+          <div style="margin-top:10px;">
+            <button onclick="toggleBancos()" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--surface3);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:12px 16px;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(245,158,11,0.6)'" onmouseout="this.style.borderColor='rgba(245,158,11,0.3)'">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:22px;">🏦</span>
+                <div style="text-align:left;"><div style="font-weight:700;font-size:13px;color:var(--gold);">Transferencia Bancaria (Bs.)</div><div style="font-size:11px;color:var(--muted);">Bancos venezolanos · Tasa del día</div></div>
               </div>
+              <span id="bancosArrow" style="color:var(--gold);font-size:16px;transition:transform .2s;">▼</span>
+            </button>
+            <div id="bancosPanel" style="display:none;background:var(--surface2);border:1px solid rgba(245,158,11,0.2);border-top:none;border-radius:0 0 12px 12px;padding:14px 16px;">
+              <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">Escríbenos por WhatsApp y te enviamos los datos bancarios con la tasa del día 📲</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="color:var(--gold);">✦</span><span style="color:var(--text);font-weight:600;">Banesco</span></div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="color:var(--gold);">✦</span><span style="color:var(--text);font-weight:600;">Mercantil</span></div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="color:var(--gold);">✦</span><span style="color:var(--text);font-weight:600;">Banco de Venezuela</span></div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="color:var(--gold);">✦</span><span style="color:var(--text);font-weight:600;">BBVA Provincial</span></div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="color:var(--gold);">✦</span><span style="color:var(--text);font-weight:600;">BNC</span></div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="color:var(--gold);">✦</span><span style="color:var(--text);font-weight:600;">Bancamiga</span></div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="color:var(--gold);">✦</span><span style="color:var(--text);font-weight:600;">Banco del Tesoro</span></div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;"><span style="color:var(--teal);">📲</span><span style="color:var(--text);font-weight:600;">Pago Móvil</span></div>
+              </div>
+              <a href="https://wa.me/584164117331?text=Hola%21+Quiero+pagar+por+TRANSFERENCIA+BANCARIA+en+Bs.+%C2%BFMe+env%C3%ADas+los+datos+y+la+tasa+del+d%C3%ADa%3F" target="_blank" onclick="notifyJarvis('Transferencia Bs.')" style="display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-weight:700;font-size:12px;padding:10px 16px;border-radius:8px;text-decoration:none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                Solicitar datos bancarios
+              </a>
             </div>
           </div>
-          <div class="form-row">
-            <div class="fg2"><label>Vencimiento *</label><input type="text" id="pf-exp" placeholder="MM/AA" maxlength="5" oninput="fmtExp(this)" required></div>
-            <div class="fg2"><label>CVV *</label><input type="text" id="pf-cvv" placeholder="123" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'')" required></div>
-          </div>
-          <button type="submit" class="btn-pay" id="payBtn">🔒 Pagar ahora</button>
-          <p class="secure-note">🔒 Pago 100% seguro procesado por PagueloFácil · Tus datos no se almacenan en nuestros servidores</p>
-        </form>
+
+          <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;">Haz clic en tu método preferido — te redirige a WhatsApp con tu pedido listo 🙌</p>
+        </div>
       </div>
 
       <!-- WHATSAPP TAB -->
@@ -649,18 +781,8 @@
         <div class="wa-checkout">
           <span class="wa-checkout-ico">💬</span>
           <h3>Coordina tu compra por WhatsApp</h3>
-          <p>Te enviaremos el resumen de tu pedido directamente a nuestro equipo. Te responderemos en menos de 1 hora con el link de pago y confirmación de activación.</p>
-          <a class="btn-wa-big" id="waCheckoutBtn" href="#" target="_blank">💬 Enviar pedido por WhatsApp</a>
-        </div>
-      </div>
-
-      <!-- RESULT -->
-      <div id="payResult" style="display:none">
-        <div class="pay-result">
-          <span class="pay-result-ico" id="resIco">✅</span>
-          <h3 id="resTitle">¡Pago exitoso!</h3>
-          <p id="resMsg">Tu compra fue procesada. Recibirás tu licencia por WhatsApp en los próximos minutos.</p>
-          <a href="https://wa.me/584164117331?text=Hola%2C%20acabo%20de%20completar%20mi%20pago" target="_blank" class="btn-wa-big" style="margin:0 auto">💬 Confirmar por WhatsApp</a>
+          <p>Te enviaremos el resumen de tu pedido directamente a nuestro equipo. Te responderemos en menos de 1 hora con las instrucciones de pago y confirmación de activación.</p>
+          <a class="btn-wa-big" id="waCheckoutBtn" href="#" target="_blank" onclick="notifyJarvis('WhatsApp')">💬 Enviar pedido por WhatsApp</a>
         </div>
       </div>
 
@@ -670,13 +792,14 @@
 
 <!-- HOW IT WORKS -->
 <div class="steps-wrap" id="como-funciona">
+  <canvas id="steps3d"></canvas>
   <div class="steps-inner">
     <div class="sec-label reveal">// Proceso Simple</div>
     <h2 class="sec-title reveal">Tu sistema activo en 24 horas</h2>
-    <p class="sec-sub reveal">Compra online, paga con tarjeta y recibe tu licencia por WhatsApp.</p>
+    <p class="sec-sub reveal">Compra online, paga en USD y recibe tu licencia por WhatsApp.</p>
     <div class="grid-steps">
       <div class="step reveal"><div class="step-num">01</div><span class="step-ico">🛒</span><div class="step-title">Agrega al carrito</div><div class="step-desc">Elige el sistema para tu negocio y agrégalo al carrito de compras.</div></div>
-      <div class="step reveal"><div class="step-num">02</div><span class="step-ico">💳</span><div class="step-title">Paga con tarjeta</div><div class="step-desc">Paga con Visa, Mastercard o los dólares de tu banco venezolano. Procesado por PagueloFácil.</div></div>
+      <div class="step reveal"><div class="step-num">02</div><span class="step-ico">💵</span><div class="step-title">Paga en USD</div><div class="step-desc">Zinli, Meru, Wally, Zelle, Binance Pay, efectivo o transferencia en bolívares a la tasa del día.</div></div>
       <div class="step reveal"><div class="step-num">03</div><span class="step-ico">🔑</span><div class="step-title">Recibe tu licencia</div><div class="step-desc">En menos de 24h recibes tu código de activación por WhatsApp.</div></div>
       <div class="step reveal"><div class="step-num">04</div><span class="step-ico">🚀</span><div class="step-title">¡A trabajar!</div><div class="step-desc">Activas el sistema con tu código y tu negocio queda digitalizado al instante.</div></div>
     </div>
@@ -735,13 +858,159 @@
   </div>
 </section>
 
+<!-- ══════════════════════════════════════════
+     SECCIÓN ELECTRÓNICOS — ZYNC Electronics
+     ══════════════════════════════════════════ -->
+<section id="electronicos" style="padding:100px 24px 80px; max-width:1280px; margin:0 auto;">
+
+  <!-- Separador visual -->
+  <div style="text-align:center; margin-bottom:56px;">
+    <div style="display:inline-flex; align-items:center; gap:10px; padding:6px 20px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:999px; font-size:0.72rem; color:var(--gold); font-weight:700; letter-spacing:1.8px; text-transform:uppercase; margin-bottom:20px;">
+      ⚡ <span style="color:var(--teal);">NUEVO</span> · ZYNC Electronics
+    </div>
+    <h2 style="font-size:clamp(2rem,5vw,3.4rem); font-weight:900; letter-spacing:-1.5px; line-height:1.1; margin-bottom:16px;">
+      Tecnología que<br><span style="background:linear-gradient(135deg,var(--gold),var(--teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">te conecta</span>
+    </h2>
+    <p style="color:var(--muted); font-size:1rem; max-width:520px; margin:0 auto;">Relojes inteligentes, micrófonos y audífonos inalámbricos. Escríbenos por WhatsApp y lo tienes en tus manos.</p>
+    <div style="display:inline-flex; align-items:center; gap:8px; margin-top:18px; padding:8px 18px; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); border-radius:999px; font-size:0.8rem; color:var(--green); font-weight:700;">
+      🚚 Envíos gratis a todo el país
+    </div>
+  </div>
+
+  <!-- Grid de productos -->
+  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:20px; margin-bottom:56px;">
+
+    <!-- COMBO Hi Watch 10 + Auriculares/K9 -->
+    <div style="background:var(--surface); border:1px solid rgba(245,158,11,0.4); border-radius:20px; overflow:hidden; transition:transform .2s,border-color .2s; position:relative;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+      <div style="position:absolute; top:12px; right:12px; background:var(--gold); color:#000; font-size:9px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; padding:3px 10px; border-radius:6px; z-index:2;">🔥 COMBO</div>
+      <img src="img/hi-watch-10.jpeg" alt="Combo Hi Watch 10 + K9" style="width:100%; height:190px; object-fit:cover; display:block;"/>
+      <div style="padding:18px;">
+        <div style="font-size:14px; font-weight:700; color:var(--gold); margin-bottom:6px;">COMBO — Reloj Hi Watch 10 + K9</div>
+        <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-bottom:14px;">i30 Pro Max Suit · Reloj + Micrófono K9 incluido · Pantalla AMOLED · Llamadas BT</div>
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:14px;">
+          <span style="font-size:22px; font-weight:800; color:var(--gold);">$19.64</span><span style="font-size:11px; color:var(--muted)">al detal</span>
+          <span style="font-size:15px; font-weight:700; color:var(--green);">$16</span><span style="font-size:11px; color:var(--muted)">mayor (3+)</span>
+        </div>
+        <button class="btn-add" style="width:100%; padding:10px 16px; font-size:13px;" onclick="addToCart('combo-hw10',event)">🛒 Agregar al carrito</button>
+      </div>
+    </div>
+
+    <!-- COMBO H55ProMax + K9 -->
+    <div style="background:var(--surface); border:1px solid rgba(245,158,11,0.4); border-radius:20px; overflow:hidden; transition:transform .2s,border-color .2s; position:relative;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+      <div style="position:absolute; top:12px; right:12px; background:var(--gold); color:#000; font-size:9px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; padding:3px 10px; border-radius:6px; z-index:2;">🔥 COMBO</div>
+      <img src="img/h55promax.jpeg" alt="Combo H55ProMax + K9" style="width:100%; height:190px; object-fit:cover; display:block;"/>
+      <div style="padding:18px;">
+        <div style="font-size:14px; font-weight:700; color:var(--gold); margin-bottom:6px;">COMBO — Reloj H55ProMax + K9</div>
+        <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-bottom:14px;">Big Display · Reloj + Micrófono K9 incluido · Llamadas BT · 10+1 accesorios</div>
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:14px;">
+          <span style="font-size:22px; font-weight:800; color:var(--gold);">$19.64</span><span style="font-size:11px; color:var(--muted)">al detal</span>
+          <span style="font-size:15px; font-weight:700; color:var(--green);">$16</span><span style="font-size:11px; color:var(--muted)">mayor (3+)</span>
+        </div>
+        <button class="btn-add" style="width:100%; padding:10px 16px; font-size:13px;" onclick="addToCart('combo-h55',event)">🛒 Agregar al carrito</button>
+      </div>
+    </div>
+
+    <!-- Relojes por Unidad — Modelos disponibles #1 -->
+    <div style="background:var(--surface); border:1px solid var(--border2); border-radius:20px; overflow:hidden; transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(245,158,11,0.4)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,0.1)'">
+      <img src="img/relojes-abiertos-1.jpeg" alt="Relojes Inteligentes por Unidad" style="width:100%; height:190px; object-fit:cover; display:block;"/>
+      <div style="padding:18px;">
+        <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px;">Relojes Inteligentes — Por Unidad</div>
+        <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-bottom:14px;">Varios modelos disponibles · Pantalla AMOLED · Llamadas BT · Múltiples correas incluidas</div>
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:14px;">
+          <span style="font-size:22px; font-weight:800; color:var(--gold);">$19.64</span><span style="font-size:11px; color:var(--muted)">al detal</span>
+          <span style="font-size:15px; font-weight:700; color:var(--green);">$16</span><span style="font-size:11px; color:var(--muted)">mayor (3+)</span>
+        </div>
+        <button class="btn-add" style="width:100%; padding:10px 16px; font-size:13px;" onclick="addToCart('reloj-unidad',event)">🛒 Agregar al carrito</button>
+      </div>
+    </div>
+
+    <!-- Relojes por Unidad — Modelos disponibles #2 -->
+    <div style="background:var(--surface); border:1px solid var(--border2); border-radius:20px; overflow:hidden; transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(245,158,11,0.4)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,0.1)'">
+      <img src="img/relojes-abiertos-2.jpeg" alt="Relojes Inteligentes por Unidad" style="width:100%; height:190px; object-fit:cover; display:block;"/>
+      <div style="padding:18px;">
+        <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px;">Relojes Inteligentes — Modelos Premium</div>
+        <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-bottom:14px;">Hi Watch Ultra · Big Display · ACE-240 y más · Correas intercambiables · Llamadas BT</div>
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:14px;">
+          <span style="font-size:22px; font-weight:800; color:var(--gold);">$19.64</span><span style="font-size:11px; color:var(--muted)">al detal</span>
+          <span style="font-size:15px; font-weight:700; color:var(--green);">$16</span><span style="font-size:11px; color:var(--muted)">mayor (3+)</span>
+        </div>
+        <button class="btn-add" style="width:100%; padding:10px 16px; font-size:13px;" onclick="addToCart('reloj-premium',event)">🛒 Agregar al carrito</button>
+      </div>
+    </div>
+
+    <!-- Micrófono K9 One -->
+    <div style="background:var(--surface); border:1px solid var(--border2); border-radius:20px; overflow:hidden; transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(245,158,11,0.4)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,0.1)'">
+      <img src="img/k9-airmax.jpeg" alt="Micrófono K9 One" style="width:100%; height:190px; object-fit:cover; object-position:center top; display:block;"/>
+      <div style="padding:18px;">
+        <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px;">Micrófono K9 One — Inalámbrico</div>
+        <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-bottom:14px;">Wireless Plug & Play · 1 micrófono · Live streaming · TikTok · Vlog</div>
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:14px;">
+          <span style="font-size:22px; font-weight:800; color:var(--gold);">$9.45</span><span style="font-size:11px; color:var(--muted)">al detal</span>
+          <span style="font-size:15px; font-weight:700; color:var(--green);">$8.20</span><span style="font-size:11px; color:var(--muted)">mayor (3+)</span>
+        </div>
+        <button class="btn-add" style="width:100%; padding:10px 16px; font-size:13px;" onclick="addToCart('k9-one',event)">🛒 Agregar al carrito</button>
+      </div>
+    </div>
+
+    <!-- Micrófono K9 Duos -->
+    <div style="background:var(--surface); border:1px solid var(--border2); border-radius:20px; overflow:hidden; transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(245,158,11,0.4)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,0.1)'">
+      <img src="img/k9-airmax.jpeg" alt="Micrófono K9 Duos" style="width:100%; height:190px; object-fit:cover; object-position:center top; display:block;"/>
+      <div style="padding:18px;">
+        <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px;">Micrófono K9 Duos — Inalámbrico</div>
+        <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-bottom:14px;">Wireless Plug & Play · 2 micrófonos · Entrevistas y podcasts a dos voces</div>
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:14px;">
+          <span style="font-size:22px; font-weight:800; color:var(--gold);">$10.45</span><span style="font-size:11px; color:var(--muted)">al detal</span>
+          <span style="font-size:15px; font-weight:700; color:var(--green);">$8.45</span><span style="font-size:11px; color:var(--muted)">mayor (3+)</span>
+        </div>
+        <button class="btn-add" style="width:100%; padding:10px 16px; font-size:13px;" onclick="addToCart('k9-duos',event)">🛒 Agregar al carrito</button>
+      </div>
+    </div>
+
+    <!-- Audífonos AirMax -->
+    <div style="background:var(--surface); border:1px solid var(--border2); border-radius:20px; overflow:hidden; transition:transform .2s,border-color .2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(245,158,11,0.4)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,0.1)'">
+      <img src="img/k9-airmax.jpeg" alt="Audífonos AirMax" style="width:100%; height:190px; object-fit:cover; object-position:center bottom; display:block;"/>
+      <div style="padding:18px;">
+        <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px;">Audífonos AirMax — Cristal Inteligente</div>
+        <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-bottom:14px;">True Wireless · Caja de cristal · Anti Ruido · Controla tu celular desde la cajita</div>
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:14px;">
+          <span style="font-size:22px; font-weight:800; color:var(--gold);">$11.36</span><span style="font-size:11px; color:var(--muted)">al detal</span>
+          <span style="font-size:15px; font-weight:700; color:var(--green);">$10</span><span style="font-size:11px; color:var(--muted)">mayor (3+)</span>
+        </div>
+        <button class="btn-add" style="width:100%; padding:10px 16px; font-size:13px;" onclick="addToCart('airmax',event)">🛒 Agregar al carrito</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tabla al mayor -->
+  <div style="background:var(--surface); border:1px solid rgba(245,158,11,0.25); border-radius:20px; padding:28px 32px; max-width:800px; margin:0 auto;">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+      <span style="font-size:22px;">📦</span>
+      <span style="color:var(--gold); font-weight:800; font-size:14px; letter-spacing:.12em; text-transform:uppercase;">Precios al Mayor · 3+ unidades</span>
+    </div>
+    <p style="color:var(--muted); font-size:13px; margin-bottom:20px;">Para revendedores y emprendedores. Desde 3 unidades del mismo producto. Envíos gratis a todo el país.</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-bottom:20px;">
+      <div style="background:var(--surface2); border-radius:12px; padding:14px 16px;"><div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Reloj Inteligente</div><div style="font-size:20px; font-weight:800; color:var(--green);">$16<span style="font-size:11px; color:var(--muted); font-weight:400"> /u</span></div></div>
+      <div style="background:var(--surface2); border-radius:12px; padding:14px 16px;"><div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Micrófono K9 One</div><div style="font-size:20px; font-weight:800; color:var(--green);">$8.20<span style="font-size:11px; color:var(--muted); font-weight:400"> /u</span></div></div>
+      <div style="background:var(--surface2); border-radius:12px; padding:14px 16px;"><div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Micrófono K9 Duos</div><div style="font-size:20px; font-weight:800; color:var(--green);">$8.45<span style="font-size:11px; color:var(--muted); font-weight:400"> /u</span></div></div>
+      <div style="background:var(--surface2); border-radius:12px; padding:14px 16px;"><div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Audífonos AirMax</div><div style="font-size:20px; font-weight:800; color:var(--green);">$10<span style="font-size:11px; color:var(--muted); font-weight:400"> /u</span></div></div>
+      <div style="background:var(--surface2); border-radius:12px; padding:14px 16px;"><div style="font-size:12px; color:var(--muted); margin-bottom:4px;">Combo Reloj + K9</div><div style="font-size:20px; font-weight:800; color:var(--green);">$16<span style="font-size:11px; color:var(--muted); font-weight:400"> /set</span></div></div>
+    </div>
+    <a href="https://wa.me/584164117331?text=Hola%21+Quiero+precios+al+mayor+de+electr%C3%B3nicos+ZYNC+%F0%9F%93%A6" target="_blank" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,#25d366,#128c7e); color:#fff; font-weight:700; font-size:13px; padding:12px 24px; border-radius:10px; text-decoration:none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Consultar precios al mayor
+    </a>
+  </div>
+
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <div class="footer-top">
       <div>
         <div class="ft-brand-name">A2K Digital Studio</div>
-        <p class="ft-brand-desc">Software empresarial profesional para negocios venezolanos. Paga con tarjeta o dólares de tu banco. Licencias vitalicias.</p>
+        <p class="ft-brand-desc">Software empresarial profesional para negocios venezolanos. Paga en USD por Zinli, Meru, Wally, Zelle y más. Licencias vitalicias.</p>
         <div class="ft-social">
           <a href="https://wa.me/584164117331" target="_blank" class="ft-soc-btn">💬</a>
           <a href="#" class="ft-soc-btn">📸</a>
@@ -763,6 +1032,7 @@
         <ul class="ft-links-list">
           <li><a href="https://wa.me/584164117331" target="_blank">💬 WhatsApp</a></li>
           <li><a href="mailto:ceo@a2kdigitalstudio.online">📧 ceo@a2kdigitalstudio.online</a></li>
+          <li><a href="#servicios-diseno">📋 Tabla de precios de servicios</a></li>
           <li><a href="#solicitar">❓ Solicitar asesoría</a></li>
           <li><a href="#como-funciona">📋 Cómo funciona</a></li>
         </ul>
@@ -770,7 +1040,7 @@
     </div>
     <div class="footer-bottom">
       <div class="ft-copy">© 2026 A2K Digital Studio · Venezuela 🇻🇪</div>
-      <div class="ft-copy">🔒 Pagos seguros con PagueloFácil</div>
+      <div class="ft-copy">💵 Pagos en USD: Zinli · Meru · Wally · Zelle</div>
     </div>
   </div>
 </footer>
@@ -780,7 +1050,6 @@
 <script>
 // ── CONFIG ─────────────────────────────────────────────────────────────────────
 const WA = '584164117331'
-const WORKER = 'https://cart-proxy.shoppingelectronics3112.workers.dev'
 
 const CATALOG = {
   comandas:     { name: 'A2K Comandas Pro',     emoji: '🍽️', price: 49  },
@@ -792,6 +1061,13 @@ const CATALOG = {
   repuestos:    { name: 'Repuestos Motos Pro',   emoji: '🔧', price: 29  },
   fruteria:     { name: 'Frutería Pro',          emoji: '🍊', price: 29  },
   mercado:      { name: 'Mercado Logic Pro',     emoji: '🛒', price: 29  },
+  'combo-hw10': { name: 'Combo Hi Watch 10 + K9', emoji: '⌚', price: 19.64 },
+  'combo-h55':  { name: 'Combo H55ProMax + K9',   emoji: '⌚', price: 19.64 },
+  'reloj-unidad':  { name: 'Reloj Inteligente — Por Unidad', emoji: '⌚', price: 19.64 },
+  'reloj-premium': { name: 'Reloj Inteligente — Premium',    emoji: '⌚', price: 19.64 },
+  'k9-one':     { name: 'Micrófono K9 One',      emoji: '🎙️', price: 9.45 },
+  'k9-duos':    { name: 'Micrófono K9 Duos',     emoji: '🎙️', price: 10.45 },
+  'airmax':     { name: 'Audífonos AirMax',      emoji: '🎧', price: 11.36 },
 }
 
 const MODALS = {
@@ -811,6 +1087,7 @@ const cart = {}  // { id: { ...CATALOG[id], qty } }
 
 function cartCount() { return Object.values(cart).reduce((s,i)=>s+i.qty, 0) }
 function cartTotal() { return Object.values(cart).reduce((s,i)=>s+(i.price*i.qty), 0) }
+function fmt$(n) { const r = Math.round(n*100)/100; return r % 1 === 0 ? String(r) : r.toFixed(2) }
 
 function addToCart(id, e) {
   if (e) e.stopPropagation()
@@ -819,7 +1096,13 @@ function addToCart(id, e) {
   else cart[id] = { ...CATALOG[id], qty: 1 }
   renderCart()
   const btn = e && e.currentTarget
-  if (btn) { btn.textContent = '✅ Agregado'; btn.classList.add('added'); setTimeout(()=>{ btn.textContent = '🛒 Agregar'; btn.classList.remove('added') }, 1800) }
+  if (btn) {
+    const original = btn.dataset.label || btn.textContent
+    btn.dataset.label = original
+    btn.textContent = '✅ Agregado'
+    btn.classList.add('added')
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove('added') }, 1800)
+  }
   openCart()
 }
 
@@ -850,13 +1133,13 @@ function renderCart() {
     return
   }
   foot.style.display = 'block'
-  document.getElementById('cartTotal').textContent = '$' + total + ' USD'
+  document.getElementById('cartTotal').textContent = '$' + fmt$(total) + ' USD'
   itemsEl.innerHTML = Object.entries(cart).map(([id, item]) => `
     <div class="cart-item">
       <div class="cart-item-ico">${item.emoji}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-price">$${item.price * item.qty} USD</div>
+        <div class="cart-item-price">$${fmt$(item.price * item.qty)} USD</div>
       </div>
       <div class="cart-item-right">
         <div class="qty-ctrl">
@@ -878,17 +1161,13 @@ function openCheckout() {
   closeCart()
   const items = Object.values(cart)
   if (!items.length) return
-  document.getElementById('coItems').innerHTML = items.map(i=>`<div class="co-item"><span class="co-item-name">${i.emoji} ${i.name} ×${i.qty}</span><span class="co-item-price">$${i.price*i.qty}</span></div>`).join('')
+  document.getElementById('coItems').innerHTML = items.map(i=>`<div class="co-item"><span class="co-item-name">${i.emoji} ${i.name} ×${i.qty}</span><span class="co-item-price">$${fmt$(i.price*i.qty)}</span></div>`).join('')
   const total = cartTotal()
-  document.getElementById('coTotal').textContent = '$' + total + ' USD'
+  document.getElementById('coTotal').textContent = '$' + fmt$(total) + ' USD'
   // Build WhatsApp message
-  const lines = items.map(i=>`  • ${i.name} ×${i.qty} = $${i.price*i.qty} USD`).join('%0A')
-  const waMsg = `Hola A2K Digital Studio!%0A%0AQuiero comprar:%0A${lines}%0A%0ATotal: $${total} USD%0A%0APor favor envíenme el link de pago.`
+  const lines = items.map(i=>`  • ${i.name} ×${i.qty} = $${fmt$(i.price*i.qty)} USD`).join('%0A')
+  const waMsg = `Hola A2K Digital Studio!%0A%0AQuiero comprar:%0A${lines}%0A%0ATotal: $${fmt$(total)} USD%0A%0APor favor envíenme el link de pago.`
   document.getElementById('waCheckoutBtn').href = `https://wa.me/${WA}?text=${waMsg}`
-  document.getElementById('payResult').style.display = 'none'
-  document.getElementById('payForm').style.display = 'flex'
-  document.getElementById('payBtn').disabled = false
-  document.getElementById('payBtn').textContent = '🔒 Pagar ahora'
   switchTab('card')
   document.getElementById('checkoutOverlay').classList.add('open')
   document.body.style.overflow = 'hidden'
@@ -906,69 +1185,34 @@ function switchTab(tab) {
   document.getElementById('panelWa').style.display  = tab==='wa'   ? 'block' : 'none'
 }
 
-// ── PAYMENT ─────────────────────────────────────────────────────────────────────
-async function processPayment(e) {
-  e.preventDefault()
-  const btn = document.getElementById('payBtn')
-  btn.disabled = true; btn.textContent = '⏳ Procesando…'
-  const expRaw = document.getElementById('pf-exp').value.replace('/','')
-  const payload = {
-    amount:      String(cartTotal()),
-    phone:       document.getElementById('pf-phone').value.replace(/\s/g,''),
-    email:       document.getElementById('pf-email').value,
-    concept:     'Licencia A2K Digital Studio — ' + Object.values(cart).map(i=>i.name).join(', '),
-    description: 'Compra realizada en tienda online A2K Digital Studio',
-    cardHolder:  document.getElementById('pf-name').value,
-    cardNumber:  document.getElementById('pf-card').value.replace(/\s/g,''),
-    expiryMonth: expRaw.slice(0,2),
-    expiryYear:  '20' + expRaw.slice(2,4),
-    cvv:         document.getElementById('pf-cvv').value,
-    returnUrl:   'https://tiendadigitalaipro.github.io/a2k-digital-studio/public/',
-    notificationUrl: 'https://a2kdigitalstudio.online/api/notificacion-pago',
-  }
+// ── JARVIS ENDPOINT ─────────────────────────────────────────────────────────────
+async function notifyJarvis(metodo) {
   try {
-    const resp = await fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
-    const data = await resp.json()
-    const ok = resp.ok && (data.success || data.data?.status === 'APROBADA' || data.data?.approved)
-    showPayResult(ok, data)
-  } catch(err) {
-    // Worker unreachable — fallback to WhatsApp
-    showPayResult(null, null)
-  }
+    const items = Object.values(cart)
+    await fetch('http://127.0.0.1:7799/venta-web', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fuente: 'web-a2kdigitalstudio',
+        metodo_pago: metodo,
+        total: cartTotal(),
+        moneda: metodo === 'Transferencia Bs.' ? 'VES' : 'USD',
+        items: items.map(i => ({ nombre: i.name, qty: i.qty, precio: i.price })),
+        fecha: new Date().toISOString()
+      })
+    })
+  } catch(e) { /* Jarvis offline — silencioso */ }
 }
 
-function showPayResult(ok, data) {
-  document.getElementById('payForm').style.display = 'none'
-  document.getElementById('payResult').style.display = 'block'
-  if (ok === true) {
-    document.getElementById('resIco').textContent = '✅'
-    document.getElementById('resTitle').textContent = '¡Pago aprobado!'
-    document.getElementById('resMsg').textContent = 'Tu compra fue procesada exitosamente. Recibirás tu licencia por WhatsApp en los próximos minutos.'
-    Object.keys(cart).forEach(k => delete cart[k])
-    renderCart()
-  } else if (ok === false) {
-    document.getElementById('resIco').textContent = '❌'
-    document.getElementById('resTitle').textContent = 'Pago no procesado'
-    document.getElementById('resMsg').textContent = 'Hubo un problema con tu tarjeta. Verifica los datos o coordina el pago por WhatsApp.'
-  } else {
-    document.getElementById('resIco').textContent = '💬'
-    document.getElementById('resTitle').textContent = 'Coordina tu pago por WhatsApp'
-    document.getElementById('resMsg').textContent = 'Escríbenos por WhatsApp con tu pedido y te enviamos el link de pago seguro en minutos.'
-  }
+// ── BANCOS PANEL TOGGLE ─────────────────────────────────────────────────────────
+function toggleBancos() {
+  const panel = document.getElementById('bancosPanel')
+  const arrow = document.getElementById('bancosArrow')
+  const open = panel.style.display === 'none'
+  panel.style.display = open ? 'block' : 'none'
+  arrow.style.transform = open ? 'rotate(180deg)' : ''
 }
 
-// ── CARD INPUT FORMATTING ───────────────────────────────────────────────────────
-function fmtCard(input) {
-  let v = input.value.replace(/\D/g,'').slice(0,16)
-  input.value = v.replace(/(.{4})/g,'$1 ').trim()
-  const ico = document.getElementById('cardTypeIco')
-  ico.textContent = v[0]==='4' ? '💙' : v[0]==='5' ? '🔴' : v.startsWith('34')||v.startsWith('37') ? '💚' : '💳'
-}
-function fmtExp(input) {
-  let v = input.value.replace(/\D/g,'').slice(0,4)
-  if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2)
-  input.value = v
-}
 
 // ── PRODUCT MODAL ───────────────────────────────────────────────────────────────
 function openModal(id) {
@@ -1006,6 +1250,13 @@ function filterCards(cat, e) {
   })
 }
 
+// ── SERVICIOS DE DISEÑO — cotizar por WhatsApp ──────────────────────────────────
+function cotizarServicio(row) {
+  const nombre = row.dataset.servicio || 'un servicio';
+  const msg = encodeURIComponent(`Hola A2K! Quiero cotizar: ${nombre}`);
+  window.open(`https://wa.me/584164117331?text=${msg}`, '_blank');
+}
+
 // ── FORM ────────────────────────────────────────────────────────────────────────
 function submitForm(e) {
   e.preventDefault()
@@ -1018,12 +1269,193 @@ function submitForm(e) {
 // ── SCROLL EFFECTS ───────────────────────────────────────────────────────────────
 window.addEventListener('scroll', ()=>{ document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY>40) })
 const revObs = new IntersectionObserver(entries=>entries.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('visible');revObs.unobserve(e.target)} }),{threshold:.1})
-document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el))
+document.querySelectorAll('.reveal').forEach(el=>{
+  const siblings = Array.from(el.parentElement.children).filter(c=>c.classList.contains('reveal'))
+  el.style.setProperty('--stagger', Math.min(siblings.indexOf(el), 5))
+  revObs.observe(el)
+})
 const cntObs = new IntersectionObserver(entries=>entries.forEach(e=>{ if(!e.isIntersecting)return; const el=e.target,t=+el.dataset.target; let c=0,s=t/60; const timer=setInterval(()=>{ c=Math.min(c+s,t); el.textContent=Math.floor(c)+(t>=100?'+':''); if(c>=t)clearInterval(timer) },25); cntObs.unobserve(el) }),{threshold:.5})
+
 document.querySelectorAll('[data-target]').forEach(c=>cntObs.observe(c))
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeModal();closeCart();closeCheckout()} })
 
+// ── MICRO-INTERACCIONES 3D (solo dispositivos con mouse) ────────────────────────
+if (window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+
+  // Tilt 3D en tarjetas
+  function initTilt(selector, { max = 7, lift = -6, scale = 1.015, perspective = 900 } = {}) {
+    document.querySelectorAll(selector).forEach(el => {
+      el.addEventListener('mousemove', e => {
+        const r = el.getBoundingClientRect()
+        const px = (e.clientX - r.left) / r.width - 0.5
+        const py = (e.clientY - r.top) / r.height - 0.5
+        el.style.transform = `perspective(${perspective}px) rotateX(${(py * -max).toFixed(2)}deg) rotateY(${(px * max).toFixed(2)}deg) translateY(${lift}px) scale(${scale})`
+      })
+      el.addEventListener('mouseleave', () => { el.style.transform = '' })
+    })
+  }
+  initTilt('.pcard', { max: 6 })
+  initTilt('.step', { max: 5, lift: -4 })
+  initTilt('.testi-card', { max: 4, lift: -3, scale: 1.01 })
+
+  // Botones magnéticos
+  function initMagnetic(selector, strength = 12) {
+    document.querySelectorAll(selector).forEach(btn => {
+      btn.addEventListener('mouseenter', () => { btn.style.transition = 'transform .05s linear' })
+      btn.addEventListener('mousemove', e => {
+        const r = btn.getBoundingClientRect()
+        const x = (e.clientX - r.left - r.width / 2) / r.width
+        const y = (e.clientY - r.top - r.height / 2) / r.height
+        btn.style.transform = `translate(${(x * strength).toFixed(1)}px, ${(y * strength).toFixed(1)}px)`
+      })
+      btn.addEventListener('mouseleave', () => { btn.style.transition = 'transform .3s ease'; btn.style.transform = '' })
+    })
+  }
+  initMagnetic('.btn-p, .btn-checkout, .btn-wa-big', 10)
+
+  // Spotlight de cursor
+  const glow = document.getElementById('cursorGlow')
+  let glowX = 50, glowY = 0, rafPending = false
+  window.addEventListener('mousemove', e => {
+    glowX = (e.clientX / window.innerWidth) * 100
+    glowY = (e.clientY / window.innerHeight) * 100
+    if (!rafPending) {
+      rafPending = true
+      requestAnimationFrame(() => {
+        glow.style.setProperty('--mx', glowX + '%')
+        glow.style.setProperty('--my', glowY + '%')
+        rafPending = false
+      })
+    }
+  })
+}
+
 renderCart()
+</script>
+
+<!-- ── Fondo 3D del hero — Three.js local (sin CDN, más confiable con internet inestable) ── -->
+<script type="module">
+  import * as THREE from './three.module.js';
+
+  const canvas = document.getElementById('hero3d');
+  if (canvas && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const heroEl = document.querySelector('.hero');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / heroEl.offsetHeight, 0.1, 100);
+    camera.position.z = 8;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    function resize() {
+      const h = heroEl.offsetHeight;
+      renderer.setSize(window.innerWidth, h);
+      camera.aspect = window.innerWidth / h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const geo1 = new THREE.IcosahedronGeometry(3.2, 1);
+    const mat1 = new THREE.MeshBasicMaterial({ color: 0x7c3aed, wireframe: true, transparent: true, opacity: 0.32 });
+    const mesh1 = new THREE.Mesh(geo1, mat1);
+    scene.add(mesh1);
+
+    const geo2 = new THREE.IcosahedronGeometry(1.6, 0);
+    const mat2 = new THREE.MeshBasicMaterial({ color: 0x00f5d4, wireframe: true, transparent: true, opacity: 0.28 });
+    const mesh2 = new THREE.Mesh(geo2, mat2);
+    mesh2.position.set(3.6, -1.6, -2);
+    scene.add(mesh2);
+
+    const particleCount = 200;
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 16;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2;
+    }
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const pMat = new THREE.PointsMaterial({ color: 0xa78bfa, size: 0.035, transparent: true, opacity: 0.45 });
+    const points = new THREE.Points(pGeo, pMat);
+    scene.add(points);
+
+    let mouseX = 0, mouseY = 0;
+    window.addEventListener('mousemove', e => {
+      mouseX = (e.clientX / window.innerWidth) - 0.5;
+      mouseY = (e.clientY / window.innerHeight) - 0.5;
+    });
+
+    (function animate() {
+      requestAnimationFrame(animate);
+      mesh1.rotation.x += 0.0016; mesh1.rotation.y += 0.0022;
+      mesh2.rotation.x -= 0.0011; mesh2.rotation.y += 0.0018;
+      points.rotation.y += 0.0004;
+      camera.position.x += (mouseX * 0.6 - camera.position.x) * 0.03;
+      camera.position.y += (-mouseY * 0.4 - camera.position.y) * 0.03;
+      camera.lookAt(0, 0, 0);
+      renderer.render(scene, camera);
+    })();
+  }
+</script>
+
+<!-- ── Fondo 3D de "Cómo funciona" — partículas ambientales sutiles ── -->
+<script type="module">
+  import * as THREE from './three.module.js';
+
+  const canvas2 = document.getElementById('steps3d');
+  if (canvas2 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const wrapEl = document.querySelector('.steps-wrap');
+    const scene2 = new THREE.Scene();
+    const camera2 = new THREE.PerspectiveCamera(50, window.innerWidth / wrapEl.offsetHeight, 0.1, 100);
+    camera2.position.z = 9;
+
+    const renderer2 = new THREE.WebGLRenderer({ canvas: canvas2, alpha: true, antialias: true });
+    renderer2.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    function resize2() {
+      const h = wrapEl.offsetHeight;
+      renderer2.setSize(window.innerWidth, h);
+      camera2.aspect = window.innerWidth / h;
+      camera2.updateProjectionMatrix();
+    }
+    resize2();
+    window.addEventListener('resize', resize2);
+
+    const ringGeo = new THREE.TorusGeometry(2.4, 0.02, 8, 64);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f5d4, transparent: true, opacity: 0.18 });
+    const ring1 = new THREE.Mesh(ringGeo, ringMat);
+    ring1.position.set(-4.5, 1.2, -3);
+    ring1.rotation.x = 1.1;
+    scene2.add(ring1);
+
+    const ring2 = new THREE.Mesh(ringGeo.clone(), new THREE.MeshBasicMaterial({ color: 0x7c3aed, transparent: true, opacity: 0.16 }));
+    ring2.position.set(5, -1.4, -4);
+    ring2.rotation.x = 0.6;
+    ring2.scale.setScalar(0.7);
+    scene2.add(ring2);
+
+    const particleCount2 = 120;
+    const positions2 = new Float32Array(particleCount2 * 3);
+    for (let i = 0; i < particleCount2; i++) {
+      positions2[i * 3] = (Math.random() - 0.5) * 18;
+      positions2[i * 3 + 1] = (Math.random() - 0.5) * 8;
+      positions2[i * 3 + 2] = (Math.random() - 0.5) * 8 - 3;
+    }
+    const pGeo2 = new THREE.BufferGeometry();
+    pGeo2.setAttribute('position', new THREE.BufferAttribute(positions2, 3));
+    const pMat2 = new THREE.PointsMaterial({ color: 0xa78bfa, size: 0.03, transparent: true, opacity: 0.3 });
+    const points2 = new THREE.Points(pGeo2, pMat2);
+    scene2.add(points2);
+
+    (function animate2() {
+      requestAnimationFrame(animate2);
+      ring1.rotation.z += 0.0012;
+      ring2.rotation.z -= 0.0009;
+      points2.rotation.y += 0.0003;
+      renderer2.render(scene2, camera2);
+    })();
+  }
 </script>
 </body>
 </html>
