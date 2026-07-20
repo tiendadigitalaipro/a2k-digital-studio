@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYNC Electronics — Tienda</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0a0a0f;--card:#13131a;--card2:#1a1a26;--border:#2a2a3a;
+    --cyan:#00e5ff;--purple:#7c3aed;--green:#22c55e;--red:#ef4444;
+    --text:#f0f0f5;--muted:#8888aa;--white:#ffffff;
+    --gradient:linear-gradient(135deg,#00e5ff,#7c3aed);
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;min-height:100vh}
+
+  /* ── HEADER ── */
+  header{background:rgba(13,13,26,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
+    padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .logo-icon{width:38px;height:38px;background:var(--gradient);border-radius:10px;
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff}
+  .logo-text{font-size:18px;font-weight:700;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .logo-sub{font-size:11px;color:var(--muted);margin-top:-2px}
+  .cart-btn{background:var(--card2);border:1px solid var(--border);color:var(--text);
+    padding:10px 18px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:8px;
+    font-size:14px;transition:all .2s;position:relative}
+  .cart-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+  .cart-badge{background:var(--cyan);color:#000;border-radius:50%;width:20px;height:20px;
+    font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
+    position:absolute;top:-6px;right:-6px;display:none}
+
+  /* ── HERO ── */
+  .hero{text-align:center;padding:50px 24px 30px;background:radial-gradient(ellipse at 50% 0%,rgba(0,229,255,.07) 0%,transparent 60%)}
+  .hero h1{font-size:clamp(26px,4vw,44px);font-weight:800;letter-spacing:-1px;margin-bottom:10px}
+  .hero h1 span{background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .hero p{color:var(--muted);font-size:15px;max-width:480px;margin:0 auto 20px}
+  .tag{display:inline-block;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);
+    color:var(--cyan);padding:4px 12px;border-radius:20px;font-size:12px;margin:4px}
+
+  /* ── SECTIONS ── */
+  .section{padding:32px 24px;max-width:1200px;margin:0 auto}
+  .section-title{font-size:20px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border);margin-left:12px}
+  .section-sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+
+  /* ── PRODUCT GRID ── */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+
+  /* ── PRODUCT CARD ── */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;
+    transition:all .25s;position:relative}
+  .card:hover{border-color:var(--cyan);transform:translateY(-3px);box-shadow:0 0 24px rgba(0,229,255,.1)}
+  .card-img{width:100%;height:190px;object-fit:cover;background:var(--card2)}
+  .card-img-placeholder{width:100%;height:190px;background:linear-gradient(135deg,#1a1a2e,#16213e);
+    display:flex;align-items:center;justify-content:center;font-size:48px;color:var(--border)}
+  .card-body{padding:16px}
+  .card-name{font-size:14px;font-weight:600;margin-bottom:6px;line-height:1.3}
+  .card-price{font-size:22px;font-weight:800;color:var(--cyan);margin-bottom:4px}
+  .card-stock{font-size:12px;color:var(--muted);margin-bottom:14px}
+  .card-stock.low{color:#f59e0b}
+  .card-stock.out{color:var(--red)}
+  .btn-add{width:100%;padding:10px;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);
+    color:var(--cyan);border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;
+    transition:all .2s}
+  .btn-add:hover{background:var(--cyan);color:#000}
+  .btn-add:disabled{background:var(--card2);border-color:var(--border);color:var(--muted);cursor:not-allowed}
+  .out-badge{position:absolute;top:12px;right:12px;background:rgba(239,68,68,.9);
+    color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px}
+
+  /* ── COMBO CARDS ── */
+  .combo-card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+    overflow:hidden;transition:all .25s;position:relative}
+  .combo-card:hover{border-color:var(--purple);transform:translateY(-3px);box-shadow:0 0 24px rgba(124,58,237,.15)}
+  .combo-header{background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(0,229,255,.1));
+    padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .combo-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--purple)}
+  .combo-savings{font-size:11px;background:rgba(34,197,94,.15);color:var(--green);
+    border:1px solid rgba(34,197,94,.3);padding:2px 8px;border-radius:20px}
+  .combo-body{padding:16px}
+  .combo-name{font-size:16px;font-weight:700;margin-bottom:8px}
+  .combo-items{list-style:none;margin-bottom:14px}
+  .combo-items li{font-size:13px;color:var(--muted);padding:3px 0;display:flex;align-items:center;gap:6px}
+  .combo-items li::before{content:'✅';font-size:11px}
+  .combo-price-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .combo-price{font-size:26px;font-weight:800;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .combo-original{font-size:14px;color:var(--muted);text-decoration:line-through}
+  .btn-combo{width:100%;padding:11px;background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(0,229,255,.2));
+    border:1px solid rgba(124,58,237,.4);color:var(--white);border-radius:10px;
+    cursor:pointer;font-weight:700;font-size:14px;transition:all .2s}
+  .btn-combo:hover{background:var(--gradient);border-color:transparent}
+
+  /* ── CART DRAWER ── */
+  .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;opacity:0;transition:opacity .3s}
+  .drawer-overlay.open{display:block;opacity:1}
+  .drawer{position:fixed;right:0;top:0;bottom:0;width:min(380px,100vw);background:var(--card);
+    border-left:1px solid var(--border);z-index:201;transform:translateX(100%);
+    transition:transform .3s;display:flex;flex-direction:column}
+  .drawer.open{transform:translateX(0)}
+  .drawer-head{padding:20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .drawer-head h2{font-size:18px;font-weight:700}
+  .drawer-close{background:none;border:1px solid var(--border);color:var(--muted);width:32px;height:32px;
+    border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+  .drawer-close:hover{color:var(--text);border-color:var(--text)}
+  .drawer-items{flex:1;overflow-y:auto;padding:16px}
+  .cart-empty{text-align:center;padding:48px 16px;color:var(--muted)}
+  .cart-empty div{font-size:48px;margin-bottom:12px}
+  .cart-item{background:var(--card2);border:1px solid var(--border);border-radius:12px;
+    padding:12px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+  .ci-img{width:52px;height:52px;border-radius:8px;object-fit:cover;background:var(--border);
+    display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+  .ci-info{flex:1}
+  .ci-name{font-size:13px;font-weight:600;margin-bottom:3px}
+  .ci-price{font-size:14px;color:var(--cyan);font-weight:700}
+  .ci-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px;
+    border-radius:6px;transition:color .2s}
+  .ci-remove:hover{color:var(--red)}
+  .drawer-footer{padding:16px;border-top:1px solid var(--border)}
+  .total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .total-label{font-size:14px;color:var(--muted)}
+  .total-amount{font-size:24px;font-weight:800;color:var(--cyan)}
+  .btn-checkout{width:100%;padding:14px;background:#25D366;border:none;color:#fff;border-radius:12px;
+    cursor:pointer;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;
+    gap:8px;transition:all .2s}
+  .btn-checkout:hover{background:#1ebe5d;transform:translateY(-1px)}
+  .btn-checkout:disabled{background:var(--border);cursor:not-allowed;transform:none}
+
+  /* ── TOAST ── */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--green);color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;
+    font-weight:600;z-index:999;transition:transform .3s;white-space:nowrap}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  /* ── LOADER ── */
+  .loader{text-align:center;padding:48px;color:var(--muted)}
+  .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--cyan);
+    border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ── FOOTER ── */
+  footer{border-top:1px solid var(--border);padding:24px;text-align:center;color:var(--muted);font-size:13px}
+  footer a{color:var(--cyan);text-decoration:none}
+
+  @media(max-width:600px){
+    .hero{padding:36px 16px 20px}
+    .section{padding:24px 16px}
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#">
+    <div class="logo-icon">Z</div>
+    <div>
+      <div class="logo-text">ZYNC Electronics</div>
+      <div class="logo-sub">Tecnología que conecta</div>
+    </div>
+  </a>
+  <button class="cart-btn" onclick="openCart()">
+    🛒 Mi carrito
+    <span class="cart-badge" id="cartBadge">0</span>
+  </button>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Tecnología <span>al alcance</span><br>de todos</h1>
+  <p>Productos electrónicos de calidad con envío rápido. Paga por Zinli, Zelle o Meru.</p>
+  <span class="tag">⚡ Envío rápido</span>
+  <span class="tag">✅ Garantía incluida</span>
+  <span class="tag">💳 Zinli · Zelle · Meru</span>
+</div>
+
+<!-- PRODUCTOS -->
+<div class="section">
+  <div class="section-title">📦 Productos disponibles</div>
+  <p class="section-sub">Stock actualizado en tiempo real</p>
+  <div class="grid" id="productGrid">
+    <div class="loader"><div class="spinner"></div>Cargando productos...</div>
+  </div>
+</div>
+
+<!-- COMBOS -->
+<div class="section">
+  <div class="section-title">🔥 Combos especiales</div>
+  <p class="section-sub">Más por menos — combina y ahorra</p>
+  <div class="grid" id="comboGrid"></div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="drawer-overlay" id="overlay" onclick="closeCart()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h2>🛒 Tu carrito</h2>
+    <button class="drawer-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="drawer-items" id="cartItems">
+    <div class="cart-empty"><div>🛒</div>Tu carrito está vacío</div>
+  </div>
+  <div class="drawer-footer">
+    <div class="total-row">
+      <span class="total-label">Total a pagar</span>
+      <span class="total-amount" id="cartTotal">$0.00</span>
+    </div>
+    <button class="btn-checkout" id="checkoutBtn" onclick="checkout()" disabled>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
+      Pedir por WhatsApp
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FOOTER -->
+<footer>
+  <p>ZYNC Electronics · Venezuela · <a href="https://a2kdigitalstudio.online">A2K Digital Studio</a></p>
+  <p style="margin-top:6px">Pagos: Zinli · Zelle · Meru (USD) &nbsp;|&nbsp; Envíos a todo el país</p>
+</footer>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://peyemxxqgkhagvxjcbjf.supabase.co'
+const SUPABASE_KEY  = 'sb_publishable_h3e2XZ1hhGSv1kb4gaKpPg_4SdZz4rg'
+const WA_NUMBER     = '584164117331'
+const TG_BOT_TOKEN  = '8351227479:AAG66TOA8LosFHwmKwPsC3wZA0Tn8v_HhB0'
+const TG_CHAT_ID    = '7579580673'
+
+// ── COMBOS ──────────────────────────────────────────────────────────────────
+const COMBOS = [
+  {
+    id:'combo-creator', label:'Combo Creator 🎙️', emoji:'🎙️🎧',
+    items:['Audífonos AirMax Cristal','Micrófono K9 Duos Lavalier'],
+    price:18, original:19.81,
+    desc:'Graba y escucha con calidad profesional'
+  },
+  {
+    id:'combo-smart-life', label:'Combo Smart Life ⌚', emoji:'⌚🎧',
+    items:['Reloj Inteligente I30 Pro Max','Audífonos AirMax Cristal'],
+    price:28, original:31.00,
+    desc:'El duo perfecto para tu estilo de vida'
+  },
+  {
+    id:'combo-smart-sound', label:'Combo Smart Sound 🎙️', emoji:'⌚🎙️',
+    items:['Reloj Inteligente I30 Pro Max','Micrófono K9 Duos Lavalier'],
+    price:25, original:28.09,
+    desc:'Tecnología de mano y de bolsillo'
+  },
+  {
+    id:'combo-pack-total', label:'PACK TOTAL 👑', emoji:'👑',
+    items:['Reloj I30 Pro Max','Audífonos AirMax Cristal','Micrófono K9 Duos'],
+    price:35, original:39.45,
+    desc:'Lo mejor de ZYNC en un solo paquete'
+  }
+]
+
+// ── CARRITO ─────────────────────────────────────────────────────────────────
+let cart = []
+
+function addToCart(item) {
+  const exists = cart.find(c => c.id === item.id)
+  if (exists) { showToast('Ya está en tu carrito ✓'); return }
+  cart.push(item)
+  updateCartUI()
+  showToast(`${item.name} agregado al carrito ✓`)
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(c => c.id !== id)
+  updateCartUI()
+  renderCartItems()
+}
+
+function updateCartUI() {
+  const badge = document.getElementById('cartBadge')
+  badge.textContent = cart.length
+  badge.style.display = cart.length > 0 ? 'flex' : 'none'
+  document.getElementById('checkoutBtn').disabled = cart.length === 0
+  const total = cart.reduce((s,c) => s + c.price, 0)
+  document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`
+  renderCartItems()
+}
+
+function renderCartItems() {
+  const el = document.getElementById('cartItems')
+  if (cart.length === 0) {
+    el.innerHTML = '<div class="cart-empty"><div>🛒</div>Tu carrito está vacío</div>'
+    return
+  }
+  el.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="ci-img">${item.emoji || '📦'}</div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-price">$${item.price.toFixed(2)}</div>
+      </div>
+      <button class="ci-remove" onclick="removeFromCart('${item.id}')">✕</button>
+    </div>
+  `).join('')
+}
+
+function openCart() {
+  document.getElementById('drawer').classList.add('open')
+  document.getElementById('overlay').classList.add('open')
+}
+function closeCart() {
+  document.getElementById('drawer').classList.remove('open')
+  document.getElementById('overlay').classList.remove('open')
+}
+
+// ── CHECKOUT ────────────────────────────────────────────────────────────────
+async function checkout() {
+  if (cart.length === 0) return
+  const total = cart.reduce((s,c) => s + c.price, 0)
+  const lines = cart.map(c => `  • ${c.name} — $${c.price.toFixed(2)}`).join('\n')
+  const msg = `Hola ZYNC Electronics! 👋\n\nQuiero hacer este pedido:\n\n${lines}\n\n*Total: $${total.toFixed(2)} USD*\n\n¿Cómo procedo con el pago? (Zinli / Zelle / Meru)`
+
+  // Notificar a Jarvis
+  const jarvisMsg = `🛒 *NUEVO PEDIDO ZYNC*\n\n${lines}\n\n💰 *Total: $${total.toFixed(2)} USD*`
+  try {
+    await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ chat_id: TG_CHAT_ID, text: jarvisMsg, parse_mode:'Markdown' })
+    })
+  } catch(e) { console.log('Jarvis offline') }
+
+  // Abrir WhatsApp
+  window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank')
+  closeCart()
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg
+  t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 2500)
+}
+
+// ── RENDER PRODUCTS ──────────────────────────────────────────────────────────
+function renderProducts(products) {
+  const grid = document.getElementById('productGrid')
+  if (!products.length) {
+    grid.innerHTML = '<p style="color:var(--muted)">No hay productos disponibles en este momento.</p>'
+    return
+  }
+  grid.innerHTML = products.map(p => {
+    const stock = p.qty - p.sold
+    const outOfStock = stock <= 0
+    const lowStock = stock > 0 && stock <= 5
+    const stockText = outOfStock ? 'Agotado' : lowStock ? `¡Solo ${stock} disponibles!` : `${stock} disponibles`
+    const stockClass = outOfStock ? 'out' : lowStock ? 'low' : ''
+    const imgEl = p.imageUrl
+      ? `<img class="card-img" src="${p.imageUrl}" alt="${p.name}" loading="lazy" onerror="this.outerHTML='<div class=card-img-placeholder>📦</div>'">`
+      : `<div class="card-img-placeholder">📦</div>`
+
+    return `
+    <div class="card">
+      ${outOfStock ? '<div class="out-badge">Agotado</div>' : ''}
+      ${imgEl}
+      <div class="card-body">
+        <div class="card-name">${p.name}</div>
+        <div class="card-price">$${p.price.toFixed(2)}</div>
+        <div class="card-stock ${stockClass}">${stockText}</div>
+        <button class="btn-add" ${outOfStock?'disabled':''} onclick='addToCart(${JSON.stringify({id:"p"+p.id,name:p.name,price:p.price,emoji:"📦"})})'>
+          ${outOfStock ? 'Sin stock' : '+ Agregar al carrito'}
+        </button>
+      </div>
+    </div>`
+  }).join('')
+}
+
+// ── RENDER COMBOS ─────────────────────────────────────────────────────────────
+function renderCombos() {
+  const grid = document.getElementById('comboGrid')
+  grid.innerHTML = COMBOS.map(c => {
+    const saved = (c.original - c.price).toFixed(2)
+    return `
+    <div class="combo-card">
+      <div class="combo-header">
+        <span class="combo-label">${c.label}</span>
+        <span class="combo-savings">Ahorra $${saved}</span>
+      </div>
+      <div class="combo-body">
+        <div class="combo-name">${c.emoji} ${c.desc}</div>
+        <ul class="combo-items">
+          ${c.items.map(i=>`<li>${i}</li>`).join('')}
+        </ul>
+        <div class="combo-price-row">
+          <span class="combo-price">$${c.price}</span>
+          <span class="combo-original">$${c.original.toFixed(2)}</span>
+        </div>
+        <button class="btn-combo" onclick='addToCart({id:"${c.id}",name:"${c.label}",price:${c.price},emoji:"${c.emoji.split(" ")[0]}"})'>
+          + Agregar combo al carrito
+        </button>
+      </div>
+    </div>`
+  }).join('')
+}
+
+// ── LOAD FROM SUPABASE ───────────────────────────────────────────────────────
+async function loadProducts() {
+  try {
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    const { data, error } = await supabase
+      .from('zync_inventario')
+      .select('*')
+      .order('id', { ascending: true })
+
+    if (error) throw error
+
+    const products = (data || []).map(r => ({
+      id: r.id,
+      name: r.nombre,
+      price: r.precio_venta_usd,
+      qty: r.qty,
+      sold: r.vendido || 0,
+      imageUrl: r.imagen_url || null
+    }))
+
+    renderProducts(products)
+  } catch(e) {
+    document.getElementById('productGrid').innerHTML =
+      '<p style="color:var(--muted)">Error cargando productos. Recarga la página.</p>'
+    console.error(e)
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+renderCombos()
+loadProducts()
+</script>
+</body>
+</html>
