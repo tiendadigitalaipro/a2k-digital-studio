@@ -1041,6 +1041,36 @@ def _cierre_diario_automatico(gui_app=None) -> None:
         time.sleep(65)   # pausa para no re-disparar al cruzar la medianoche
 
 
+def _contenido_diario_automatico(gui_app=None) -> None:
+    """
+    Hilo daemon — genera una pieza de contenido (post + imagen) todos los
+    días a las 09:00 usando automatizaciones_ia.generar_contenido_diario().
+    Equivalente al flujo n8n "Motor de Contenido Automático" (antes manual).
+    Avisa a Abigail por WhatsApp cuando queda lista.
+    """
+    from datetime import datetime as _dtd, timedelta
+    from modulos.automatizaciones_ia import generar_contenido_diario
+
+    _cprint("INFO", "Cron de contenido iniciado — pieza nueva programada para las 09:00 cada dia")
+    while True:
+        ahora    = _dtd.now()
+        objetivo = ahora.replace(hour=9, minute=0, second=0, microsecond=0)
+        if ahora >= objetivo:
+            objetivo += timedelta(days=1)
+
+        segundos = max((objetivo - _dtd.now()).total_seconds(), 1)
+        _cprint("INFO", f"Proximo contenido: {objetivo.strftime('%Y-%m-%d 09:00')} (en {segundos / 3600:.1f} h)")
+        time.sleep(segundos)
+
+        try:
+            contenido = generar_contenido_diario()
+            _cprint("OK", f"[CONTENIDO IA] Generado: {contenido.get('idea', '?')}")
+        except Exception as e:
+            _cprint("WARN", f"[CONTENIDO IA] Error generando contenido del dia: {e}")
+
+        time.sleep(65)   # pausa para no re-disparar en el mismo minuto
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 #  MÓDULO DE CRÉDITOS Y COBRANZA — Cuentas por Cobrar (Fiado) + Cron Sábado
 # ──────────────────────────────────────────────────────────────────────────────
@@ -3239,6 +3269,22 @@ def _arrancar_servidor_zync(gui_app):
                     msg = f"[WEB A2K] Pedido — {moneda} {total:.2f} ({metodo}) | {items_txt}"
                     gui_app.root.after(0, lambda m=msg: gui_app.log(m, "ok"))
 
+                    # Aviso inmediato por WhatsApp — es intencion de compra (eligio
+                    # metodo de pago), NO pago confirmado. El sitio no captura
+                    # nombre/telefono del cliente en este paso, asi que aqui solo
+                    # se alerta a Abigail; el onboarding real (bienvenida al
+                    # cliente) se dispara a mano con /clientenuevo en Telegram
+                    # una vez ella confirme el pago y tenga los datos reales.
+                    try:
+                        _enviar_whatsapp(
+                            os.environ.get("WA_ADMIN_NUMERO", "").strip(),
+                            f"🛒 Pedido nuevo en la web — {moneda} {total:.2f} vía {metodo}\n"
+                            f"{items_txt}\n\n"
+                            f"Cuando confirmes el pago, dispara el onboarding con /clientenuevo en Telegram.",
+                        )
+                    except Exception as _e2:
+                        gui_app.root.after(0, lambda e=str(_e2): gui_app.log(f"[WEB A2K] No se pudo avisar por WhatsApp: {e}", "warn"))
+
                     self.send_response(200)
                     self.send_header("Content-Type", "application/json")
                     self.send_header("Access-Control-Allow-Origin", "*")
@@ -3248,6 +3294,32 @@ def _arrancar_servidor_zync(gui_app):
                     self.send_response(500)
                     self.end_headers()
                     gui_app.root.after(0, lambda e=str(_e): gui_app.log(f"[WEB A2K] Error webhook: {e}", "err"))
+                return
+
+            if self.path == "/lead-nuevo":
+                try:
+                    length = int(self.headers.get("Content-Length", 0))
+                    body   = _json.loads(self.rfile.read(length))
+                    from modulos.automatizaciones_ia import calificar_lead
+
+                    resultado = calificar_lead(
+                        nombre=body.get("nombre", "Sin nombre"),
+                        mensaje=body.get("mensaje", ""),
+                        empresa=body.get("negocio", ""),
+                        canal="formulario web a2kdigitalstudio.online",
+                    )
+                    gui_app.root.after(0, lambda r=resultado: gui_app.log(
+                        f"[LEAD WEB] {r.get('categoria', '?')} ({r.get('puntuacion', '?')}/100) — {r.get('razon', '')}", "ok"))
+
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.end_headers()
+                    self.wfile.write(_json.dumps(resultado).encode())
+                except Exception as _e:
+                    self.send_response(500)
+                    self.end_headers()
+                    gui_app.root.after(0, lambda e=str(_e): gui_app.log(f"[LEAD WEB] Error: {e}", "err"))
                 return
 
             if self.path != "/venta-zync":
@@ -4878,18 +4950,44 @@ def _arrancar_servidor_sms(gui_app):
                             "e-commerce", "ecommerce", "tienda online", "logo", "logotipo",
                             "diseño grafico", "diseño gráfico", "identidad visual",
                             "manual de marca", "mockup"))):
-                    respuesta = (
-                        "¡Claro! Aquí tienes nuestra tabla de precios completa con todos los "
-                        "servicios de A2K Digital Studio 👇\n"
-                        "👉 https://www.a2kdigitalstudio.online/precios.html\n\n"
-                        "Tenemos 4 niveles:\n"
-                        "⭐ Básicos: desde $5\n"
-                        "🔥 Intermedios: desde $20\n"
-                        "💎 Avanzados: desde $60\n"
-                        "👑 Premium: desde $200\n\n"
-                        "¿Sobre qué servicio te gustaría más información? Escríbeme y te ayudo 🤖🔥"
+                    # Precios exactos verificados en vivo (a2kdigitalstudio.online/precios.html,
+                    # 2026-07-20) — responde puntual si pregunta por landing/flyer/edición de fotos.
+                    _precios_especificos = (
+                        (("edicion de fotos", "edición de fotos", "editar fotos", "editar foto"),
+                         "🖼️ Edición de fotos básica: $5\n"
+                         "Corrección de color · recorte · limpieza de fondo · hasta 3 fotos"),
+                        (("flyer", "flyers", "volante", "volantes"),
+                         "📋 Flyers / Volantes:\n"
+                         "• Básico: $10–$18 (1 diseño, texto promocional, logo, 1 ajuste, entrega 24h)\n"
+                         "• Profesional: $20–$35 (diseño avanzado, copywriting, iconografía, 2 ajustes, 48h)"),
+                        (("landing page", "landing"),
+                         "🌐 Landing page:\n"
+                         "• Básica: $40–$80 (1 sección, responsive, formulario, hosting Vercel gratis, SEO básico)\n"
+                         "• Alto impacto: $80–$150 (estructura AIDA, copy persuasivo, CTA, contador, testimonios, pago integrado)"),
                     )
-                    _cprint("INFO", f"[TG precios servicios] chat={chat_id[:10]}")
+                    _respuesta_especifica = next(
+                        (msg for kws, msg in _precios_especificos if any(k in _txt_lower for k in kws)),
+                        None,
+                    )
+                    if _respuesta_especifica:
+                        respuesta = (
+                            f"{_respuesta_especifica}\n\n"
+                            "👉 Catálogo completo: https://www.a2kdigitalstudio.online/precios.html"
+                        )
+                    else:
+                        respuesta = (
+                            "¡Claro! Aquí tienes nuestra tabla de precios completa con todos los "
+                            "servicios de A2K Digital Studio 👇\n"
+                            "👉 https://www.a2kdigitalstudio.online/precios.html\n\n"
+                            "Tenemos 4 niveles:\n"
+                            "⭐ Básicos: desde $5\n"
+                            "🔥 Intermedios: desde $20\n"
+                            "💎 Avanzados: desde $60\n"
+                            "👑 Premium: desde $200\n\n"
+                            "¿Sobre qué servicio te gustaría más información? Escríbeme y te ayudo 🤖🔥"
+                        )
+                    _cprint("INFO", f"[TG precios servicios] chat={chat_id[:10]} "
+                            f"({'específico' if _respuesta_especifica else 'genérico'})")
 
                 else:
                     # ── Relay estándar al cloud de catálogos ─────────────────────
@@ -5110,6 +5208,7 @@ if __name__ == "__main__":
         threading.Thread(target=_cierre_diario_automatico,  args=(app,),   daemon=True).start()
         threading.Thread(target=_cron_cobros_sabado,        args=(app,),   daemon=True).start()
         threading.Thread(target=_monitor_tasas_automatico,  args=(app,),   daemon=True).start()
+        threading.Thread(target=_contenido_diario_automatico, args=(app,), daemon=True).start()
 
         # ── Telegram Bot ────────────────────────────────────────────────────
         _tg_bridge.iniciar(

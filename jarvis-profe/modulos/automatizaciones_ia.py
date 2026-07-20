@@ -2,14 +2,17 @@
 automatizaciones_ia.py — Automatizaciones que antes vivian en n8n, portadas a Jarvis
 A2K Digital Studio
 
-Modulo nuevo e independiente: no lo importa jarvis_profe.py ni ningun otro
-modulo existente, asi que no puede romper nada de lo que ya funciona.
-Se ejecuta solo desde los scripts sueltos ejecutar_contenido_diario.py y
-servidor_onboarding.py (o desde donde tu decidas engancharlo mas adelante).
+Se usa desde 3 lugares:
+- jarvis_profe.py (hilo diario de contenido + endpoints /venta-web y /lead-nuevo
+  del servidor ZYNC en el puerto 7799)
+- ejecutar_contenido_diario.py (script suelto, uso manual opcional)
+- servidor_onboarding.py (servidor suelto en :3100, uso manual opcional)
 
 Usa las mismas piezas que ya existen en Jarvis:
 - modulos.config_loader.get_ollama_url() / get_ollama_modelo()  (igual que tecnico.py y vision.py)
-- modulos.whatsapp_zapi.enviar_mensaje()                        (igual que el resto de Jarvis)
+- enviar_mensaje() de aqui mismo → POST a localhost:3099/send-text (el canal
+  WhatsApp real, whatsapp-web.js). NUNCA modulos.whatsapp_zapi — ese es el
+  canal Z-API viejo, confirmado apagado, no usar.
 """
 import json
 from pathlib import Path
@@ -17,11 +20,28 @@ from pathlib import Path
 import requests
 
 from modulos.config_loader import get_ollama_url, get_ollama_modelo, get_ollama_timeout
-from modulos.whatsapp_zapi import enviar_mensaje
 
 # Mismos numeros que usaban los flujos en n8n
 TELEFONO_ABIGAIL = "584126148666"
 TELEFONO_EQUIPO_INTERNO = "584164117331"
+
+
+def enviar_mensaje(numero: str, mensaje: str) -> bool:
+    """
+    Envia WhatsApp via wa-jarvis-service.js (whatsapp-web.js real, puerto 3099).
+    OJO: modulos.whatsapp_zapi es el canal viejo Z-API, confirmado apagado/no
+    usar (ver memoria project_recepcionista_ai) - NO importar ese modulo aqui.
+    """
+    try:
+        resp = requests.post(
+            "http://localhost:3099/send-text",
+            json={"phone": numero, "message": mensaje},
+            timeout=15,
+        )
+        return resp.ok
+    except Exception as e:
+        print(f"[Automatizaciones IA] No se pudo enviar WhatsApp: {e}")
+        return False
 
 
 def _llamar_ollama(system_prompt: str, user_prompt: str) -> dict:
@@ -147,5 +167,53 @@ Responde UNICAMENTE con un JSON valido, sin texto extra, con estas llaves:
             f"{resultado.get('resumen_interno', '')} Documentos a pedir: {docs}"
         )
         enviar_mensaje(TELEFONO_EQUIPO_INTERNO, mensaje)
+
+    return resultado
+
+
+# ── 3. Calificacion de Leads ────────────────────────────────────────────────
+
+def calificar_lead(
+    nombre: str,
+    mensaje: str,
+    empresa: str = "",
+    canal: str = "formulario web",
+    avisar_whatsapp: bool = True,
+) -> dict:
+    """
+    Califica un lead entrante (CALIENTE/TIBIO/FRIO) con IA local y avisa por
+    WhatsApp solo si es CALIENTE, para no saturar con ruido de leads frios.
+    Equivalente al flujo n8n "Respuesta Instantanea de Leads".
+
+    Devuelve: {"categoria", "puntuacion", "razon", "respuesta_sugerida"}
+    """
+    system_prompt = f"""Eres un asistente de calificacion de leads B2B para A2K Digital Studio, una empresa que construye automatizaciones con IA para negocios (recepcionista IA, POS, bots de ventas, landing pages, diseno grafico).
+
+Datos del lead:
+- nombre: {nombre}
+- empresa: {empresa or "no indicada"}
+- canal: {canal}
+- mensaje: {mensaje}
+
+Reglas de calificacion:
+- CALIENTE: menciona un dolor concreto (perdida de clientes, tiempo de respuesta, procesos manuales) o pide precio/demo directamente.
+- TIBIO: pregunta general sobre servicios sin dolor especifico.
+- FRIO: mensaje vago, spam, o sin intencion clara de compra.
+
+Responde UNICAMENTE con un JSON valido, sin texto extra, con estas llaves:
+- "categoria": "CALIENTE" o "TIBIO" o "FRIO"
+- "puntuacion": numero de 0 a 100
+- "razon": explicacion breve de la calificacion (1 frase)
+- "respuesta_sugerida": mensaje corto, profesional y cercano en espanol venezolano, agradeciendo el contacto y proponiendo el siguiente paso. Maximo 3 frases."""
+
+    resultado = _llamar_ollama(system_prompt, "Califica este lead y responde con el JSON pedido.")
+
+    if avisar_whatsapp and resultado.get("categoria") == "CALIENTE":
+        enviar_mensaje(
+            TELEFONO_ABIGAIL,
+            f"🔥 Lead CALIENTE ({resultado.get('puntuacion', '?')}/100) — {nombre}"
+            f"{f' ({empresa})' if empresa else ''}: {resultado.get('razon', '')}\n"
+            f"Mensaje: {mensaje[:200]}",
+        )
 
     return resultado

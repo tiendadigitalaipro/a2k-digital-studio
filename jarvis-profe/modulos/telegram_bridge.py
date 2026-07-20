@@ -53,6 +53,85 @@ def _log(fn, msg: str, tag: str = "info"):
         print(msg)
 
 
+PRECIOS_URL = "https://www.a2kdigitalstudio.online/precios.html"
+# Si el mensaje menciona un producto ZYNC específico, dejamos que el flujo
+# normal (on_texto → ComandoParser / IA) responda el precio puntual.
+_ZYNC_KEYWORDS = ("smartwatch", "smart watch", "reloj", "watch", "microfono",
+                  "micrófono", "k9", "audifono", "audífono", "airmax", "combo")
+_PRECIOS_KEYWORDS = (
+    # preguntas genéricas de precio
+    "precio", "precios", "cuanto cuesta", "cuánto cuesta", "quiero contratar",
+    "servicios", "lista de precios", "tabla de precios", "tarifas", "costos",
+    # nombres de trabajos concretos del catálogo de diseño
+    "volante", "flyer", "tarjeta de presentacion", "tarjetas de presentación",
+    "publicacion", "publicación", "edicion de fotos", "edición de fotos",
+    "landing page", "landing", "branding", "video promocional",
+    "presentacion corporativa", "presentación corporativa",
+    "pagina web", "página web", "sitio web", "bot de ventas",
+    "pack de marketing", "asistente virtual", "catalogo digital",
+    "catálogo digital", "imagen de marca", "automatizacion integral",
+    "automatización integral", "desarrollo web", "ecosistema de bots",
+    "e-commerce", "ecommerce", "tienda online", "logo", "logotipo",
+    "diseño grafico", "diseño gráfico", "identidad visual",
+    "manual de marca", "mockup",
+)
+
+
+def _es_consulta_precios_servicios(texto: str) -> bool:
+    lower = texto.lower()
+    if any(z in lower for z in _ZYNC_KEYWORDS):
+        return False
+    return any(k in lower for k in _PRECIOS_KEYWORDS)
+
+
+# ── Precios exactos verificados en vivo en a2kdigitalstudio.online/precios.html
+# (2026-07-20) — se responden puntuales en vez del resumen genérico por nivel.
+_PRECIOS_ESPECIFICOS = (
+    (
+        ("edicion de fotos", "edición de fotos", "editar fotos", "editar foto"),
+        "🖼️ Edición de fotos básica: $5\n"
+        "Corrección de color · recorte · limpieza de fondo · hasta 3 fotos",
+    ),
+    (
+        ("flyer", "flyers", "volante", "volantes"),
+        "📋 Flyers / Volantes:\n"
+        "• Básico: $10–$18 (1 diseño, texto promocional, logo, 1 ajuste, entrega 24h)\n"
+        "• Profesional: $20–$35 (diseño avanzado, copywriting, iconografía, 2 ajustes, 48h)",
+    ),
+    (
+        ("landing page", "landing"),
+        "🌐 Landing page:\n"
+        "• Básica: $40–$80 (1 sección, responsive, formulario, hosting Vercel gratis, SEO básico)\n"
+        "• Alto impacto: $80–$150 (estructura AIDA, copy persuasivo, CTA, contador, testimonios, pago integrado)",
+    ),
+)
+
+
+def _mensaje_precio_especifico(texto_lower: str) -> str | None:
+    """
+    Si el mensaje pregunta por landing/flyer/edición de fotos, responde con el
+    precio exacto de la página en vez del resumen genérico por nivel.
+    """
+    for keywords, mensaje in _PRECIOS_ESPECIFICOS:
+        if any(k in texto_lower for k in keywords):
+            return mensaje + f"\n\n👉 Catálogo completo: {PRECIOS_URL}"
+    return None
+
+
+def _mensaje_precios_servicios() -> str:
+    return (
+        "¡Claro! Aquí tienes nuestra tabla de precios completa con todos los "
+        "servicios de A2K Digital Studio 👇\n"
+        f"👉 {PRECIOS_URL}\n\n"
+        "Tenemos 4 niveles:\n"
+        "⭐ Básicos: desde $5\n"
+        "🔥 Intermedios: desde $20\n"
+        "💎 Avanzados: desde $60\n"
+        "👑 Premium: desde $200\n\n"
+        "¿Sobre qué servicio te gustaría más información? Escríbeme y te ayudo 🤖🔥"
+    )
+
+
 def _texto_desde_resultado(res) -> str:
     """
     Convierte cualquier tipo de retorno de ComandoParser.procesar() en texto plano
@@ -142,6 +221,14 @@ async def _bot_main(token: str, chat_id: str, on_texto, log_fn):
         if not texto:
             return
         _log(log_fn, f"[TELEGRAM] → '{texto[:80]}'", "info")
+
+        if _es_consulta_precios_servicios(texto):
+            especifico = _mensaje_precio_especifico(texto.lower())
+            await update.message.reply_text(especifico or _mensaje_precios_servicios())
+            _log(log_fn, "[TELEGRAM] Precio de servicios enviado"
+                 + (" (específico)" if especifico else " (tabla genérica)"), "ok")
+            return
+
         try:
             res      = await loop.run_in_executor(None, on_texto, texto)
             respuesta = _texto_desde_resultado(res)
@@ -271,12 +358,12 @@ async def _bot_main(token: str, chat_id: str, on_texto, log_fn):
             "/deudores — Clientes con deuda\n\n"
             "💳 <b>Cobros:</b>\n"
             "/cobrar [monto] [concepto] — Enlace de pago\n"
-            "   <i>Ej: /cobrar 45.50 Reloj Smartwatch</i>\n\n"
+            "   <i>Ej: /cobrar 45.50 Reloj Smartwatch</i>\n"
+            "/clientenuevo tel|nombre|empresa|rubro|servicio — Onboarding\n\n"
             "🔥 <b>Contenido Viral:</b>\n"
             "/viral [tema] [plataforma] — Busca videos virales\n"
             "   <i>Ej: /viral barberia tiktok</i>\n"
             "   <i>Ej: /viral sistema pos youtube</i>\n\n"
-            "🔍 /status [id] — Estado de un pago\n"
             "📸 /screen — Captura pantalla Jarvis\n\n"
             "💬 Cualquier mensaje se procesa con IA.",
             parse_mode="HTML",
@@ -341,24 +428,48 @@ async def _bot_main(token: str, chat_id: str, on_texto, log_fn):
         )
         _log(log_fn, f"[TELEGRAM] /cobrar formulario enviado — ref={ref} monto={monto}", "ok")
 
-    # ── Comando /status — consulta estado de pago PágueloFácil ───────────────
-    async def _cmd_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    # ── Comando /clientenuevo — dispara onboarding real tras confirmar pago ──
+    async def _cmd_cliente_nuevo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         if not await _autorizado(update):
             return
-        partes = (update.message.text or "").strip().split(None, 1)
-        if len(partes) < 2:
+        texto_cmd = (update.message.text or "").split(None, 1)
+        if len(texto_cmd) < 2 or "|" not in texto_cmd[1]:
             await update.message.reply_text(
-                "⚠️ Uso: /status [id_transaccion]\nEjemplo: /status TXN-20260605-1234"
+                "⚠️ Uso: /clientenuevo telefono|nombre|empresa|rubro|servicio\n"
+                "Ej: /clientenuevo 584121234567|Juan Perez|Barberia Los Amigos|barberia|Recepcionista IA"
             )
             return
-        tx_id = partes[1].strip()
-        _log(log_fn, f"[TELEGRAM] /status {tx_id}", "info")
+
+        partes = [p.strip() for p in texto_cmd[1].split("|")]
+        while len(partes) < 5:
+            partes.append("")
+        telefono, nombre, empresa, rubro, servicio = partes[:5]
+
+        if not telefono or not nombre:
+            await update.message.reply_text("⚠️ Falta el teléfono o el nombre. Formato: telefono|nombre|empresa|rubro|servicio")
+            return
+
+        await update.message.reply_text(f"⏳ Generando onboarding para {nombre}...")
         try:
-            from modulos.paguelofacil_suite import consultar_estado_pago
-            estado = await loop.run_in_executor(None, consultar_estado_pago, tx_id)
-            await update.message.reply_text(f"🔍 Estado de {tx_id}:\n{estado}")
+            from modulos.automatizaciones_ia import onboarding_cliente, enviar_mensaje
+            resultado = onboarding_cliente(
+                nombre=nombre,
+                empresa=empresa or "su negocio",
+                rubro=rubro or "servicios profesionales",
+                servicio_contratado=servicio or "el servicio contratado",
+                cerrado_por="Abigail",
+            )
+            enviar_mensaje(telefono.replace("+", "").strip(), resultado["bienvenida_cliente"])
+            docs = "\n".join(f"• {d}" for d in resultado.get("documentos_requeridos", []))
+            await update.message.reply_text(
+                f"✅ Bienvenida enviada a +{telefono}\n\n"
+                f"📋 Documentos a pedirle:\n{docs}\n\n"
+                f"🏢 Responsable: {resultado.get('departamento_responsable', '?')}"
+            )
+            _log(log_fn, f"[TELEGRAM] /clientenuevo → {nombre} ({telefono})", "ok")
         except Exception as exc:
-            await update.message.reply_text(f"⚠️ Error consultando pago: {exc}")
+            await update.message.reply_text(f"⚠️ Error generando onboarding: {exc}")
+            _log(log_fn, f"[TELEGRAM] /clientenuevo error: {exc}", "err")
 
     # ── Comando /screen — captura de pantalla ─────────────────────────────────
     async def _cmd_screen(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -812,9 +923,9 @@ async def _bot_main(token: str, chat_id: str, on_texto, log_fn):
     app.add_handler(CommandHandler("resumen",                        _cmd_resumen))
     app.add_handler(CommandHandler("deudores",                       _cmd_deudores))
     app.add_handler(CommandHandler("cobrar",                         _cmd_cobrar))
+    app.add_handler(CommandHandler("clientenuevo",                   _cmd_cliente_nuevo))
     app.add_handler(CommandHandler("inv",                            _cmd_inv))
     app.add_handler(CommandHandler("viral",                          _cmd_viral))
-    app.add_handler(CommandHandler("status",                         _cmd_status))
     app.add_handler(CommandHandler("screen",                         _cmd_screen))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, _handle_texto))
     app.add_handler(MessageHandler(filters.PHOTO,                   _handle_foto))
