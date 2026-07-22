@@ -115,3 +115,27 @@ El flujo `02-asistente-ejecutivo-gmail-calendario` es el único que requiere tra
 ## Cómo reimportar a n8n si hace falta
 
 Panel de n8n → Workflows → Import from File → seleccionar el `.json` correspondiente de esta carpeta.
+
+---
+
+# Backup de flujos n8n (2026-07-20/21) — demos B2B para rubros nuevos
+
+A pedido explícito de Abigail ("enfócate en otros rubros de otras empresas importantes, olvídate de barbería/bodega/farmacia/lo que hacemos"), se crearon estos 4 flujos nuevos en n8n Cloud para vender A2K a verticales que la empresa NO atiende hoy. Mismo patrón técnico que los 4 de arriba (Ollama local vía túnel cloudflared + WhatsApp + Google Calendar), reutilizando la credencial de Google Calendar ya autorizada.
+
+| Archivo | Flujo | Trigger en n8n |
+|---|---|---|
+| `05-triage-medico-clinicas.json` | Clasifica mensajes de pacientes (urgencia/cita nueva/confirmación), notifica a la guardia y agenda en Calendar | Webhook `mensaje-paciente-clinica` |
+| `06-captacion-legal-bufetes.json` | Califica consultas legales entrantes por área de práctica y urgencia, notifica al socio senior si es urgente | Webhook `consulta-legal-nueva` |
+| `07-calificacion-leads-inmobiliaria.json` | Califica leads interesados en propiedades y agenda visita automática en Calendar si están listos para comprar | Webhook `interes-propiedad-nuevo` |
+| `08-notificacion-envios-logistica.json` | Redacta actualizaciones de estado de envío para el cliente y alerta al gerente de cuenta si hay retraso | Webhook `actualizacion-envio` |
+
+Mismo patrón interno que los primeros 4:
+```
+webhook → armar prompt → IA local (Ollama, qwen2.5:3b vía tunel cloudflared) → parsear JSON → enrutar (switch/if) → acción (WhatsApp / Calendar) → responder al webhook
+```
+
+**Diferencia con los 4 anteriores:** estos usan además el nodo `n8n-nodes-base.googleCalendar` (con la credencial de Google Calendar ya conectada en la cuenta de n8n) para revisar disponibilidad y crear eventos — no son solo IA + WhatsApp.
+
+Los nodos HTTP Request hacia Ollama y WhatsApp siguen en `placeholder()` — hay que poner la URL del túnel cloudflared activo antes de una demo en vivo, las URLs viejas de sesiones anteriores ya no sirven.
+
+Los videos demo de estos 4 (intro Canva + grabación real del canvas/ejecución en n8n + narración) están en `Desktop\Videos-Productos\intros-b2b-n8n\` en la laptop de Abigail (no en este repo, son archivos de video pesados).
