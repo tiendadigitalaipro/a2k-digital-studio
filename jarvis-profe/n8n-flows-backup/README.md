@@ -139,3 +139,28 @@ webhook → armar prompt → IA local (Ollama, qwen2.5:3b vía tunel cloudflared
 Los nodos HTTP Request hacia Ollama y WhatsApp siguen en `placeholder()` — hay que poner la URL del túnel cloudflared activo antes de una demo en vivo, las URLs viejas de sesiones anteriores ya no sirven.
 
 Los videos demo de estos 4 (intro Canva + grabación real del canvas/ejecución en n8n + narración) están en `Desktop\Videos-Productos\intros-b2b-n8n\` en la laptop de Abigail (no en este repo, son archivos de video pesados).
+
+---
+
+# Backup de flujos n8n (2026-07-27) — 8 workflows nuevos por rubro (creados 2026-07-22)
+
+Respaldo de emergencia antes de que venza la prueba gratis de n8n Cloud. Estos 8 workflows se crearon el 2026-07-22 para nuevos rubros (no B2B legal/clínicas/inmobiliaria/logística de la tanda anterior). Mismo patrón técnico: webhook/cron → IA local (Ollama qwen2.5:3b vía túnel cloudflared) → parsear JSON → acción (WhatsApp / publicar en redes). Las URLs de túnel siguen en `placeholder()` salvo donde se indica.
+
+| Archivo | Flujo | Rubro | Video demo |
+|---|---|---|---|
+| `09-obraviva-contratistas-construccion.json` | ObraViva | Contratistas/Construcción | `DEMO-ObraViva-FINAL.mp4` — intro pendiente de rehacer (rechazada) |
+| `10-gympulse-gimnasios-fitness.json` | GymPulse | Gimnasios/Estudios Fitness | `DEMO-GymPulse-FINAL.mp4` — intro pendiente de rehacer (rechazada) |
+| `11-petpro-auto-servicios-mascotas.json` | PetPro Auto | Servicios para Mascotas | `DEMO-PetProAuto-FINAL.mp4` — intro pendiente de rehacer (rechazada) |
+| `12-courselaunchos-cursos-coaches.json` | CourseLaunchOS | Creadores de Cursos/Coaches | `DEMO-CourseLaunchOS-FINAL.mp4` — intro pendiente de rehacer (rechazada) |
+| `13-propertyautopilot-inmobiliarias-video-tours.json` | PropertyAutoPilot | Inmobiliarias (video tours IA) | 🔴 sin terminar — bloqueado por cuota de Canva agotada |
+| `14-autostock-social-concesionarias.json` | AutoStock Social | Concesionarias de Vehículos | `DEMO-AutoStock-FINAL.mp4` — ✅ listo, publicado en LinkedIn 2026-07-27 |
+| `15-medspas-content-engine-estetica-medica.json` | MedSpas Content Engine | Estética Médica (compliance) | `DEMO-MedSpas-FINAL.mp4` — ✅ listo, publicado en LinkedIn 2026-07-27 |
+| `16-travelmomentum-turismo-aventura.json` | TravelMomentum | Turismo/Aventura | `DEMO-TravelMomentum-FINAL.mp4` — ✅ listo |
+
+Todos los videos FINAL están en `C:\Users\ASUS\Videos\Videos-Productos\Nuevos videos Demo\` (no en este repo).
+
+**Nota sobre "Competitor Intelligence Brief"** (`fvTxRG4MlCUH5RK3` en n8n): existe en la cuenta de n8n pero **no se pudo exportar** — el MCP devuelve `"Workflow is not available in MCP. Enable MCP access from the workflow card"`. No tiene descripción tipo demo B2B como los demás ni video asociado; parece un workflow interno/incompleto, no parte de la serie de contenido. Si se necesita respaldar, hay que habilitar el acceso MCP manualmente desde la tarjeta del workflow en n8n antes de que venza la prueba.
+
+## Cómo reimportar a n8n si hace falta
+
+Panel de n8n → Workflows → Import from File → seleccionar el `.json` correspondiente de esta carpeta.
