@@ -161,6 +161,30 @@ Todos los videos FINAL están en `C:\Users\ASUS\Videos\Videos-Productos\Nuevos v
 
 **Nota sobre "Competitor Intelligence Brief"** (`fvTxRG4MlCUH5RK3` en n8n): existe en la cuenta de n8n pero **no se pudo exportar** — el MCP devuelve `"Workflow is not available in MCP. Enable MCP access from the workflow card"`. No tiene descripción tipo demo B2B como los demás ni video asociado; parece un workflow interno/incompleto, no parte de la serie de contenido. Si se necesita respaldar, hay que habilitar el acceso MCP manualmente desde la tarjeta del workflow en n8n antes de que venza la prueba.
 
+---
+
+# Backup de flujos n8n (2026-07-27) — 11 workflows nuevos por rubro (creados 2026-07-27)
+
+Respaldo de emergencia antes de que venza la prueba gratis de n8n Cloud. Estos 11 workflows se crearon el mismo día 2026-07-27 para rubros aún sin cubrir (a pedido de Abigail: "con todos lo que se puedan alcanzar hacer"). Mismo patrón técnico que los anteriores: webhook nuevo evento → IA triaje/confirmación (fan-out a WhatsApp cliente + respond webhook) + 2 crons de automatización recurrente + webhook de respuestas → IA clasifica → notifica equipo interno. Las URLs de túnel siguen en `placeholder()`.
+
+| Archivo | Flujo | Rubro | ID n8n |
+|---|---|---|---|
+| `17-homeservices-plomeria-electricidad-hvac.json` | HomeServices Rapid | Plomería/Electricidad/HVAC | `by49hSHXqh9gWmbA` |
+| `18-dentalcare-flow-clinicas-dentales.json` | DentalCare Flow | Clínicas Dentales | `FDOj2BLqIOr9f3Pj` |
+| `19-vetcare-pro-clinicas-veterinarias.json` | VetCare Pro | Veterinarias | `h8pcw2WKYcsXHwhY` |
+| `20-beautybook-flow-salones-belleza-peluquerias.json` | BeautyBook Flow | Salones de Belleza/Peluquerías | `2ofdAjhOFi6osEhM` |
+| `21-cleanroute-pro-servicios-limpieza.json` | CleanRoute Pro | Servicios de Limpieza | `ox26bqubiadVH4RS` |
+| `22-taxflow-assist-contadores-bookkeeping.json` | TaxFlow Assist | Contadores/Bookkeeping | `aWLlmIIfH8gnAKVa` |
+| `23-insurelead-engine-agencias-seguros.json` | InsureLead Engine | Agencias de Seguros | `Z0yjy0xuU0dGsJXP` |
+| `24-moveeasy-dispatch-empresas-mudanza.json` | MoveEasy Dispatch | Empresas de Mudanza | `Pp3KViSINIcWMJaX` |
+| `25-rehabtrack-flow-fisioterapia-rehabilitacion.json` | RehabTrack Flow | Fisioterapia/Rehabilitación | `uxG5Yvwm5j5bATAt` |
+| `26-autofix-diagnostic-talleres-mecanicos.json` | AutoFix Diagnostic | Talleres Mecánicos | `3skvCKvARWN9AOeD` |
+| `27-chemsupply-connect-fabricantes-quimicos-aseo-limpieza.json` | ChemSupply Connect | Fabricantes Químicos/Aseo/Limpieza (idea de Abigail) | `sKrJ49jhmr1KQu3j` |
+
+Todos en el proyecto n8n "Abigail Jose <ceo@a2kdigitalstudio.online>" (`42MAy5o1NWPJjqFg`), cuenta `a2kdigitalstudio2025.app.n8n.cloud`.
+
+**Pendiente:** ningún video creado todavía para estos 11 (mismo bloqueo esperado de cuota Canva agotada). Facebook sigue bloqueado por captcha.
+
 ## Cómo reimportar a n8n si hace falta
 
 Panel de n8n → Workflows → Import from File → seleccionar el `.json` correspondiente de esta carpeta.
