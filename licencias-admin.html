@@ -182,7 +182,8 @@ tr:hover td{background:var(--bg4)}
       <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px">Licencia creada — copia y envía al cliente</div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <span class="key-code" id="cr-key-display" onclick="copiarKey(this.textContent)" title="Clic para copiar"></span>
-        <button class="btn btn-ghost btn-sm" onclick="copiarKey(document.getElementById('cr-key-display').textContent)">📋 Copiar</button>
+        <button class="btn btn-ghost btn-sm" onclick="copiarKey(document.getElementById('cr-key-display').textContent)">📋 Copiar código</button>
+        <button class="btn btn-ghost btn-sm" onclick="copiarMensajeCompleto()">📋 Copiar mensaje completo</button>
         <button class="btn btn-ghost btn-sm" onclick="enviarPorWA()">💬 Enviar por WhatsApp</button>
       </div>
       <div id="cr-info" style="font-size:12px;color:var(--text2);margin-top:8px"></div>
@@ -269,6 +270,16 @@ const NOMBRES = {
   zync:'ZYNC Electronics', dental:'Zync Dental Pro', ferreteria:'Ferretería Zync',
   mercado:'Mercado Logic Pro', fruteria:'Frutería Pro', motos:'Repuestos Motos Pro',
   synthtrade:'SynthTrade Pro', fiadospro:'FiadosPro'
+};
+
+// Página de descarga/acceso de cada producto — se va llenando a medida que
+// cada app tiene su página propia. Si un producto no tiene link todavía,
+// se omite la línea de descarga en el mensaje de WhatsApp.
+const LINKS = {
+  barberia: 'https://tiendadigitalaipro.github.io/barberflow/',
+  bodega: '', comandas: '', nail: '', farmacia: '', recepcionista: '',
+  zync: '', dental: '', ferreteria: '', mercado: '', fruteria: '',
+  motos: '', synthtrade: '', fiadospro: ''
 };
 
 // ── Verificar conexión ──
@@ -417,9 +428,14 @@ async function crearLicencia(){
   crTelefonoActual = telefono;
 
   document.getElementById('cr-key-display').textContent = d.key;
+  const link = LINKS[product];
+  const linkHtml = link
+    ? `<br>Link de descarga: <span class="key-code" onclick="copiarKey('${link}')" title="Clic para copiar" style="color:var(--blue)">${link}</span>`
+    : `<br><span style="color:var(--warn)">⚠ Este producto todavía no tiene link de descarga configurado</span>`;
   document.getElementById('cr-info').innerHTML =
     `Cliente: <strong>${cliente}</strong> · Sistema: <strong>${NOMBRES[product]||product}</strong> · ` +
-    (type==='demo' ? `Vence: <strong>${d.expires}</strong>` : `Licencia <strong>PERMANENTE</strong>`);
+    (type==='demo' ? `Vence: <strong>${d.expires}</strong>` : `Licencia <strong>PERMANENTE</strong>`) +
+    linkHtml;
   document.getElementById('cr-resultado').style.display = 'block';
 
   toast(`Licencia ${type.toUpperCase()} creada para ${cliente}`);
@@ -461,10 +477,17 @@ function copiarKey(key){
   navigator.clipboard.writeText(key).then(()=>toast(`Copiado: ${key}`));
 }
 
+// ── Armar mensaje para el cliente (licencia + link) ──
+function armarMensaje(product, key){
+  const nombre = NOMBRES[product]||product;
+  const link = LINKS[product];
+  const lineaLink = link ? `\n\nDescárgala aquí:\n${link}` : '';
+  return `Hola! Aquí tu acceso a ${nombre}:${lineaLink}\n\nCódigo de licencia:\n*${key}*\n\nInstala la app y activa la licencia con ese código. Cualquier duda escríbeme.\n— A2K Digital Studio`;
+}
+
 // ── WhatsApp cliente ──
 function waCliente(tel, key, product){
-  const nombre = NOMBRES[product]||product;
-  const msg = encodeURIComponent(`Hola! Aquí tu código de acceso para ${nombre}:\n\n*${key}*\n\nÁbrelo en la app e ingresa este código. Cualquier duda escríbeme.\n— A2K Digital Studio`);
+  const msg = encodeURIComponent(armarMensaje(product, key));
   window.open(`https://wa.me/${tel.replace(/\D/g,'')}?text=${msg}`, '_blank');
 }
 
@@ -472,6 +495,12 @@ function waCliente(tel, key, product){
 function enviarPorWA(){
   if(!crTelefonoActual){ toast('No hay teléfono registrado para este cliente','danger'); return; }
   waCliente(crTelefonoActual, crKeyActual, crProductoActual);
+}
+
+// ── Copiar mensaje completo (desde creación) ──
+function copiarMensajeCompleto(){
+  const msg = armarMensaje(crProductoActual, crKeyActual);
+  navigator.clipboard.writeText(msg).then(()=>toast('Mensaje copiado — pégalo donde quieras enviarlo'));
 }
 
 // ── Modal confirmar ──
