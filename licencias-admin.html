@@ -97,7 +97,19 @@ tr:hover td{background:var(--bg4)}
 @media(max-width:600px){
   .crear-grid{grid-template-columns:1fr}
   .acciones{justify-content:center}
-  td:nth-child(5),th:nth-child(5){display:none}
+}
+/* En pantalla angosta, cada <tr> de la tabla de licencias se convierte en
+   una tarjeta apilada (sin tabla horizontal ni scroll lateral) — la
+   etiqueta de cada dato sale del atributo data-label puesto en cada <td>
+   desde renderTabla(). */
+@media(max-width:640px){
+  .tabla-wrap{background:transparent;border:none}
+  table,thead,tbody,tr,td{display:block;width:100%}
+  thead{display:none}
+  tbody tr{background:var(--bg3);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;padding:14px 16px}
+  tbody td{border-top:none;padding:7px 0}
+  tbody td::before{content:attr(data-label);display:block;color:var(--text3);font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+  td[data-label="Acciones"] .acciones{justify-content:flex-start}
 }
 .empty{text-align:center;padding:40px;color:var(--text3)}
 .empty-icon{font-size:40px;margin-bottom:12px}
@@ -278,7 +290,7 @@ const NOMBRES = {
 const LINKS = {
   barberia: 'https://tiendadigitalaipro.github.io/barberflow/',
   bodega: '', comandas: '', nail: '', farmacia: '', recepcionista: '',
-  zync: '', dental: '', ferreteria: '', mercado: '', fruteria: '',
+  zync: 'https://tiendadigitalaipro.github.io/zyncelectronics/', dental: '', ferreteria: '', mercado: '', fruteria: '',
   motos: '', synthtrade: '', fiadospro: ''
 };
 
@@ -377,12 +389,12 @@ function renderTabla(lics){
     }
     const tel = l.telefono ? `<br><span style="color:var(--text3);font-size:11px">${l.telefono}</span>` : '';
     return `<tr>
-      <td><span class="key-code" onclick="copiarKey('${l.key}')" title="Clic para copiar">${l.key}</span></td>
-      <td>${l.cliente||'—'}${tel}</td>
-      <td style="color:var(--text2)">${nombre}</td>
-      <td>${badge}</td>
-      <td>${diasHtml}</td>
-      <td><div class="acciones">
+      <td data-label="Código"><span class="key-code" onclick="copiarKey('${l.key}')" title="Clic para copiar">${l.key}</span></td>
+      <td data-label="Cliente">${l.cliente||'—'}${tel}</td>
+      <td data-label="Sistema" style="color:var(--text2)">${nombre}</td>
+      <td data-label="Tipo / Estado">${badge}</td>
+      <td data-label="Vencimiento">${diasHtml}</td>
+      <td data-label="Acciones"><div class="acciones">
         ${l.type==='demo'&&l.activa?`<button class="btn btn-pro btn-sm" onclick="activarPRO('${l.key}','${l.cliente}')">↑ PRO</button>`:''}
         ${l.activa?`<button class="btn btn-danger btn-sm" onclick="revocarLic('${l.key}','${l.cliente}')">✕ Revocar</button>`:''}
         <button class="btn btn-ghost btn-sm" onclick="copiarKey('${l.key}')">📋</button>
