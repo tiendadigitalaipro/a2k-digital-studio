@@ -176,6 +176,14 @@ tr:hover td{background:var(--bg4)}
         </select>
       </div>
       <div class="form-group">
+        <label class="form-label">Plataforma</label>
+        <select id="cr-plataforma">
+          <option value="">Ambas / no aplica</option>
+          <option value="android">📱 Android</option>
+          <option value="pc">🖥️ PC</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label class="form-label">Nombre del cliente</label>
         <input type="text" id="cr-cliente" placeholder="Ej: Bodega El Sol">
       </div>
@@ -275,6 +283,7 @@ let crKeyActual = '';
 let crProductoActual = '';
 let crClienteActual = '';
 let crTelefonoActual = '';
+let crPlataformaActual = '';
 
 const NOMBRES = {
   barberia:'Barbería Pro', bodega:'Bodega Pro', comandas:'A2K Comandas',
@@ -287,12 +296,30 @@ const NOMBRES = {
 // Página de descarga/acceso de cada producto — se va llenando a medida que
 // cada app tiene su página propia. Si un producto no tiene link todavía,
 // se omite la línea de descarga en el mensaje de WhatsApp.
+// Un producto puede tener un solo link (string) o uno por plataforma
+// ({android, pc}) cuando el mismo código de licencia sirve para ambas
+// apps (ej. Bodega Pro: app móvil Flutter + versión web para PC).
 const LINKS = {
   barberia: 'https://tiendadigitalaipro.github.io/barberflow/',
-  bodega: 'https://tiendadigitalaipro.github.io/bodegapro/', comandas: '', nail: 'https://tiendadigitalaipro.github.io/nailstudiopro/', farmacia: '', recepcionista: '',
+  bodega: { android: 'https://tiendadigitalaipro.github.io/bodegapro/', pc: 'https://tiendadigitalaipro.github.io/bodega-pro-v9/' },
+  comandas: '', nail: 'https://tiendadigitalaipro.github.io/nailstudiopro/', farmacia: '', recepcionista: '',
   zync: 'https://tiendadigitalaipro.github.io/zyncelectronics/', dental: '', ferreteria: '', mercado: 'https://tiendadigitalaipro.github.io/mercadologicopro/', fruteria: 'https://tiendadigitalaipro.github.io/fruteriapro/',
   motos: '', synthtrade: '', fiadospro: ''
 };
+
+const PLATAFORMA_LABEL = { android: '📱 Android', pc: '🖥️ PC', '': '' };
+
+// Resuelve el o los links a mostrar para un producto+plataforma.
+// Devuelve un array de {label, url} (1 elemento normalmente, 2 si no se
+// especificó plataforma en un producto que tiene ambas).
+function resolverLinks(product, plataforma){
+  const entry = LINKS[product];
+  if(!entry) return [];
+  if(typeof entry === 'string') return entry ? [{label:'', url: entry}] : [];
+  // entry es {android, pc}
+  if(plataforma && entry[plataforma]) return [{label: PLATAFORMA_LABEL[plataforma], url: entry[plataforma]}];
+  return Object.entries(entry).filter(([,url])=>url).map(([plat,url])=>({label: PLATAFORMA_LABEL[plat], url}));
+}
 
 // ── Verificar conexión ──
 async function verificarConexion(){
@@ -388,17 +415,18 @@ function renderTabla(lics){
       }
     }
     const tel = l.telefono ? `<br><span style="color:var(--text3);font-size:11px">${l.telefono}</span>` : '';
+    const plat = l.plataforma ? `<br><span style="color:var(--text3);font-size:11px">${PLATAFORMA_LABEL[l.plataforma]}</span>` : '';
     return `<tr>
       <td data-label="Código"><span class="key-code" onclick="copiarKey('${l.key}')" title="Clic para copiar">${l.key}</span></td>
       <td data-label="Cliente">${l.cliente||'—'}${tel}</td>
-      <td data-label="Sistema" style="color:var(--text2)">${nombre}</td>
+      <td data-label="Sistema" style="color:var(--text2)">${nombre}${plat}</td>
       <td data-label="Tipo / Estado">${badge}</td>
       <td data-label="Vencimiento">${diasHtml}</td>
       <td data-label="Acciones"><div class="acciones">
         ${l.type==='demo'&&l.activa?`<button class="btn btn-pro btn-sm" onclick="activarPRO('${l.key}','${l.cliente}')">↑ PRO</button>`:''}
         ${l.activa?`<button class="btn btn-danger btn-sm" onclick="revocarLic('${l.key}','${l.cliente}')">✕ Revocar</button>`:''}
         <button class="btn btn-ghost btn-sm" onclick="copiarKey('${l.key}')">📋</button>
-        ${l.telefono?`<button class="btn btn-ghost btn-sm" onclick="waCliente('${l.telefono}','${l.key}','${l.product}')">💬</button>`:''}
+        ${l.telefono?`<button class="btn btn-ghost btn-sm" onclick="waCliente('${l.telefono}','${l.key}','${l.product}','${l.plataforma||''}')">💬</button>`:''}
       </div></td>
     </tr>`;
   }).join('');
@@ -422,6 +450,7 @@ function filtrarTabla(){
 async function crearLicencia(){
   const product = document.getElementById('cr-product').value;
   const type    = document.getElementById('cr-type').value;
+  const plataforma = document.getElementById('cr-plataforma').value;
   const cliente = document.getElementById('cr-cliente').value.trim();
   const telefono= document.getElementById('cr-telefono').value.trim();
   if(!cliente){ toast('Ingresa el nombre del cliente'); return; }
@@ -429,7 +458,7 @@ async function crearLicencia(){
   const r = await fetch(`${ENGINE}/crear`, {
     method:'POST',
     headers:{'Content-Type':'application/json','X-Admin-Key':ADMIN_KEY},
-    body: JSON.stringify({product,type,cliente,telefono})
+    body: JSON.stringify({product,type,cliente,telefono,plataforma})
   });
   const d = await r.json();
   if(!d.ok){ toast('Error: '+d.error,'danger'); return; }
@@ -438,14 +467,16 @@ async function crearLicencia(){
   crProductoActual = product;
   crClienteActual  = cliente;
   crTelefonoActual = telefono;
+  crPlataformaActual = plataforma;
 
   document.getElementById('cr-key-display').textContent = d.key;
-  const link = LINKS[product];
-  const linkHtml = link
-    ? `<br>Link de descarga: <span class="key-code" onclick="copiarKey('${link}')" title="Clic para copiar" style="color:var(--blue)">${link}</span>`
+  const links = resolverLinks(product, plataforma);
+  const linkHtml = links.length
+    ? links.map(l => `<br>Link de descarga${l.label?` (${l.label})`:''}: <span class="key-code" onclick="copiarKey('${l.url}')" title="Clic para copiar" style="color:var(--blue)">${l.url}</span>`).join('')
     : `<br><span style="color:var(--warn)">⚠ Este producto todavía no tiene link de descarga configurado</span>`;
   document.getElementById('cr-info').innerHTML =
-    `Cliente: <strong>${cliente}</strong> · Sistema: <strong>${NOMBRES[product]||product}</strong> · ` +
+    `Cliente: <strong>${cliente}</strong> · Sistema: <strong>${NOMBRES[product]||product}</strong>` +
+    (plataforma ? ` · Plataforma: <strong>${PLATAFORMA_LABEL[plataforma]}</strong>` : '') + ' · ' +
     (type==='demo' ? `Vence: <strong>${d.expires}</strong>` : `Licencia <strong>PERMANENTE</strong>`) +
     linkHtml;
   document.getElementById('cr-resultado').style.display = 'block';
@@ -489,29 +520,31 @@ function copiarKey(key){
   navigator.clipboard.writeText(key).then(()=>toast(`Copiado: ${key}`));
 }
 
-// ── Armar mensaje para el cliente (licencia + link) ──
-function armarMensaje(product, key){
+// ── Armar mensaje para el cliente (licencia + link[es]) ──
+function armarMensaje(product, key, plataforma){
   const nombre = NOMBRES[product]||product;
-  const link = LINKS[product];
-  const lineaLink = link ? `\n\nDescárgala aquí:\n${link}` : '';
+  const links = resolverLinks(product, plataforma);
+  const lineaLink = links.length
+    ? '\n\n' + links.map(l => `Descárgala aquí${l.label?` (${l.label})`:''}:\n${l.url}`).join('\n\n')
+    : '';
   return `Hola! Aquí tu acceso a ${nombre}:${lineaLink}\n\nCódigo de licencia:\n*${key}*\n\nInstala la app y activa la licencia con ese código. Cualquier duda escríbeme.\n— A2K Digital Studio`;
 }
 
 // ── WhatsApp cliente ──
-function waCliente(tel, key, product){
-  const msg = encodeURIComponent(armarMensaje(product, key));
+function waCliente(tel, key, product, plataforma){
+  const msg = encodeURIComponent(armarMensaje(product, key, plataforma));
   window.open(`https://wa.me/${tel.replace(/\D/g,'')}?text=${msg}`, '_blank');
 }
 
 // ── Enviar por WA (desde creación) ──
 function enviarPorWA(){
   if(!crTelefonoActual){ toast('No hay teléfono registrado para este cliente','danger'); return; }
-  waCliente(crTelefonoActual, crKeyActual, crProductoActual);
+  waCliente(crTelefonoActual, crKeyActual, crProductoActual, crPlataformaActual);
 }
 
 // ── Copiar mensaje completo (desde creación) ──
 function copiarMensajeCompleto(){
-  const msg = armarMensaje(crProductoActual, crKeyActual);
+  const msg = armarMensaje(crProductoActual, crKeyActual, crPlataformaActual);
   navigator.clipboard.writeText(msg).then(()=>toast('Mensaje copiado — pégalo donde quieras enviarlo'));
 }
 
